@@ -12,12 +12,20 @@ export default function MerchantLoginPage() {
           Iniciar sesion
         </h1>
         <LoginForm />
-        <p className="muted" style={{ marginTop: 18 }}>
-          No tienes tienda?{" "}
-          <Link href="/panel/registro" style={{ color: "white", fontWeight: 700 }}>
-            Crear cuenta de comerciante
-          </Link>
-        </p>
+        <section className="panel" style={{ marginTop: 18, padding: 18 }}>
+          <p style={{ fontWeight: 700, margin: "0 0 6px" }}>Aun no tienes cuenta?</p>
+          <p className="muted" style={{ margin: "0 0 16px" }}>
+            Elige el tipo de cuenta que necesitas para continuar.
+          </p>
+          <div className="grid-auto">
+            <Link className="btn btn-dark" href="/cuenta/registro">
+              Crear cuenta de cliente
+            </Link>
+            <Link className="btn" href="/panel/registro">
+              Crear cuenta de comerciante
+            </Link>
+          </div>
+        </section>
       </section>
     </main>
   );
