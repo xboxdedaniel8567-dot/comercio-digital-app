@@ -83,6 +83,9 @@ type ProductRow = {
   categories: {
     name: string;
   } | null;
+  product_images: {
+    url: string;
+  }[];
 };
 
 function formatPrice(price: number | null, currency: string) {
@@ -149,90 +152,137 @@ export default async function StorePage({ params }: StorePageProps) {
   return (
     <main className="shell">
       <AppHeader />
-      <section className="container section">
-        <div className="panel">
+      <div className="container store-page">
+        <section className="store-hero">
           {business.cover_url ? (
-            <img alt={`Portada de ${business.name}`} src={business.cover_url} style={{ aspectRatio: "16 / 5", display: "block", objectFit: "cover", width: "100%" }} />
-          ) : null}
-          <div style={{ padding: 28 }}>
-          <div style={{ alignItems: "center", display: "flex", flexWrap: "wrap", gap: 18 }}>
-            {business.logo_url ? (
-              <img alt={`Logo de ${business.name}`} src={business.logo_url} style={{ aspectRatio: "1", border: "1px solid var(--line)", objectFit: "cover", width: 96 }} />
-            ) : null}
-            <div>
-              <p className="kicker">{business.categories?.name ?? "Sin categoria"}</p>
-              <h1 style={{ fontSize: "clamp(2rem, 5vw, 4.4rem)", margin: "10px 0" }}>{business.name}</h1>
-            </div>
-          </div>
-          <p className="muted">{business.description}</p>
-          <p className="muted">{business.address}</p>
-          {business.neighborhood ? <p className="muted">Barrio: {business.neighborhood}</p> : null}
-          {business.shopping_center ? (
-            <p className="muted">
-              {business.shopping_center}
-              {business.floor ? ` - Piso ${business.floor}` : ""}
-              {business.local_number ? ` - Local ${business.local_number}` : ""}
-            </p>
-          ) : null}
-          {business.landmark ? <p className="muted">Referencia: {business.landmark}</p> : null}
-          <p>{business.city}</p>
-          <p>WhatsApp: {business.whatsapp}</p>
-          <BusinessOpenStatus hours={hours} />
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-            <ContactButton
-              businessId={business.id}
-              businessName={business.name}
-              label="Contactar tienda"
-              message={message}
-              source="store_detail"
-              whatsapp={business.whatsapp}
-            />
-            <DirectionsLink address={business.address} city={business.city} />
-          </div>
-          <div style={{ marginTop: 14 }}>
-            <ReportButton
-              returnPath={`/tiendas/${business.slug}`}
-              targetId={business.id}
-              targetName={business.name}
-              targetType="business"
-            />
-          </div>
-          </div>
-        </div>
-        <section style={{ marginTop: 32 }}>
-          <h2>Horario de atencion</h2>
-          {hours.length > 0 ? (
-            <div className="grid-auto" style={{ marginTop: 16 }}>
-              {hours.map((day) => (
-                <div
-                  key={day.day_of_week}
-                  style={{ borderTop: "1px solid var(--line)", paddingTop: 12 }}
-                >
-                  <strong>{dayNames[day.day_of_week]}</strong>
-                  <p className="muted" style={{ marginBottom: 0 }}>
-                    {day.is_closed
-                      ? "Cerrado"
-                      : `${formatTime12Hour(day.opens_at)} - ${formatTime12Hour(day.closes_at)}`}
-                  </p>
-                </div>
-              ))}
-            </div>
+            // eslint-disable-next-line @next/next/no-img-element
+            <img alt={`Portada de ${business.name}`} className="store-cover" src={business.cover_url} />
           ) : (
-            <p className="muted">Horario por confirmar.</p>
+            <div className="store-cover-placeholder" />
           )}
+          <div className="store-hero-content">
+            <div className="store-identity">
+            {business.logo_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img alt={`Logo de ${business.name}`} className="store-logo" src={business.logo_url} />
+              ) : (
+                <span className="store-logo store-logo-placeholder" aria-hidden="true">
+                  {business.name.slice(0, 2).toUpperCase()}
+                </span>
+              )}
+            <div>
+                <p className="store-category">{business.categories?.name ?? "Sin categoria"}</p>
+                <h1>{business.name}</h1>
+                <BusinessOpenStatus hours={hours} />
+              </div>
+            </div>
+            <p className="store-description">
+              {business.description || "Descubre los productos disponibles y contacta directamente con la tienda."}
+            </p>
+            <div className="store-hero-actions">
+              <ContactButton
+                businessId={business.id}
+                businessName={business.name}
+                label="Escribir por WhatsApp"
+                message={message}
+                source="store_detail"
+                whatsapp={business.whatsapp}
+              />
+              <DirectionsLink address={business.address} city={business.city} />
+            </div>
+          </div>
         </section>
-        <h2 style={{ marginTop: 32 }}>Productos de la tienda</h2>
-        <div className="grid-auto" style={{ marginTop: 18 }}>
-          {storeProducts.map((product) => (
-            <ProductCard key={product.slug} product={product} />
-          ))}
+
+        <div className="store-content-layout">
+          <section aria-labelledby="store-products-title" className="store-catalog">
+            <div className="store-section-heading">
+              <div>
+                <p>Catalogo</p>
+                <h2 id="store-products-title">Productos disponibles</h2>
+              </div>
+              <span>{storeProducts.length} {storeProducts.length === 1 ? "producto" : "productos"}</span>
+            </div>
+            {storeProducts.length > 0 ? (
+              <div className="store-product-grid">
+                {storeProducts.map((product) => (
+                  <ProductCard key={product.slug} product={product} />
+                ))}
+              </div>
+            ) : (
+              <div className="store-empty-catalog">
+                <h3>Catalogo en preparacion</h3>
+                <p>Esta tienda todavia no tiene productos activos.</p>
+              </div>
+            )}
+          </section>
+
+          <aside className="store-sidebar" aria-label="Informacion de la tienda">
+            <section className="store-info-block">
+              <h2>Ubicacion</h2>
+              <address>
+                <strong>{business.address ?? "Direccion por confirmar"}</strong>
+                {business.neighborhood ? <span>Barrio: {business.neighborhood}</span> : null}
+                {business.shopping_center ? (
+                  <span>
+                    {business.shopping_center}
+                    {business.floor ? ` - Piso ${business.floor}` : ""}
+                    {business.local_number ? ` - Local ${business.local_number}` : ""}
+                  </span>
+                ) : null}
+                {business.landmark ? <span>Referencia: {business.landmark}</span> : null}
+                <span>{business.city}</span>
+              </address>
+              <DirectionsLink address={business.address} city={business.city} />
+            </section>
+
+            <section className="store-info-block">
+              <h2>Horario de atencion</h2>
+              {hours.length > 0 ? (
+                <dl className="store-hours-list">
+                  {hours.map((day) => (
+                    <div key={day.day_of_week}>
+                      <dt>{dayNames[day.day_of_week]}</dt>
+                      <dd className={day.is_closed ? "store-hours-closed" : undefined}>
+                        {day.is_closed
+                          ? "Cerrado"
+                          : `${formatTime12Hour(day.opens_at)} - ${formatTime12Hour(day.closes_at)}`}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+              ) : (
+                <p className="muted">Horario por confirmar.</p>
+              )}
+            </section>
+
+            <section className="store-info-block store-contact-block">
+              <h2>Contacto directo</h2>
+              <p>Confirma existencias, variantes y precio antes de desplazarte.</p>
+              <ContactButton
+                businessId={business.id}
+                businessName={business.name}
+                label="Abrir WhatsApp"
+                message={message}
+                source="store_detail"
+                whatsapp={business.whatsapp}
+              />
+            </section>
+          </aside>
         </div>
-        {storeProducts.length === 0 ? (
-          <p className="muted" style={{ marginTop: 18 }}>
-            Esta tienda todavia no tiene productos activos.
-          </p>
-        ) : null}
-      </section>
+
+        <section className="store-report-section" aria-label="Seguridad del comercio">
+          <div>
+            <h2>¿La informacion de esta tienda no coincide?</h2>
+            <p>Envia un reporte para que el equipo administrativo pueda revisarla.</p>
+          </div>
+          <ReportButton
+            returnPath={`/tiendas/${business.slug}`}
+            targetId={business.id}
+            targetName={business.name}
+            targetType="business"
+          />
+        </section>
+      </div>
     </main>
   );
 }

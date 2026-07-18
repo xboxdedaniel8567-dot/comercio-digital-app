@@ -240,7 +240,7 @@ Todo listado o formulario debe definir:
 2. Cabecera y navegacion movil. Completado.
 3. Busqueda y tarjetas de producto. Completado.
 4. Detalle de producto. Completado.
-5. Perfil de tienda y directorio.
+5. Perfil de tienda y directorio. Perfil completado; directorio pendiente.
 6. Cuenta del comprador.
 7. Panel del comerciante.
 8. Panel administrativo.
@@ -256,3 +256,11 @@ precio y disponibilidad, atributos, variantes, contacto por WhatsApp, reservas,
 favoritos, ubicacion, resumen de la tienda, productos relacionados y reporte de
 informacion. La composicion utiliza tres zonas en escritorio y una sola columna
 en movil sin inventar calificaciones, distancias ni garantias comerciales.
+
+El perfil publico de tienda ya cuenta con portada y logo reales, identidad del
+comercio, estado abierto o cerrado, contacto por WhatsApp, ruta externa,
+catalogo completo, ubicacion detallada, horario semanal en formato de 12 horas y
+reporte de informacion. En escritorio separa catalogo y contexto operativo; en
+movil mantiene dos columnas de productos y apila la informacion sin
+desbordamiento horizontal. No muestra reputacion, mapas ni estadisticas que la
+plataforma todavia no pueda demostrar.
