@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#050505" />
+    <title>Sin conexion | Comercio Digital</title>
+    <style>
+      * { box-sizing: border-box; }
+      body {
+        min-height: 100vh;
+        margin: 0;
+        display: grid;
+        place-items: center;
+        background: #050505;
+        color: #f5f5f5;
+        font-family: Inter, system-ui, sans-serif;
+        padding: 24px;
+      }
+      main {
+        width: min(520px, 100%);
+        border: 1px solid #292929;
+        background: #101010;
+        padding: 28px;
+      }
+      p { color: #a3a3a3; line-height: 1.6; }
+      button {
+        min-height: 44px;
+        border: 1px solid #f5f5f5;
+        background: transparent;
+        color: #f5f5f5;
+        cursor: pointer;
+        padding: 0 18px;
+        font: inherit;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <strong>Comercio Digital</strong>
+      <h1>Sin conexion</h1>
+      <p>Comprueba tu conexion a internet para volver a consultar tiendas y productos actualizados.</p>
+      <button type="button" onclick="window.location.reload()">Volver a intentar</button>
+    </main>
+  </body>
+</html>

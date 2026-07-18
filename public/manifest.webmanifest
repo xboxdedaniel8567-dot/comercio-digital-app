@@ -1,0 +1,22 @@
+{
+  "id": "/",
+  "name": "Comercio Digital",
+  "short_name": "Comercio",
+  "description": "Encuentra productos en comercios fisicos y contacta directamente a cada tienda.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#050505",
+  "theme_color": "#050505",
+  "lang": "es-CO",
+  "categories": ["shopping", "business", "lifestyle"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
