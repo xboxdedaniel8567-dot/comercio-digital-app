@@ -88,7 +88,7 @@ export function AppHeader() {
       }}
     >
       <Link href="/" style={{ display: "grid", gap: 2 }}>
-        <strong style={{ fontSize: "1.05rem", letterSpacing: "-0.02em" }}>
+        <strong style={{ fontSize: "1.05rem", letterSpacing: 0 }}>
           Comercio Digital
         </strong>
         <span className="muted" style={{ fontSize: "0.78rem" }}>

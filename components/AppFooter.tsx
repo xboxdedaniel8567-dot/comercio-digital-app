@@ -5,7 +5,7 @@ export function AppFooter() {
     <footer className="container" style={{ paddingBottom: 32, paddingTop: 48 }}>
       <div
         style={{
-          borderTop: "1px solid var(--border)",
+          borderTop: "1px solid var(--line)",
           display: "flex",
           flexWrap: "wrap",
           gap: 16,
