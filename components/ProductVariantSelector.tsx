@@ -64,15 +64,12 @@ export function ProductVariantSelector({
   );
 
   return (
-    <section
-      aria-labelledby="variant-selector-title"
-      style={{ borderTop: "1px solid var(--line)", display: "grid", gap: 12, marginTop: 22, paddingTop: 18 }}
-    >
+    <section aria-labelledby="variant-selector-title" className="product-variant-selector">
       <div>
-        <h2 id="variant-selector-title" style={{ fontSize: "1rem", margin: "0 0 6px" }}>
+        <h2 id="variant-selector-title">
           Selecciona una presentacion
         </h2>
-        <p className="muted" style={{ margin: 0 }}>
+        <p className="muted">
           Elige la talla, color o capacidad que necesitas.
         </p>
       </div>
@@ -87,13 +84,13 @@ export function ProductVariantSelector({
           </option>
         ))}
       </select>
-      {optionText ? <p className="muted" style={{ margin: 0 }}>{optionText}</p> : null}
-      <div style={{ alignItems: "center", display: "flex", flexWrap: "wrap", gap: 10 }}>
-        <strong style={{ fontSize: "1.2rem" }}>{formatPrice(selectedPrice, currency)}</strong>
+      {optionText ? <p className="product-variant-options">{optionText}</p> : null}
+      <div className="product-variant-price">
+        <strong>{formatPrice(selectedPrice, currency)}</strong>
         <InventoryBadge stock={selectedVariant.stock} />
       </div>
       {selectedVariant.stock > 0 ? (
-        <div style={{ display: "grid", gap: 10 }}>
+        <div className="product-variant-actions">
           <ContactButton
             businessId={businessId}
             businessName={businessName}
@@ -113,7 +110,7 @@ export function ProductVariantSelector({
           />
         </div>
       ) : (
-        <p className="muted" style={{ margin: 0 }}>Esta variante esta agotada.</p>
+        <p className="muted">Esta variante esta agotada.</p>
       )}
     </section>
   );

@@ -239,7 +239,7 @@ Todo listado o formulario debe definir:
 1. Tokens y componentes base. Completado.
 2. Cabecera y navegacion movil. Completado.
 3. Busqueda y tarjetas de producto. Completado.
-4. Detalle de producto.
+4. Detalle de producto. Completado.
 5. Perfil de tienda y directorio.
 6. Cuenta del comprador.
 7. Panel del comerciante.
@@ -250,3 +250,9 @@ La busqueda publica ya cuenta con filtros laterales en escritorio, filtros
 desplegables en movil, dos columnas de productos en 390 px, tres columnas en
 escritorio, estado sin coincidencias, paginacion y comparador sin modificar el
 motor de busqueda de Supabase.
+
+El detalle de producto ya cuenta con galeria interactiva, jerarquia clara de
+precio y disponibilidad, atributos, variantes, contacto por WhatsApp, reservas,
+favoritos, ubicacion, resumen de la tienda, productos relacionados y reporte de
+informacion. La composicion utiliza tres zonas en escritorio y una sola columna
+en movil sin inventar calificaciones, distancias ni garantias comerciales.
