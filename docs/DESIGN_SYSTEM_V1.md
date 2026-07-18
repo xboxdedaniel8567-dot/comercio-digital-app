@@ -236,9 +236,9 @@ Todo listado o formulario debe definir:
 
 ## 15. Orden de implementacion
 
-1. Tokens y componentes base.
-2. Cabecera y navegacion movil.
-3. Busqueda y tarjetas de producto.
+1. Tokens y componentes base. Completado.
+2. Cabecera y navegacion movil. Completado.
+3. Busqueda y tarjetas de producto. Completado.
 4. Detalle de producto.
 5. Perfil de tienda y directorio.
 6. Cuenta del comprador.
@@ -246,3 +246,7 @@ Todo listado o formulario debe definir:
 8. Panel administrativo.
 9. Estados, accesibilidad y responsive final.
 
+La busqueda publica ya cuenta con filtros laterales en escritorio, filtros
+desplegables en movil, dos columnas de productos en 390 px, tres columnas en
+escritorio, estado sin coincidencias, paginacion y comparador sin modificar el
+motor de busqueda de Supabase.

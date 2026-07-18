@@ -8,7 +8,15 @@ import {
   writeComparison,
 } from "@/lib/comparison";
 
-export function CompareButton({ name, slug }: { name: string; slug: string }) {
+export function CompareButton({
+  compact = false,
+  name,
+  slug,
+}: {
+  compact?: boolean;
+  name: string;
+  slug: string;
+}) {
   const [isSelected, setIsSelected] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -41,17 +49,18 @@ export function CompareButton({ name, slug }: { name: string; slug: string }) {
   }
 
   return (
-    <div style={{ display: "grid", gap: 6 }}>
+    <div className={compact ? "compare-control compare-control-compact" : "compare-control"}>
       <button
         aria-pressed={isSelected}
         className={isSelected ? "btn" : "btn btn-dark"}
         onClick={toggleProduct}
         type="button"
       >
-        {isSelected ? "Quitar del comparador" : "Agregar al comparador"}
+        {compact
+          ? isSelected ? "Quitar" : "Comparar"
+          : isSelected ? "Quitar del comparador" : "Agregar al comparador"}
       </button>
       {message ? <small className="muted" role="status">{message}</small> : null}
     </div>
   );
 }
-

@@ -180,94 +180,181 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     return queryString ? `/buscar?${queryString}` : "/buscar";
   }
 
+  function renderFilters(prefix: string) {
+    return (
+      <>
+        <input name="q" type="hidden" value={query} />
+        <label className="search-filter-group" htmlFor={`${prefix}-city`}>
+          <span>Ubicacion</span>
+          <input
+            className="input"
+            defaultValue={cityFilter}
+            id={`${prefix}-city`}
+            name="city"
+            placeholder="Ej: Cali"
+          />
+        </label>
+        <label className="search-filter-group" htmlFor={`${prefix}-category`}>
+          <span>Categoria</span>
+          <select className="input" defaultValue={categoryFilter} id={`${prefix}-category`} name="category">
+            <option value="">Todas las categorias</option>
+            {categories.map((category) => (
+              <option key={category.id} value={category.slug}>{category.name}</option>
+            ))}
+          </select>
+        </label>
+        <label className="search-filter-group" htmlFor={`${prefix}-subcategory`}>
+          <span>Subcategoria</span>
+          <select className="input" defaultValue={subcategoryFilter} id={`${prefix}-subcategory`} name="subcategory">
+            <option value="">Todas las subcategorias</option>
+            {subcategories.map((subcategory) => (
+              <option key={subcategory.id} value={subcategory.id}>
+                {subcategory.categories?.name ? `${subcategory.categories.name} / ` : ""}{subcategory.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <fieldset className="search-filter-group">
+          <legend>Rango de precio</legend>
+          <div className="search-price-grid">
+            <label className="sr-only" htmlFor={`${prefix}-min-price`}>Precio minimo</label>
+            <input
+              className="input"
+              defaultValue={params?.min_price ?? ""}
+              id={`${prefix}-min-price`}
+              min="0"
+              name="min_price"
+              placeholder="Minimo"
+              type="number"
+            />
+            <label className="sr-only" htmlFor={`${prefix}-max-price`}>Precio maximo</label>
+            <input
+              className="input"
+              defaultValue={params?.max_price ?? ""}
+              id={`${prefix}-max-price`}
+              min="0"
+              name="max_price"
+              placeholder="Maximo"
+              type="number"
+            />
+          </div>
+        </fieldset>
+        <div className="search-filter-actions">
+          <button className="btn" type="submit">Aplicar filtros</button>
+          <Link className="btn btn-dark" href={query ? `/buscar?q=${encodeURIComponent(query)}` : "/buscar"}>
+            Limpiar
+          </Link>
+        </div>
+      </>
+    );
+  }
+
   return (
     <main className="shell">
       <AppHeader />
       <SearchLogger query={query} resultsCount={totalResults} />
-      <section className="container section">
-        <p className="kicker">Marketplace</p>
-        <h1 style={{ fontSize: "clamp(2rem, 5vw, 4.6rem)", margin: "10px 0" }}>
-          Buscar productos
-        </h1>
-        <form action="/buscar" style={{ display: "grid", gap: 10 }}>
-          <div className="search-submit-row" style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr) auto", gap: 10 }}>
+      <section className="container section search-page">
+        <header className="search-heading">
+          <p className="kicker">Marketplace local</p>
+          <h1>{query ? `Resultados para “${query}”` : "Encuentra lo que buscas"}</h1>
+          <p>
+            {cityFilter
+              ? `Productos disponibles en comercios de ${cityFilter}.`
+              : "Compara opciones y contacta directamente a comercios fisicos."}
+          </p>
+        </header>
+        <form action="/buscar" className="search-primary-form">
+          {cityFilter ? <input name="city" type="hidden" value={cityFilter} /> : null}
+          {categoryFilter ? <input name="category" type="hidden" value={categoryFilter} /> : null}
+          {subcategoryFilter ? <input name="subcategory" type="hidden" value={subcategoryFilter} /> : null}
+          {minPrice !== null ? <input name="min_price" type="hidden" value={minPrice} /> : null}
+          {maxPrice !== null ? <input name="max_price" type="hidden" value={maxPrice} /> : null}
+          <div className="search-submit-row">
+            <label className="sr-only" htmlFor="marketplace-search">Buscar productos</label>
             <input
               className="input"
               defaultValue={query}
+              id="marketplace-search"
               name="q"
-              placeholder="Ej: celular Samsung, tenis blancos, perfume"
+              placeholder="Buscar productos, marcas o tiendas"
             />
             <button className="btn" type="submit">Buscar</button>
           </div>
-          <div className="grid-auto">
-            <input className="input" defaultValue={cityFilter} name="city" placeholder="Ciudad. Ej: Cali" />
-            <select className="input" defaultValue={categoryFilter} name="category">
-              <option value="">Todas las categorias</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.slug}>{category.name}</option>
-              ))}
-            </select>
-            <select className="input" defaultValue={subcategoryFilter} name="subcategory">
-              <option value="">Todas las subcategorias</option>
-              {subcategories.map((subcategory) => (
-                <option key={subcategory.id} value={subcategory.id}>
-                  {subcategory.categories?.name ? `${subcategory.categories.name} / ` : ""}{subcategory.name}
-                </option>
-              ))}
-            </select>
-            <input className="input" defaultValue={params?.min_price ?? ""} min="0" name="min_price" placeholder="Precio minimo" type="number" />
-            <input className="input" defaultValue={params?.max_price ?? ""} min="0" name="max_price" placeholder="Precio maximo" type="number" />
-          </div>
-          {query || categoryFilter || subcategoryFilter || cityFilter || minPrice !== null || maxPrice !== null ? (
-            <Link className="muted" href="/buscar" style={{ justifySelf: "start" }}>Limpiar filtros</Link>
-          ) : null}
         </form>
-        <CompareTray />
-        {!error && totalResults > 0 ? (
-          <div style={{ alignItems: "center", display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "space-between", marginTop: 24 }}>
-            <p className="muted" style={{ margin: 0 }}>
-              {totalResults} {totalResults === 1 ? "resultado" : "resultados"} - Pagina {currentPage} de {totalPages}
-            </p>
-          </div>
-        ) : null}
-        {error ? (
-          <div className="card" style={{ borderColor: "#ef4444", marginTop: 24 }}>
-            <strong>No se pudo consultar Supabase.</strong>
-            <p className="muted">{error.message}</p>
-          </div>
-        ) : null}
-        <div className="grid-auto" style={{ marginTop: 24 }}>
-          {products.map((product) => (
-            <div key={product.slug} style={{ display: "grid", gap: 8 }}>
-              <ProductCard product={product} />
-              <CompareButton name={product.name} slug={product.slug} />
+
+        <details className="search-mobile-filters">
+          <summary>Filtros de busqueda</summary>
+          <form action="/buscar" className="search-filter-form">
+            {renderFilters("mobile-filter")}
+          </form>
+        </details>
+
+        <div className="search-results-layout">
+          <aside className="search-filter-sidebar" aria-label="Filtros de busqueda">
+            <div className="search-filter-sidebar-heading">
+              <strong>Filtros</strong>
+              <Link href={query ? `/buscar?q=${encodeURIComponent(query)}` : "/buscar"}>Limpiar</Link>
             </div>
-          ))}
-        </div>
-        {!error && products.length === 0 ? (
-          <div className="card" style={{ marginTop: 24 }}>
-            <strong>No encontramos coincidencias.</strong>
-            <p className="muted" style={{ marginBottom: 0 }}>
-              Prueba con menos palabras, otro nombre del producto o elimina alguno de los filtros.
-            </p>
+            <form action="/buscar" className="search-filter-form">
+              {renderFilters("desktop-filter")}
+            </form>
+          </aside>
+
+          <div className="search-results-main">
+            <CompareTray />
+            {!error ? (
+              <div className="search-results-toolbar">
+                <p>
+                  <strong>{totalResults}</strong> {totalResults === 1 ? "resultado" : "resultados"}
+                </p>
+                {totalPages > 1 ? <span>Pagina {currentPage} de {totalPages}</span> : null}
+              </div>
+            ) : null}
+            {error ? (
+              <div className="search-error" role="alert">
+                <strong>No pudimos cargar los productos.</strong>
+                <p>{error.message}</p>
+              </div>
+            ) : null}
+            {!error && products.length > 0 ? (
+              <div className="search-product-grid">
+                {products.map((product) => (
+                  <div className="search-product-item" key={product.slug}>
+                    <ProductCard product={product} />
+                    <CompareButton compact name={product.name} slug={product.slug} />
+                  </div>
+                ))}
+              </div>
+            ) : null}
+            {!error && products.length === 0 ? (
+              <section className="search-empty-state">
+                <span>Sin coincidencias</span>
+                <h2>No encontramos resultados{query ? ` para “${query}”` : ""}</h2>
+                <p>Prueba con menos palabras, revisa la escritura o elimina alguno de los filtros.</p>
+                <div>
+                  <Link className="btn" href="/buscar">Explorar productos</Link>
+                  <Link className="btn btn-dark" href="/">Volver al inicio</Link>
+                </div>
+              </section>
+            ) : null}
+            {!error && totalPages > 1 ? (
+              <nav aria-label="Paginacion de resultados" className="search-pagination">
+                {currentPage > 1 ? <Link className="btn btn-dark" href={paginationHref(currentPage - 1)}>Anterior</Link> : null}
+                {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => (
+                  <Link
+                    aria-current={pageNumber === currentPage ? "page" : undefined}
+                    className={pageNumber === currentPage ? "btn" : "btn btn-dark"}
+                    href={paginationHref(pageNumber)}
+                    key={pageNumber}
+                  >
+                    {pageNumber}
+                  </Link>
+                ))}
+                {currentPage < totalPages ? <Link className="btn btn-dark" href={paginationHref(currentPage + 1)}>Siguiente</Link> : null}
+              </nav>
+            ) : null}
           </div>
-        ) : null}
-        {!error && totalPages > 1 ? (
-          <nav aria-label="Paginacion de resultados" style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center", marginTop: 28 }}>
-            {currentPage > 1 ? <Link className="btn btn-dark" href={paginationHref(currentPage - 1)}>Anterior</Link> : null}
-            {Array.from({ length: totalPages }, (_, index) => index + 1).map((pageNumber) => (
-              <Link
-                aria-current={pageNumber === currentPage ? "page" : undefined}
-                className={pageNumber === currentPage ? "btn" : "btn btn-dark"}
-                href={paginationHref(pageNumber)}
-                key={pageNumber}
-              >
-                {pageNumber}
-              </Link>
-            ))}
-            {currentPage < totalPages ? <Link className="btn btn-dark" href={paginationHref(currentPage + 1)}>Siguiente</Link> : null}
-          </nav>
-        ) : null}
+        </div>
       </section>
     </main>
   );

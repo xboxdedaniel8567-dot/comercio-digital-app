@@ -25,16 +25,16 @@ export function CompareTray() {
   if (items.length === 0) return null;
 
   return (
-    <aside className="card" style={{ display: "grid", gap: 12, marginTop: 20 }}>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "space-between" }}>
+    <aside className="compare-tray">
+      <div className="compare-tray-heading">
         <strong>Comparador: {items.length} de 3</strong>
         <button className="btn btn-dark" onClick={() => writeComparison([])} type="button">
           Limpiar
         </button>
       </div>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+      <div className="compare-tray-items">
         {items.map((item) => (
-          <span className="card" key={item.slug} style={{ padding: "7px 9px" }}>{item.name}</span>
+          <span className="compare-tray-item" key={item.slug}>{item.name}</span>
         ))}
       </div>
       {items.length >= 2 ? (
@@ -45,4 +45,3 @@ export function CompareTray() {
     </aside>
   );
 }
-
