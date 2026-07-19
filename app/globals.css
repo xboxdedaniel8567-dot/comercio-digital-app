@@ -2050,6 +2050,419 @@ h3 {
   }
 }
 
+/* Merchant workspace */
+.dashboard-page {
+  padding: 42px 0 80px;
+}
+
+.dashboard-page-heading {
+  margin-bottom: 28px;
+}
+
+.dashboard-page-heading h1 {
+  font-size: clamp(2.4rem, 5vw, 4.5rem);
+  margin: 8px 0 0;
+}
+
+.dashboard-grid {
+  align-items: start;
+  display: grid;
+  gap: 24px;
+  grid-template-columns: 224px minmax(0, 1fr);
+}
+
+.dashboard-nav {
+  display: grid;
+  gap: 4px;
+  padding: 10px;
+  position: sticky;
+  top: 98px;
+}
+
+.dashboard-nav-label {
+  color: var(--subtle);
+  font-size: 0.72rem;
+  font-weight: 800;
+  margin: 8px 10px 10px;
+  text-transform: uppercase;
+}
+
+.dashboard-nav-link {
+  align-items: center;
+  border-left: 3px solid transparent;
+  color: var(--muted);
+  display: flex;
+  font-weight: 700;
+  min-height: 44px;
+  padding: 0 12px;
+}
+
+.dashboard-nav-link:hover {
+  background: var(--panel-interactive);
+  color: var(--foreground);
+}
+
+.dashboard-nav-link[aria-current="page"] {
+  background: rgba(112, 183, 255, 0.1);
+  border-left-color: var(--accent);
+  color: var(--accent);
+}
+
+.dashboard-nav-logout {
+  border-top: 1px solid var(--line);
+  margin-top: 8px;
+  padding-top: 10px;
+}
+
+.dashboard-nav-logout .btn {
+  width: 100%;
+}
+
+.dashboard-content,
+.merchant-overview,
+.merchant-inventory,
+.merchant-reservations,
+.merchant-stats-dashboard {
+  display: grid;
+  gap: 24px;
+  min-width: 0;
+}
+
+.merchant-welcome {
+  align-items: start;
+  display: flex;
+  gap: 24px;
+  justify-content: space-between;
+  padding: 26px;
+}
+
+.merchant-welcome h2,
+.merchant-section-heading h2,
+.merchant-next-action h2,
+.merchant-data-panel h2 {
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  margin: 5px 0 8px;
+}
+
+.merchant-welcome p:last-child,
+.merchant-section-heading p:last-child {
+  color: var(--muted);
+  margin: 0;
+  max-width: 700px;
+}
+
+.merchant-store-state {
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-sm);
+  flex: 0 0 auto;
+  font-size: 0.82rem;
+  font-weight: 800;
+  padding: 7px 10px;
+}
+
+.merchant-store-state-active {
+  border-color: var(--success);
+  color: var(--success);
+}
+
+.merchant-store-state-pending_review {
+  border-color: var(--warning);
+  color: var(--warning);
+}
+
+.merchant-store-state-suspended,
+.merchant-store-state-rejected {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.merchant-section-heading {
+  align-items: end;
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.merchant-section-heading > a:not(.btn) {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.merchant-stat-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.merchant-stat-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  display: grid;
+  gap: 7px;
+  min-height: 132px;
+  padding: 18px;
+}
+
+.merchant-stat-card > span {
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.merchant-stat-card strong {
+  font-size: clamp(1.35rem, 3vw, 1.85rem);
+}
+
+.merchant-stat-card small {
+  color: var(--subtle);
+}
+
+.merchant-next-action {
+  display: grid;
+  gap: 10px;
+  padding: 24px;
+}
+
+.merchant-next-action > p {
+  margin: 0;
+}
+
+.merchant-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.merchant-inventory-heading {
+  margin-bottom: 0;
+}
+
+.merchant-inventory-summary {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.merchant-inventory-summary-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+}
+
+.merchant-inventory-summary-card span {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.merchant-inventory-summary-card strong {
+  font-size: 1.4rem;
+}
+
+.merchant-inventory-list,
+.merchant-reservation-list {
+  display: grid;
+  gap: 10px;
+}
+
+.inventory-product-row {
+  align-items: center;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 76px minmax(170px, 1fr) minmax(320px, auto);
+  padding: 12px;
+}
+
+.inventory-product-image {
+  aspect-ratio: 1;
+  background: var(--panel-raised);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+
+.inventory-product-image img {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.inventory-product-copy {
+  display: grid;
+  gap: 5px;
+}
+
+.inventory-product-copy > p,
+.inventory-product-copy > small {
+  color: var(--muted);
+  margin: 0;
+}
+
+.inventory-product-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.inventory-product-state {
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.merchant-reservation-card {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(0, 1fr) minmax(290px, 0.75fr);
+  padding: 20px;
+}
+
+.merchant-reservation-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: space-between;
+}
+
+.merchant-reservation-summary h3 {
+  font-size: 1.2rem;
+  margin: 8px 0;
+}
+
+.merchant-reservation-form {
+  border-left: 1px solid var(--line);
+  display: grid;
+  gap: 10px;
+  padding-left: 20px;
+}
+
+.merchant-reservation-form label {
+  display: grid;
+  gap: 6px;
+}
+
+.merchant-data-panel {
+  padding: 22px;
+}
+
+.merchant-data-panel h2 {
+  margin-top: 0;
+}
+
+@media (max-width: 1040px) {
+  .inventory-product-row {
+    grid-template-columns: 72px minmax(0, 1fr);
+  }
+
+  .inventory-product-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-start;
+  }
+
+  .merchant-reservation-card {
+    grid-template-columns: 1fr;
+  }
+
+  .merchant-reservation-form {
+    border-left: 0;
+    border-top: 1px solid var(--line);
+    padding-left: 0;
+    padding-top: 18px;
+  }
+}
+
+@media (max-width: 820px) {
+  .dashboard-page {
+    padding-top: 30px;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-nav {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    position: static;
+  }
+
+  .dashboard-nav-label,
+  .dashboard-nav-logout {
+    display: none;
+  }
+
+  .dashboard-nav-link {
+    border: 1px solid var(--line);
+    border-left-width: 1px;
+    flex: 0 0 auto;
+    padding: 0 14px;
+  }
+
+  .dashboard-nav-link[aria-current="page"] {
+    border-color: var(--accent);
+  }
+
+  .merchant-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .dashboard-page-heading h1 {
+    font-size: 2.35rem;
+  }
+
+  .merchant-welcome,
+  .merchant-section-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .merchant-welcome {
+    padding: 20px;
+  }
+
+  .merchant-store-state {
+    width: fit-content;
+  }
+
+  .merchant-stat-grid,
+  .merchant-inventory-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .merchant-stat-card {
+    min-height: 118px;
+    padding: 14px;
+  }
+
+  .merchant-inventory-heading .btn,
+  .merchant-action-row .btn {
+    width: 100%;
+  }
+
+  .inventory-product-row {
+    grid-template-columns: 60px minmax(0, 1fr);
+  }
+
+  .inventory-product-actions {
+    align-items: stretch;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .inventory-product-actions > * {
+    min-width: 0;
+  }
+}
+
 @media (max-width: 350px) {
   .search-product-grid {
     grid-template-columns: 1fr;

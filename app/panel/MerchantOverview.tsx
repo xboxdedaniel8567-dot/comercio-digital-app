@@ -144,29 +144,49 @@ export function MerchantOverview() {
   }
 
   return (
-    <div style={{ display: "grid", gap: 18 }}>
-      <div className="grid-auto">
-        {[
-          ["Tienda", businessStatusLabel(business.status)],
-          ["Perfil completo", `${stats.completion}%`],
-          ["Productos", String(stats.total)],
-          ["Activos", String(stats.active)],
-          ["Ocultos", String(stats.hidden)],
-          ["Pocas unidades", String(stats.lowStock)],
-          ["Agotados", String(stats.outOfStock)],
-          ["WhatsApp", String(contactClicks)],
-          ["Reservas pendientes", String(pendingReservations)],
-          ["Inventario", formatMoney(stats.inventoryValue)],
-        ].map(([label, value]) => (
-          <div className="card" key={label}>
-            <p className="muted">{label}</p>
-            <strong style={{ fontSize: "1.4rem" }}>{value}</strong>
-          </div>
-        ))}
-      </div>
+    <div className="merchant-overview">
+      <section className="merchant-welcome panel">
+        <div>
+          <p className="kicker">Resumen de hoy</p>
+          <h2>{business.name}</h2>
+          <p>Controla el catalogo, las reservas y el estado de tu tienda desde un solo lugar.</p>
+        </div>
+        <span className={`merchant-store-state merchant-store-state-${business.status}`}>
+          {businessStatusLabel(business.status)}
+        </span>
+      </section>
 
-      <div className="card">
-        <h2 style={{ marginTop: 0 }}>Siguiente accion recomendada</h2>
+      <section aria-labelledby="merchant-metrics-title">
+        <div className="merchant-section-heading">
+          <div>
+            <p className="kicker">Indicadores</p>
+            <h2 id="merchant-metrics-title">Estado del negocio</h2>
+          </div>
+          <Link href="/panel/estadisticas">Ver estadisticas</Link>
+        </div>
+        <div className="merchant-stat-grid">
+          {[
+            ["Perfil completo", `${stats.completion}%`, "Completa los datos que ven tus clientes"],
+            ["Productos activos", String(stats.active), `${stats.total} productos en total`],
+            ["Reservas pendientes", String(pendingReservations), "Solicitudes por responder"],
+            ["Contactos WhatsApp", String(contactClicks), "Interes generado por tu catalogo"],
+            ["Pocas unidades", String(stats.lowStock), `${stats.outOfStock} productos agotados`],
+            ["Valor del inventario", formatMoney(stats.inventoryValue), "Precio por unidades registradas"],
+          ].map(([label, value, detail]) => (
+            <article className="merchant-stat-card" key={label}>
+              <span>{label}</span>
+              <strong>{value}</strong>
+              <small>{detail}</small>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="merchant-next-action panel">
+        <div>
+          <p className="kicker">Prioridad operativa</p>
+          <h2>Siguiente accion recomendada</h2>
+        </div>
         <p className="muted">
           {pendingReservations > 0
             ? `Tienes ${pendingReservations} reserva(s) nueva(s) esperando confirmacion.`
@@ -180,7 +200,7 @@ export function MerchantOverview() {
                   ? "Publica al menos 10 productos con foto, precio y descripcion para que tu tienda tenga mejor presencia en las busquedas."
                   : "Revisa los productos ocultos y manten actualizado el stock para evitar consultas por productos no disponibles."}
         </p>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+        <div className="merchant-action-row">
           {pendingReservations > 0 ? (
             <Link className="btn" href="/panel/reservas">
               Revisar reservas
@@ -198,7 +218,7 @@ export function MerchantOverview() {
             </Link>
           ) : null}
         </div>
-      </div>
+      </section>
     </div>
   );
 }

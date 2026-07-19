@@ -142,8 +142,15 @@ export function StatsDashboard() {
   }
 
   return (
-    <div style={{ display: "grid", gap: 18 }}>
-      <div className="grid-auto">
+    <div className="merchant-stats-dashboard">
+      <div className="merchant-section-heading">
+        <div>
+          <p className="kicker">Rendimiento</p>
+          <h2>Lectura general de la tienda</h2>
+          <p>Datos operativos para mantener actualizado tu catalogo.</p>
+        </div>
+      </div>
+      <div className="merchant-stat-grid">
         {[
           ["Total productos", String(stats.total)],
           ["Productos activos", String(stats.active)],
@@ -154,14 +161,14 @@ export function StatsDashboard() {
           ["Busquedas", String(searchCount)],
           ["Valor inventario", formatMoney(stats.inventoryValue)],
         ].map(([label, value]) => (
-          <div className="card" key={label}>
-            <p className="muted">{label}</p>
-            <strong style={{ fontSize: "1.6rem" }}>{value}</strong>
+          <div className="merchant-stat-card" key={label}>
+            <span>{label}</span>
+            <strong>{value}</strong>
           </div>
         ))}
       </div>
 
-      <div className="card">
+      <section className="merchant-data-panel panel">
         <h2 style={{ marginTop: 0 }}>Busquedas recientes</h2>
         <div style={{ display: "grid", gap: 10 }}>
           {recentSearches.map((search) => (
@@ -184,9 +191,9 @@ export function StatsDashboard() {
             </p>
           ) : null}
         </div>
-      </div>
+      </section>
 
-      <div className="card">
+      <section className="merchant-data-panel panel">
         <h2 style={{ marginTop: 0 }}>Lectura rapida del negocio</h2>
         <div style={{ display: "grid", gap: 10 }}>
           <p className="muted" style={{ margin: 0 }}>
@@ -209,7 +216,7 @@ export function StatsDashboard() {
             Recomendacion: manten activos solo los productos disponibles y oculta los agotados para evitar preguntas innecesarias por WhatsApp.
           </p>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

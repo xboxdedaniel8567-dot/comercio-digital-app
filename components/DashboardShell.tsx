@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { AppHeader } from "./AppHeader";
 import { LogoutButton } from "./LogoutButton";
 
@@ -15,32 +18,32 @@ export function DashboardShell({
   children,
   links,
 }: DashboardShellProps) {
+  const pathname = usePathname();
+
   return (
     <main className="shell">
       <AppHeader />
-      <section className="container" style={{ padding: "32px 0 72px" }}>
-        <p className="kicker">{eyebrow}</p>
-        <h1 style={{ fontSize: "clamp(2rem, 5vw, 4rem)", margin: "10px 0 24px" }}>
-          {title}
-        </h1>
-        <div
-          className="dashboard-grid"
-          style={{
-            display: "grid",
-            gridTemplateColumns: "220px 1fr",
-            gap: 18,
-            alignItems: "start",
-          }}
-        >
-          <aside className="dashboard-nav panel" style={{ padding: 14, display: "grid", gap: 8 }}>
+      <section className="container dashboard-page">
+        <header className="dashboard-page-heading">
+          <p className="kicker">{eyebrow}</p>
+          <h1>{title}</h1>
+        </header>
+        <div className="dashboard-grid">
+          <aside className="dashboard-nav panel" aria-label="Navegacion del panel">
+            <p className="dashboard-nav-label">Gestion de tienda</p>
             {links.map((link) => (
-              <Link className="btn btn-dark" href={link.href} key={link.href}>
+              <Link
+                aria-current={pathname === link.href ? "page" : undefined}
+                className="dashboard-nav-link"
+                href={link.href}
+                key={link.href}
+              >
                 {link.label}
               </Link>
             ))}
-            <LogoutButton />
+            <div className="dashboard-nav-logout"><LogoutButton /></div>
           </aside>
-          <div>{children}</div>
+          <div className="dashboard-content">{children}</div>
         </div>
       </section>
     </main>

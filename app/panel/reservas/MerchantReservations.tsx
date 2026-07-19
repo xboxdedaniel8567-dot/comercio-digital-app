@@ -84,12 +84,31 @@ export function MerchantReservations() {
 
   if (message && reservations.length === 0) return <p className="muted">{message}</p>;
 
+  const pendingCount = reservations.filter((reservation) => reservation.status === "pending").length;
+  const confirmedCount = reservations.filter((reservation) => reservation.status === "confirmed").length;
+
   return (
-    <div style={{ display: "grid", gap: 12 }}>
+    <div className="merchant-reservations">
+      <div className="merchant-section-heading">
+        <div>
+          <p className="kicker">Atencion al cliente</p>
+          <h2>Solicitudes de reserva</h2>
+          <p>Confirma disponibilidad y responde antes de que el comprador visite la tienda.</p>
+        </div>
+      </div>
+      {reservations.length > 0 ? (
+        <div className="merchant-inventory-summary">
+          <div className="merchant-inventory-summary-card"><span>Total</span><strong>{reservations.length}</strong></div>
+          <div className="merchant-inventory-summary-card"><span>Pendientes</span><strong>{pendingCount}</strong></div>
+          <div className="merchant-inventory-summary-card"><span>Confirmadas</span><strong>{confirmedCount}</strong></div>
+        </div>
+      ) : null}
       {message ? <p className="muted" role="status">{message}</p> : null}
-      {reservations.map((reservation) => (
-        <MerchantReservationCard key={reservation.id} onSave={updateReservation} reservation={reservation} />
-      ))}
+      <div className="merchant-reservation-list">
+        {reservations.map((reservation) => (
+          <MerchantReservationCard key={reservation.id} onSave={updateReservation} reservation={reservation} />
+        ))}
+      </div>
       {reservations.length === 0 ? <p className="muted">Todavia no hay solicitudes de reserva.</p> : null}
     </div>
   );
@@ -110,14 +129,14 @@ function MerchantReservationCard({
   );
 
   return (
-    <article className="card" style={{ display: "grid", gap: 10 }}>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 12, justifyContent: "space-between" }}>
+    <article className="merchant-reservation-card panel">
+      <div className="merchant-reservation-summary">
         <div>
           <StatusBadge
             label={statusLabels[reservation.status] ?? reservation.status}
             tone={statusTone(reservation.status)}
           />
-          <h2 style={{ margin: "6px 0" }}>{reservation.products?.name ?? "Producto no disponible"}</h2>
+          <h3>{reservation.products?.name ?? "Producto no disponible"}</h3>
           {reservation.product_variants?.name ? <p className="muted">Variante: {reservation.product_variants.name}</p> : null}
           <p style={{ marginBottom: 4 }}>Cantidad: {reservation.quantity}</p>
           <p className="muted" style={{ margin: 0 }}>Comprador: {reservation.buyer_name}</p>
@@ -127,8 +146,9 @@ function MerchantReservationCard({
           Escribir por WhatsApp
         </a>
       </div>
+      <div className="merchant-reservation-form">
       {reservation.products?.slug ? <Link className="btn btn-dark" href={`/productos/${reservation.products.slug}`}>Ver producto</Link> : null}
-      <label style={{ display: "grid", gap: 6 }}>
+      <label>
         <span>Estado</span>
         <select onChange={(event) => setStatus(event.target.value)} value={status}>
           <option value="pending">Pendiente</option>
@@ -139,7 +159,7 @@ function MerchantReservationCard({
           <option value="expired">Vencida</option>
         </select>
       </label>
-      <label style={{ display: "grid", gap: 6 }}>
+      <label>
         <span>Respuesta para el comprador</span>
         <textarea maxLength={500} onChange={(event) => setNote(event.target.value)} rows={3} value={note} />
       </label>
@@ -155,6 +175,7 @@ function MerchantReservationCard({
       >
         {isSaving ? "Guardando..." : "Guardar estado"}
       </button>
+      </div>
     </article>
   );
 }

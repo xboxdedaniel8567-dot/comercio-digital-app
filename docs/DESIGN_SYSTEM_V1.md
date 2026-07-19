@@ -278,3 +278,10 @@ solicitudes de privacidad. En escritorio utiliza una navegacion lateral estable;
 en movil convierte el contenido en una secuencia clara y mantiene dos columnas
 de favoritos cuando el ancho lo permite. Los estados de reservas y reportes usan
 color y texto, y todas las acciones conservan las reglas y permisos de Supabase.
+
+El panel del comerciante ya tiene una estructura operativa compartida con
+navegacion activa, resumen de tienda, indicadores, prioridad recomendada,
+inventario, reservas y estadisticas. Las filas de producto priorizan stock,
+moderacion y acciones; las reservas separan la informacion del comprador de la
+respuesta del comercio. La siguiente iteracion cubrira los formularios de tienda
+y de creacion o edicion de productos antes de declarar completa esta etapa.

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { ProductStatusButton } from "@/components/ProductStatusButton";
 import { QuickStockControl } from "@/components/QuickStockControl";
 import { ProductAvailabilityButton } from "@/components/ProductAvailabilityButton";
+import { StatusBadge } from "@/components/StatusBadge";
 import { getCurrentBusiness } from "@/lib/current-business";
 import { getInventoryState } from "@/lib/inventory";
 import { supabase } from "@/lib/supabase";
@@ -103,10 +104,15 @@ export function ProductInventory() {
   }, []);
 
   return (
-    <>
-      <Link className="btn" href="/panel/productos/nuevo">
-        Nuevo producto
-      </Link>
+    <div className="merchant-inventory">
+      <div className="merchant-section-heading merchant-inventory-heading">
+        <div>
+          <p className="kicker">Catalogo</p>
+          <h2>Inventario de productos</h2>
+          <p>Actualiza existencias, visibilidad y datos de cada publicacion.</p>
+        </div>
+        <Link className="btn" href="/panel/productos/nuevo">Nuevo producto</Link>
+      </div>
       {message ? (
         <p className="muted" style={{ marginTop: 18 }}>
           {message}
@@ -119,40 +125,26 @@ export function ProductInventory() {
         </div>
       ) : null}
       {!message && !error && products.length > 0 ? (
-        <div className="grid-auto" style={{ marginTop: 18 }}>
+        <div className="merchant-inventory-summary">
           {[
             ["Disponibles", availableCount],
             ["Pocas unidades", lowStockCount],
             ["Agotados", outOfStockCount],
           ].map(([label, value]) => (
-            <div className="card" key={label}>
-              <p className="muted" style={{ marginTop: 0 }}>{label}</p>
-              <strong style={{ fontSize: "1.5rem" }}>{value}</strong>
+            <div className="merchant-inventory-summary-card" key={label}>
+              <span>{label}</span>
+              <strong>{value}</strong>
             </div>
           ))}
         </div>
       ) : null}
-      <div style={{ display: "grid", gap: 10, marginTop: 18 }}>
+      <div className="merchant-inventory-list">
         {products.map((product) => (
           <div
-            className="inventory-product-row card"
+            className="inventory-product-row panel"
             key={product.slug}
-            style={{
-              alignItems: "center",
-              display: "grid",
-              gap: 14,
-              gridTemplateColumns: "72px 1fr auto",
-            }}
           >
-            <div
-              style={{
-                aspectRatio: "1",
-                background:
-                  "linear-gradient(135deg, #222 0%, #101010 50%, #070707 100%)",
-                border: "1px solid var(--line)",
-                overflow: "hidden",
-              }}
-            >
+            <div className="inventory-product-image">
               {product.product_images?.[0]?.url ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -167,19 +159,18 @@ export function ProductInventory() {
                 />
               ) : null}
             </div>
-            <div style={{ display: "grid", gap: 4 }}>
+            <div className="inventory-product-copy">
               <strong>{product.name}</strong>
-              <p className="muted" style={{ margin: 0 }}>
-                {formatPrice(product.price, product.currency)}
-              </p>
-              <p className="muted" style={{ margin: 0 }}>
-                Moderacion: {moderationLabel(product.moderation_status)}
-              </p>
+              <p>{formatPrice(product.price, product.currency)}</p>
+              <StatusBadge
+                label={moderationLabel(product.moderation_status)}
+                tone={product.moderation_status === "approved" ? "success" : product.moderation_status === "rejected" ? "danger" : "warning"}
+              />
               {product.moderation_note ? (
                 <small className="muted">Nota: {product.moderation_note}</small>
               ) : null}
             </div>
-            <div className="inventory-product-actions" style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+            <div className="inventory-product-actions">
               <QuickStockControl
                 initialStock={product.stock}
                 onStockChange={(stock) => updateProductStock(product.id, stock)}
@@ -189,7 +180,7 @@ export function ProductInventory() {
                 initialUpdatedAt={product.updated_at}
                 productId={product.id}
               />
-              <span>{statusLabel(product.status)}</span>
+              <span className="inventory-product-state">{statusLabel(product.status)}</span>
               <Link className="btn btn-dark" href={`/panel/productos/${product.slug}/editar`}>
                 Editar
               </Link>
@@ -203,6 +194,6 @@ export function ProductInventory() {
           Esta tienda todavia no tiene productos.
         </p>
       ) : null}
-    </>
+    </div>
   );
 }
