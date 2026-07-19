@@ -391,8 +391,16 @@ h3 {
 }
 
 .site-header-actions a:hover,
-.site-header-actions a:focus-visible {
+.site-header-actions a:focus-visible,
+.site-header-actions a[aria-current="page"] {
   color: var(--foreground);
+}
+
+.site-header-actions a[aria-current="page"] {
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 6px;
 }
 
 .mobile-bottom-navigation {
@@ -3217,6 +3225,19 @@ h3 {
 
   .merchant-variant-actions {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-delay: 0s !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-delay: 0s !important;
+    transition-duration: 0.01ms !important;
   }
 }
 

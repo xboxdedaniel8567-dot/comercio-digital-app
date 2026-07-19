@@ -130,14 +130,14 @@ export function AppHeader() {
           ) : null}
 
           <nav aria-label="Navegacion principal" className="site-header-actions">
-            <Link href="/buscar">Buscar</Link>
-            <Link href="/comerciantes">Tiendas</Link>
+            <Link aria-current={isCurrentPath("/buscar") ? "page" : undefined} href="/buscar">Buscar</Link>
+            <Link aria-current={isCurrentPath("/comerciantes") ? "page" : undefined} href="/comerciantes">Tiendas</Link>
             {accountLink.label !== "Iniciar sesion" ? (
-              <Link href="/notificaciones">
+              <Link aria-current={isCurrentPath("/notificaciones") ? "page" : undefined} href="/notificaciones">
                 Avisos{unreadNotifications > 0 ? ` (${unreadNotifications})` : ""}
               </Link>
             ) : null}
-            <Link href={accountLink.href}>{accountLink.label}</Link>
+            <Link aria-current={isCurrentPath(accountLink.href) ? "page" : undefined} href={accountLink.href}>{accountLink.label}</Link>
             <InstallAppButton />
           </nav>
         </div>

@@ -244,7 +244,7 @@ Todo listado o formulario debe definir:
 6. Cuenta del comprador. Completado.
 7. Panel del comerciante. Completado.
 8. Panel administrativo. Completado.
-9. Estados, accesibilidad y responsive final.
+9. Estados, accesibilidad y responsive final. Completado.
 
 La busqueda publica ya cuenta con filtros laterales en escritorio, filtros
 desplegables en movil, dos columnas de productos en 390 px, tres columnas en
@@ -296,3 +296,10 @@ calidad del catalogo y la taxonomia del Adaptive Business Engine comparten una
 estructura densa pero ordenada, formularios etiquetados y respuestas de estado
 accesibles. En movil, las filas se convierten en bloques apilados sin perder las
 acciones esenciales ni el contexto necesario para tomar decisiones.
+
+La auditoria final valida foco visible, campos etiquetados, estados anunciados,
+navegacion activa en escritorio y movil y preferencias de movimiento reducido.
+Las vistas de busqueda, detalle de producto, directorio y resultados vacios se
+probaron en 1440 px y 390 px sin desbordamiento horizontal. El sistema visual v1
+queda listo para recibir fotografias, contenido definitivo y pruebas con
+usuarios sin cambiar sus fundamentos.
