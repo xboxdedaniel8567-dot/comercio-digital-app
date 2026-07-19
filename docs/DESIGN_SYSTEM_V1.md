@@ -240,7 +240,7 @@ Todo listado o formulario debe definir:
 2. Cabecera y navegacion movil. Completado.
 3. Busqueda y tarjetas de producto. Completado.
 4. Detalle de producto. Completado.
-5. Perfil de tienda y directorio. Perfil completado; directorio pendiente.
+5. Perfil de tienda y directorio. Completado.
 6. Cuenta del comprador.
 7. Panel del comerciante.
 8. Panel administrativo.
@@ -264,3 +264,10 @@ reporte de informacion. En escritorio separa catalogo y contexto operativo; en
 movil mantiene dos columnas de productos y apila la informacion sin
 desbordamiento horizontal. No muestra reputacion, mapas ni estadisticas que la
 plataforma todavia no pueda demostrar.
+
+El directorio permite buscar comercios por nombre, categoria o ubicacion,
+filtrar mediante categorias existentes en Supabase, limpiar filtros y recuperar
+una busqueda sin coincidencias. Cada comercio presenta portada, logo o
+monograma, descripcion, direccion y acciones reales para abrir la tienda,
+contactar por WhatsApp o consultar la ruta. La composicion se transforma de una
+fila informativa en escritorio a una tarjeta compacta y operable en movil.
