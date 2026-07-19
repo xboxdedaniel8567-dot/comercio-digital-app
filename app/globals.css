@@ -2064,3 +2064,468 @@ h3 {
     min-height: auto;
   }
 }
+
+.buyer-account-page > h1 {
+  font-size: clamp(2.4rem, 5vw, 4.2rem);
+  line-height: 1.05;
+  margin: 10px 0 8px;
+}
+
+.buyer-account-intro {
+  margin: 0 0 32px;
+  max-width: 680px;
+}
+
+.account-loading,
+.account-guest-state {
+  border: 1px solid var(--line);
+  min-height: 220px;
+  padding: 32px;
+}
+
+.account-guest-state h2 {
+  font-size: clamp(1.7rem, 4vw, 2.6rem);
+  margin: 12px 0 8px;
+}
+
+.account-guest-state .muted {
+  margin: 0 0 24px;
+}
+
+.account-guest-actions,
+.account-record-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.buyer-account-layout {
+  align-items: start;
+  display: grid;
+  gap: 28px;
+  grid-template-columns: 220px minmax(0, 1fr);
+}
+
+.buyer-account-sidebar {
+  border: 1px solid var(--line);
+  display: grid;
+  gap: 18px;
+  padding: 16px;
+  position: sticky;
+  top: 92px;
+}
+
+.buyer-account-person {
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 48px minmax(0, 1fr);
+  padding-bottom: 16px;
+}
+
+.buyer-account-avatar {
+  align-items: center;
+  aspect-ratio: 1;
+  background: var(--accent);
+  color: var(--background);
+  display: flex;
+  font-size: 1.15rem;
+  font-weight: 850;
+  justify-content: center;
+  width: 48px;
+}
+
+.buyer-account-person > div {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.buyer-account-person strong,
+.buyer-account-person span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.buyer-account-person span {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.buyer-account-sidebar nav {
+  display: grid;
+  gap: 3px;
+}
+
+.buyer-account-sidebar nav a {
+  border-left: 2px solid transparent;
+  color: var(--muted);
+  padding: 10px 12px;
+  text-decoration: none;
+}
+
+.buyer-account-sidebar nav a:hover,
+.buyer-account-sidebar nav a:focus-visible {
+  background: var(--panel-interactive);
+  border-left-color: var(--accent);
+  color: var(--foreground);
+}
+
+.buyer-account-sidebar .btn {
+  justify-content: center;
+  width: 100%;
+}
+
+.buyer-account-content {
+  display: grid;
+  gap: 28px;
+  min-width: 0;
+}
+
+.buyer-account-overview,
+.account-profile-form,
+.account-section,
+.account-privacy-section {
+  scroll-margin-top: 96px;
+}
+
+.account-profile-heading {
+  align-items: start;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  padding-bottom: 22px;
+}
+
+.account-profile-heading h2 {
+  font-size: clamp(1.7rem, 3vw, 2.5rem);
+  margin: 8px 0 6px;
+}
+
+.account-profile-heading .muted {
+  margin: 0;
+}
+
+.account-stat-grid {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 14px;
+}
+
+.account-stat-grid a {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  color: inherit;
+  display: grid;
+  gap: 8px;
+  min-height: 96px;
+  padding: 16px;
+  text-decoration: none;
+}
+
+.account-stat-grid a:hover {
+  border-color: var(--accent);
+}
+
+.account-stat-grid span {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.account-stat-grid strong {
+  font-size: 1.75rem;
+}
+
+.account-profile-form {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  display: grid;
+  gap: 18px;
+  padding: 22px;
+}
+
+.account-profile-form h2 {
+  margin: 0;
+}
+
+.account-form-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.account-form-grid label {
+  display: grid;
+  gap: 7px;
+}
+
+.account-form-grid input {
+  min-height: 52px;
+}
+
+.account-profile-form > .btn {
+  justify-self: start;
+}
+
+.account-feedback {
+  background: color-mix(in srgb, var(--info) 9%, var(--panel));
+  border: 1px solid var(--info);
+  color: var(--foreground);
+  margin: -10px 0 0;
+  padding: 12px 14px;
+}
+
+.account-section,
+.account-privacy-section {
+  border-top: 1px solid var(--line);
+  padding-top: 26px;
+}
+
+.account-section-heading {
+  align-items: end;
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.account-section-heading h2 {
+  font-size: clamp(1.45rem, 3vw, 2rem);
+  margin: 7px 0 0;
+}
+
+.account-section-heading > span {
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.account-search-list,
+.account-record-list {
+  border: 1px solid var(--line);
+  display: grid;
+}
+
+.account-search-list > a {
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  color: inherit;
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+  min-height: 64px;
+  padding: 12px 16px;
+  text-decoration: none;
+}
+
+.account-search-list > a:last-child,
+.account-record:last-child {
+  border-bottom: 0;
+}
+
+.account-search-list > a:hover {
+  background: var(--panel-interactive);
+}
+
+.account-search-list > a > span:first-child {
+  display: grid;
+  gap: 3px;
+}
+
+.account-search-list small,
+.account-search-list > a > span:last-child {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.account-favorites-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.account-favorite-item {
+  display: grid;
+  gap: 6px;
+}
+
+.account-favorite-item .text-action {
+  justify-self: start;
+}
+
+.danger-text {
+  color: var(--danger);
+}
+
+.account-record {
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+
+.account-record p,
+.account-record small {
+  margin: 0;
+}
+
+.account-record-heading {
+  align-items: start;
+  display: flex;
+  gap: 14px;
+  justify-content: space-between;
+}
+
+.account-record-heading > div {
+  display: grid;
+  gap: 4px;
+}
+
+.account-record-heading > div > span {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.account-record-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 28px;
+  margin: 0;
+}
+
+.account-record-details div {
+  display: grid;
+  gap: 2px;
+}
+
+.account-record-details dt {
+  color: var(--subtle);
+  font-size: 0.72rem;
+}
+
+.account-record-details dd {
+  margin: 0;
+}
+
+.account-record-link {
+  justify-self: start;
+}
+
+.btn-danger-outline {
+  background: transparent;
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.account-empty {
+  align-items: start;
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-height: 130px;
+  padding: 22px;
+}
+
+.account-empty p {
+  color: var(--muted);
+  margin: 0;
+}
+
+.account-privacy-section > section > h2 {
+  font-size: clamp(1.45rem, 3vw, 2rem);
+  margin-top: 0;
+}
+
+@media (max-width: 980px) {
+  .buyer-account-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .buyer-account-sidebar {
+    position: static;
+  }
+
+  .buyer-account-sidebar nav {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+  }
+
+  .buyer-account-sidebar nav a {
+    border: 1px solid var(--line);
+    flex: 0 0 auto;
+  }
+
+  .account-favorites-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 620px) {
+  .buyer-account-page {
+    padding-top: 34px;
+  }
+
+  .buyer-account-page > h1 {
+    font-size: 2.4rem;
+  }
+
+  .buyer-account-sidebar {
+    padding: 12px;
+  }
+
+  .buyer-account-sidebar > .btn {
+    display: none;
+  }
+
+  .account-profile-heading,
+  .account-section-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .account-profile-heading .btn {
+    width: 100%;
+  }
+
+  .account-stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .account-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .account-profile-form > .btn {
+    width: 100%;
+  }
+
+  .account-favorites-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .account-search-list > a {
+    align-items: start;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .account-record-heading {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .account-record-actions .btn {
+    flex: 1 1 150px;
+  }
+}
+
+@media (max-width: 350px) {
+  .account-favorites-grid {
+    grid-template-columns: 1fr;
+  }
+}

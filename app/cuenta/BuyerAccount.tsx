@@ -93,6 +93,14 @@ function formatPrice(price: number | null, currency: string) {
   }).format(price);
 }
 
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat("es-CO", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(new Date(value));
+}
+
 export function BuyerAccount() {
   const [favorites, setFavorites] = useState<FavoriteRow[]>([]);
   const [searchHistory, setSearchHistory] = useState<SearchHistoryRow[]>([]);
@@ -258,13 +266,17 @@ export function BuyerAccount() {
     setIsSaving(false);
   }
 
-  if (isLoggedIn === null) return <p className="muted">{message}</p>;
+  if (isLoggedIn === null) {
+    return <div className="account-loading" role="status">{message}</div>;
+  }
 
   if (!isLoggedIn) {
     return (
-      <div className="card" style={{ display: "grid", gap: 12 }}>
-        <strong>Inicia sesion para ver tus productos guardados.</strong>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+      <div className="account-guest-state">
+        <p className="kicker">Acceso necesario</p>
+        <h2>Inicia sesion para ver tu actividad</h2>
+        <p className="muted">Tus favoritos, reservas y busquedas se guardan de forma privada en tu cuenta.</p>
+        <div className="account-guest-actions">
           <Link className="btn" href="/panel/login?next=/cuenta">Iniciar sesion</Link>
           <Link className="btn btn-dark" href="/cuenta/registro">Crear cuenta</Link>
         </div>
@@ -273,181 +285,137 @@ export function BuyerAccount() {
   }
 
   return (
-    <div style={{ display: "grid", gap: 24 }}>
-      <div className="card" style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 16 }}>
-        <div>
-          <span className="muted">Cuenta</span>
-          <h2 style={{ margin: "6px 0 0" }}>{fullName}</h2>
-          {phone ? <p className="muted" style={{ margin: "6px 0 0" }}>{phone}</p> : null}
-        </div>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "center" }}>
-          <button className="btn btn-dark" onClick={() => setIsEditing((current) => !current)} type="button">
-            {isEditing ? "Cancelar" : "Editar perfil"}
-          </button>
-          <LogoutButton />
-        </div>
-      </div>
-
-      {isEditing ? (
-        <form className="card" onSubmit={saveProfile} style={{ display: "grid", gap: 12 }}>
-          <h2 style={{ margin: 0 }}>Datos personales</h2>
-          <label style={{ display: "grid", gap: 6 }}>
-            <span>Nombre completo</span>
-            <input
-              maxLength={100}
-              minLength={3}
-              onChange={(event) => setDraftFullName(event.target.value)}
-              required
-              value={draftFullName}
-            />
-          </label>
-          <label style={{ display: "grid", gap: 6 }}>
-            <span>Telefono</span>
-            <input
-              inputMode="tel"
-              maxLength={30}
-              onChange={(event) => setDraftPhone(event.target.value)}
-              placeholder="Ej. 322 584 0281"
-              value={draftPhone}
-            />
-          </label>
-          <button className="btn" disabled={isSaving} type="submit">
-            {isSaving ? "Guardando..." : "Guardar cambios"}
-          </button>
-        </form>
-      ) : null}
-
-      {profileMessage ? <p className="muted" role="status">{profileMessage}</p> : null}
-
-      <section aria-labelledby="recent-searches">
-        <div style={{ alignItems: "center", display: "flex", flexWrap: "wrap", gap: 12, justifyContent: "space-between" }}>
-          <h2 id="recent-searches" style={{ margin: 0 }}>Busquedas recientes</h2>
-          {searchHistory.length > 0 ? (
-            <button className="btn btn-dark" onClick={() => void clearSearchHistory()} type="button">
-              Borrar historial
-            </button>
-          ) : null}
-        </div>
-        <div className="card" style={{ display: "grid", gap: 10, marginTop: 18 }}>
-          {searchHistory.map((search, index) => (
-            <Link
-              href={`/buscar?q=${encodeURIComponent(search.query)}`}
-              key={`${search.created_at}-${index}`}
-              style={{
-                alignItems: "center",
-                borderBottom: index < searchHistory.length - 1 ? "1px solid var(--line)" : undefined,
-                display: "flex",
-                justifyContent: "space-between",
-                gap: 12,
-                paddingBottom: index < searchHistory.length - 1 ? 10 : 0,
-              }}
-            >
-              <strong>{search.query}</strong>
-              <span className="muted">{search.results_count ?? 0} resultados</span>
-            </Link>
-          ))}
-          {searchHistory.length === 0 ? (
-            <p className="muted" style={{ margin: 0 }}>Todavia no hay busquedas guardadas en esta cuenta.</p>
-          ) : null}
-        </div>
-      </section>
-
-      <section aria-labelledby="favorite-products">
-        <h2 id="favorite-products">Productos guardados</h2>
-        {message ? <p className="muted">{message}</p> : null}
-        <div className="grid-auto" style={{ marginTop: 18 }}>
-          {favorites.map((favorite) => {
-            const product = favorite.products;
-            if (!product) return null;
-
-            return (
-              <div key={favorite.id} style={{ display: "grid", gap: 8 }}>
-                <ProductCard
-                  product={{
-                    attributes: [],
-                    businessName: product.businesses?.name ?? "Tienda por confirmar",
-                    category: product.categories?.name ?? "Sin categoria",
-                    imageUrl: product.product_images?.[0]?.url ?? null,
-                    name: product.name,
-                    price: formatPrice(product.price, product.currency),
-                    slug: product.slug,
-                    stock: product.stock,
-                  }}
-                />
-                <button className="btn btn-dark" onClick={() => void removeFavorite(favorite.id)} type="button">
-                  Quitar de favoritos
-                </button>
-              </div>
-            );
-          })}
-        </div>
-        {!message && favorites.length === 0 ? (
-          <div className="card" style={{ marginTop: 18 }}>
-            <p className="muted">Todavia no has guardado productos.</p>
-            <Link className="btn" href="/buscar">Buscar productos</Link>
+    <div className="buyer-account-layout">
+      <aside className="buyer-account-sidebar" aria-label="Secciones de la cuenta">
+        <div className="buyer-account-person">
+          <span className="buyer-account-avatar" aria-hidden="true">
+            {fullName.trim().charAt(0).toUpperCase() || "C"}
+          </span>
+          <div>
+            <strong>{fullName}</strong>
+            <span>{phone || "Telefono sin registrar"}</span>
           </div>
+        </div>
+        <nav>
+          <a href="#resumen">Resumen</a>
+          <a href="#busquedas">Busquedas</a>
+          <a href="#favoritos">Favoritos</a>
+          <a href="#reservas">Reservas</a>
+          <a href="#reportes">Reportes</a>
+          <a href="#privacidad">Privacidad</a>
+        </nav>
+        <LogoutButton />
+      </aside>
+
+      <div className="buyer-account-content">
+        <section className="buyer-account-overview" id="resumen" aria-labelledby="account-summary-title">
+          <div className="account-profile-heading">
+            <div>
+              <p className="kicker">Resumen de cuenta</p>
+              <h2 id="account-summary-title">Hola, {fullName.split(" ")[0]}</h2>
+              <p className="muted">Aqui puedes consultar y administrar tu actividad en Comercio Digital.</p>
+            </div>
+            <button className="btn btn-dark" onClick={() => setIsEditing((current) => !current)} type="button">
+              {isEditing ? "Cancelar edicion" : "Editar perfil"}
+            </button>
+          </div>
+
+          <div className="account-stat-grid">
+            <a href="#favoritos"><span>Favoritos</span><strong>{favorites.length}</strong></a>
+            <a href="#reservas"><span>Reservas</span><strong>{reservations.length}</strong></a>
+            <a href="#busquedas"><span>Busquedas</span><strong>{searchHistory.length}</strong></a>
+            <a href="#reportes"><span>Reportes</span><strong>{reports.length}</strong></a>
+          </div>
+        </section>
+
+        {isEditing ? (
+          <form className="account-profile-form" onSubmit={saveProfile}>
+            <h2>Datos personales</h2>
+            <div className="account-form-grid">
+              <label>
+                <span>Nombre completo</span>
+                <input maxLength={100} minLength={3} onChange={(event) => setDraftFullName(event.target.value)} required value={draftFullName} />
+              </label>
+              <label>
+                <span>Telefono</span>
+                <input inputMode="tel" maxLength={30} onChange={(event) => setDraftPhone(event.target.value)} placeholder="Ej. 322 584 0281" value={draftPhone} />
+              </label>
+            </div>
+            <button className="btn" disabled={isSaving} type="submit">{isSaving ? "Guardando..." : "Guardar cambios"}</button>
+          </form>
         ) : null}
-      </section>
 
-      <section aria-labelledby="my-reservations">
-        <h2 id="my-reservations">Mis reservas</h2>
-        <div style={{ display: "grid", gap: 10, marginTop: 18 }}>
-          {reservations.map((reservation) => (
-            <article className="card" key={reservation.id} style={{ display: "grid", gap: 8 }}>
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "space-between" }}>
-                <strong>{reservation.products?.name ?? "Producto no disponible"}</strong>
-                <StatusBadge
-                  label={reservationStatusLabels[reservation.status] ?? reservation.status}
-                  tone={reservationStatusTone(reservation.status)}
-                />
-              </div>
-              <p className="muted" style={{ margin: 0 }}>
-                {reservation.businesses?.name ?? "Tienda no disponible"} - Cantidad: {reservation.quantity}
-              </p>
-              {reservation.product_variants?.name ? <p className="muted" style={{ margin: 0 }}>Variante: {reservation.product_variants.name}</p> : null}
-              {reservation.buyer_note ? <p className="muted" style={{ margin: 0 }}>Tu nota: {reservation.buyer_note}</p> : null}
-              {reservation.merchant_note ? <p style={{ margin: 0 }}><strong>Respuesta:</strong> {reservation.merchant_note}</p> : null}
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
-                {reservation.products?.slug ? <Link className="btn btn-dark" href={`/productos/${reservation.products.slug}`}>Ver producto</Link> : null}
-                {["pending", "confirmed"].includes(reservation.status) ? (
-                  <button className="btn btn-dark" onClick={() => void cancelReservation(reservation.id)} type="button">Cancelar reserva</button>
-                ) : null}
-              </div>
-            </article>
-          ))}
-          {reservations.length === 0 ? <p className="muted">No tienes solicitudes de reserva.</p> : null}
-        </div>
-      </section>
+        {profileMessage ? <p className="account-feedback" role="status">{profileMessage}</p> : null}
+        {message ? <p className="account-feedback" role="status">{message}</p> : null}
 
-      <section aria-labelledby="my-reports">
-        <h2 id="my-reports">Mis reportes</h2>
-        <div style={{ display: "grid", gap: 10, marginTop: 18 }}>
-          {reports.map((report) => {
-            const target = report.target_type === "product" ? report.products : report.businesses;
-            const href = report.target_type === "product"
-              ? `/productos/${report.products?.slug ?? ""}`
-              : `/tiendas/${report.businesses?.slug ?? ""}`;
+        <section className="account-section" id="busquedas" aria-labelledby="recent-searches">
+          <header className="account-section-heading">
+            <div><p className="kicker">Actividad</p><h2 id="recent-searches">Busquedas recientes</h2></div>
+            {searchHistory.length > 0 ? <button className="text-action" onClick={() => void clearSearchHistory()} type="button">Borrar historial</button> : null}
+          </header>
+          {searchHistory.length > 0 ? (
+            <div className="account-search-list">
+              {searchHistory.map((search, index) => (
+                <Link href={`/buscar?q=${encodeURIComponent(search.query)}`} key={`${search.created_at}-${index}`}>
+                  <span><strong>{search.query}</strong><small>{formatDate(search.created_at)}</small></span>
+                  <span>{search.results_count ?? 0} resultados</span>
+                </Link>
+              ))}
+            </div>
+          ) : <div className="account-empty"><p>Todavia no hay busquedas guardadas.</p><Link className="btn btn-dark" href="/buscar">Comenzar a buscar</Link></div>}
+        </section>
 
-            return (
-              <article className="card" key={report.id} style={{ display: "grid", gap: 8 }}>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "space-between" }}>
-                  <strong>{target?.name ?? "Publicacion no disponible"}</strong>
-                  <span>{reportStatusLabels[report.status] ?? report.status}</span>
-                </div>
-                <span className="muted">{reportReasonLabels[report.reason] ?? report.reason}</span>
-                <p className="muted" style={{ margin: 0 }}>{report.details}</p>
-                {report.admin_note ? (
-                  <p style={{ margin: 0 }}><strong>Respuesta:</strong> {report.admin_note}</p>
-                ) : null}
-                {target?.slug ? <Link className="btn btn-dark" href={href}>Ver publicacion</Link> : null}
+        <section className="account-section" id="favoritos" aria-labelledby="favorite-products">
+          <header className="account-section-heading"><div><p className="kicker">Guardados</p><h2 id="favorite-products">Productos favoritos</h2></div><span>{favorites.length} guardados</span></header>
+          {favorites.length > 0 ? (
+            <div className="account-favorites-grid">
+              {favorites.map((favorite) => {
+                const product = favorite.products;
+                if (!product) return null;
+                return (
+                  <div className="account-favorite-item" key={favorite.id}>
+                    <ProductCard product={{ attributes: [], businessName: product.businesses?.name ?? "Tienda por confirmar", category: product.categories?.name ?? "Sin categoria", imageUrl: product.product_images?.[0]?.url ?? null, name: product.name, price: formatPrice(product.price, product.currency), slug: product.slug, stock: product.stock }} />
+                    <button className="text-action danger-text" onClick={() => void removeFavorite(favorite.id)} type="button">Quitar de favoritos</button>
+                  </div>
+                );
+              })}
+            </div>
+          ) : <div className="account-empty"><p>Todavia no has guardado productos.</p><Link className="btn" href="/buscar">Explorar productos</Link></div>}
+        </section>
+
+        <section className="account-section" id="reservas" aria-labelledby="my-reservations">
+          <header className="account-section-heading"><div><p className="kicker">Solicitudes</p><h2 id="my-reservations">Mis reservas</h2></div><span>{reservations.length} solicitudes</span></header>
+          {reservations.length > 0 ? <div className="account-record-list">
+            {reservations.map((reservation) => (
+              <article className="account-record" key={reservation.id}>
+                <div className="account-record-heading"><div><strong>{reservation.products?.name ?? "Producto no disponible"}</strong><span>{reservation.businesses?.name ?? "Tienda no disponible"}</span></div><StatusBadge label={reservationStatusLabels[reservation.status] ?? reservation.status} tone={reservationStatusTone(reservation.status)} /></div>
+                <dl className="account-record-details"><div><dt>Cantidad</dt><dd>{reservation.quantity}</dd></div>{reservation.product_variants?.name ? <div><dt>Variante</dt><dd>{reservation.product_variants.name}</dd></div> : null}<div><dt>Fecha</dt><dd>{formatDate(reservation.created_at)}</dd></div></dl>
+                {reservation.buyer_note ? <p className="muted">Tu nota: {reservation.buyer_note}</p> : null}
+                {reservation.merchant_note ? <p><strong>Respuesta de la tienda:</strong> {reservation.merchant_note}</p> : null}
+                <div className="account-record-actions">{reservation.products?.slug ? <Link className="btn btn-dark" href={`/productos/${reservation.products.slug}`}>Ver producto</Link> : null}{["pending", "confirmed"].includes(reservation.status) ? <button className="btn btn-danger-outline" onClick={() => void cancelReservation(reservation.id)} type="button">Cancelar reserva</button> : null}</div>
               </article>
-            );
-          })}
-          {reports.length === 0 ? <p className="muted">No has enviado reportes.</p> : null}
-        </div>
-      </section>
+            ))}
+          </div> : <div className="account-empty"><p>No tienes solicitudes de reserva.</p><Link className="btn btn-dark" href="/buscar">Buscar productos</Link></div>}
+        </section>
 
-      <PrivacyRequestCenter />
+        <section className="account-section" id="reportes" aria-labelledby="my-reports">
+          <header className="account-section-heading"><div><p className="kicker">Seguimiento</p><h2 id="my-reports">Mis reportes</h2></div><span>{reports.length} enviados</span></header>
+          {reports.length > 0 ? <div className="account-record-list">
+            {reports.map((report) => {
+              const target = report.target_type === "product" ? report.products : report.businesses;
+              const href = report.target_type === "product" ? `/productos/${report.products?.slug ?? ""}` : `/tiendas/${report.businesses?.slug ?? ""}`;
+              return <article className="account-record" key={report.id}>
+                <div className="account-record-heading"><div><strong>{target?.name ?? "Publicacion no disponible"}</strong><span>{reportReasonLabels[report.reason] ?? report.reason}</span></div><StatusBadge label={reportStatusLabels[report.status] ?? report.status} tone={report.status === "resolved" ? "success" : report.status === "dismissed" ? "neutral" : report.status === "under_review" ? "warning" : "info"} /></div>
+                <p className="muted">{report.details}</p><small className="muted">Enviado el {formatDate(report.created_at)}</small>
+                {report.admin_note ? <p><strong>Respuesta administrativa:</strong> {report.admin_note}</p> : null}
+                {target?.slug ? <Link className="btn btn-dark account-record-link" href={href}>Ver publicacion</Link> : null}
+              </article>;
+            })}
+          </div> : <div className="account-empty"><p>No has enviado reportes.</p></div>}
+        </section>
+
+        <div id="privacidad" className="account-privacy-section"><PrivacyRequestCenter /></div>
+      </div>
     </div>
   );
 }

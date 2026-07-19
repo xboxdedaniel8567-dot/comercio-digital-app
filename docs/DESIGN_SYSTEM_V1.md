@@ -241,7 +241,7 @@ Todo listado o formulario debe definir:
 3. Busqueda y tarjetas de producto. Completado.
 4. Detalle de producto. Completado.
 5. Perfil de tienda y directorio. Completado.
-6. Cuenta del comprador.
+6. Cuenta del comprador. Completado.
 7. Panel del comerciante.
 8. Panel administrativo.
 9. Estados, accesibilidad y responsive final.
@@ -271,3 +271,10 @@ una busqueda sin coincidencias. Cada comercio presenta portada, logo o
 monograma, descripcion, direccion y acciones reales para abrir la tienda,
 contactar por WhatsApp o consultar la ruta. La composicion se transforma de una
 fila informativa en escritorio a una tarjeta compacta y operable en movil.
+
+La cuenta del comprador organiza su actividad en un resumen con metricas reales,
+datos personales editables, busquedas recientes, favoritos, reservas, reportes y
+solicitudes de privacidad. En escritorio utiliza una navegacion lateral estable;
+en movil convierte el contenido en una secuencia clara y mantiene dos columnas
+de favoritos cuando el ancho lo permite. Los estados de reservas y reportes usan
+color y texto, y todas las acciones conservan las reglas y permisos de Supabase.
