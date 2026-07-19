@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { StatusBadge } from "@/components/StatusBadge";
 import { supabase } from "@/lib/supabase";
 
 type ReportRow = {
@@ -77,7 +78,8 @@ export function AdminReportsManager() {
   if (message && reports.length === 0) return <p className="muted">{message}</p>;
 
   return (
-    <div style={{ display: "grid", gap: 12 }}>
+    <div className="admin-workspace">
+      <section className="admin-toolbar panel"><div><span className="eyebrow">Confianza y seguridad</span><h2>{reports.length} reportes recibidos</h2><p className="muted">Revisa primero los casos abiertos y documenta cada decision.</p></div></section>
       {message ? <p className="muted" role="status">{message}</p> : null}
       {reports.map((report) => {
         const target = report.target_type === "product" ? report.products : report.businesses;
@@ -116,17 +118,18 @@ function ReportReviewCard({
   const [isSaving, setIsSaving] = useState(false);
 
   return (
-    <article className="card" style={{ display: "grid", gap: 10 }}>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 12, justifyContent: "space-between" }}>
+    <article className="admin-review-card panel">
+      <div className="admin-review-heading">
         <div>
-          <p className="kicker" style={{ marginTop: 0 }}>{reasonLabels[report.reason] ?? report.reason}</p>
-          <h2 style={{ margin: "6px 0" }}>{targetName}</h2>
-          <p className="muted" style={{ margin: 0 }}>{report.details}</p>
+          <p className="kicker">{reasonLabels[report.reason] ?? report.reason}</p>
+          <h2>{targetName}</h2>
+          <p className="muted">{report.details}</p>
         </div>
-        <strong>{statusLabels[report.status] ?? report.status}</strong>
+        <StatusBadge label={statusLabels[report.status] ?? report.status} tone={report.status === "resolved" ? "success" : report.status === "dismissed" ? "neutral" : report.status === "under_review" ? "info" : "warning"} />
       </div>
-      <Link className="btn btn-dark" href={targetPath}>Revisar publicacion</Link>
-      <label style={{ display: "grid", gap: 6 }}>
+      <Link className="text-action" href={targetPath}>Abrir publicacion</Link>
+      <div className="admin-review-form">
+      <label className="merchant-field">
         <span>Estado</span>
         <select onChange={(event) => setStatus(event.target.value)} value={status}>
           <option value="open">Abierto</option>
@@ -135,10 +138,11 @@ function ReportReviewCard({
           <option value="dismissed">Descartado</option>
         </select>
       </label>
-      <label style={{ display: "grid", gap: 6 }}>
+      <label className="merchant-field">
         <span>Nota administrativa</span>
         <textarea maxLength={1000} onChange={(event) => setNote(event.target.value)} rows={3} value={note} />
       </label>
+      </div>
       <button
         className="btn"
         disabled={isSaving}
@@ -154,4 +158,3 @@ function ReportReviewCard({
     </article>
   );
 }
-

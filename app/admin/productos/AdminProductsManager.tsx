@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ProductModerationActions } from "@/components/ProductModerationActions";
+import { StatusBadge } from "@/components/StatusBadge";
 import { supabase } from "@/lib/supabase";
 
 type ProductRow = {
@@ -43,8 +44,16 @@ function moderationLabel(status: string) {
   return status;
 }
 
+function moderationTone(status: string): "danger" | "info" | "success" {
+  if (status === "approved") return "success";
+  if (status === "rejected") return "danger";
+  return "info";
+}
+
 export function AdminProductsManager() {
   const [products, setProducts] = useState<ProductRow[]>([]);
+  const [query, setQuery] = useState("");
+  const [moderationFilter, setModerationFilter] = useState("all");
   const [message, setMessage] = useState("Cargando todos los productos...");
   const [error, setError] = useState("");
 
@@ -73,38 +82,46 @@ export function AdminProductsManager() {
 
   if (message) return <p className="muted">{message}</p>;
 
+  const visibleProducts = products.filter((product) => {
+    const matchesQuery = `${product.name} ${product.businesses?.name ?? ""} ${product.categories?.name ?? ""}`
+      .toLowerCase().includes(query.trim().toLowerCase());
+    return matchesQuery && (moderationFilter === "all" || product.moderation_status === moderationFilter);
+  });
+
   return (
-    <div style={{ display: "grid", gap: 10 }}>
+    <div className="admin-workspace">
+      <section className="admin-toolbar panel">
+        <div><span className="eyebrow">Catalogo global</span><h2>{products.length} productos registrados</h2></div>
+        <div className="admin-toolbar-controls">
+          <label><span className="sr-only">Buscar productos</span><input className="input" onChange={(event) => setQuery(event.target.value)} placeholder="Buscar producto, tienda o categoria" value={query} /></label>
+          <label><span className="sr-only">Filtrar moderacion</span><select className="input" onChange={(event) => setModerationFilter(event.target.value)} value={moderationFilter}><option value="all">Todos los estados</option><option value="under_review">En revision</option><option value="approved">Aprobados</option><option value="rejected">Rechazados</option></select></label>
+        </div>
+      </section>
       {error ? (
         <div className="card" style={{ borderColor: "#ef4444" }}>
           <strong>No se pudieron cargar los productos.</strong>
           <p className="muted">{error}</p>
         </div>
       ) : null}
-      {products.map((product) => (
-        <div
-          className="admin-product-row card"
-          key={product.id}
-          style={{ display: "grid", gap: 14, gridTemplateColumns: "72px minmax(180px, 1fr) minmax(250px, auto)", alignItems: "center" }}
-        >
-          <div style={{ aspectRatio: "1", border: "1px solid var(--line)", background: "linear-gradient(135deg, #222, #080808)", overflow: "hidden" }}>
+      <div className="admin-record-list">
+      {visibleProducts.map((product) => (
+        <article className="admin-product-row" key={product.id}>
+          <div className="admin-product-media">
             {product.product_images?.[0]?.url ? (
-              <img alt={product.name} src={product.product_images[0].url} style={{ display: "block", height: "100%", objectFit: "cover", width: "100%" }} />
-            ) : null}
+              <img alt={product.name} src={product.product_images[0].url} />
+            ) : <span>Sin imagen</span>}
           </div>
-          <div>
-            <strong>{product.name}</strong>
-            <p className="muted" style={{ marginBottom: 4 }}>
+          <div className="admin-record-copy">
+            <div className="admin-record-title"><strong>{product.name}</strong><StatusBadge label={moderationLabel(product.moderation_status)} tone={moderationTone(product.moderation_status)} /></div>
+            <p className="muted">
               {product.businesses?.name ?? "Tienda por confirmar"} - {product.categories?.name ?? "Sin categoria"}
             </p>
-            <p className="muted" style={{ margin: 0 }}>
+            <p className="muted">
               {formatPrice(product.price, product.currency)} - Stock: {product.stock ?? "Por confirmar"}
             </p>
-            <p style={{ marginBottom: 0 }}>
-              {publicationLabel(product.status)} - {moderationLabel(product.moderation_status)}
-            </p>
+            <small>{publicationLabel(product.status)}</small>
             {product.status === "active" && product.moderation_status === "approved" ? (
-              <Link className="btn btn-dark" href={`/productos/${product.slug}`} style={{ marginTop: 10 }}>
+              <Link className="text-action" href={`/productos/${product.slug}`}>
                 Ver producto
               </Link>
             ) : null}
@@ -114,9 +131,11 @@ export function AdminProductsManager() {
             initialNote={product.moderation_note ?? ""}
             productId={product.id}
           />
-        </div>
+        </article>
       ))}
+      </div>
       {!error && products.length === 0 ? <p className="muted">Todavia no hay productos registrados.</p> : null}
+      {!error && products.length > 0 && visibleProducts.length === 0 ? <div className="admin-empty panel"><strong>No encontramos productos con esos filtros.</strong><button className="btn btn-dark" onClick={() => { setQuery(""); setModerationFilter("all"); }} type="button">Limpiar filtros</button></div> : null}
     </div>
   );
 }

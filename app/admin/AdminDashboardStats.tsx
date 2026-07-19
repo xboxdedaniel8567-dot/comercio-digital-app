@@ -72,30 +72,37 @@ export function AdminDashboardStats() {
   }
 
   const cards = [
-    ["Comercios totales", stats.businesses_total],
-    ["Activos", stats.businesses_active],
-    ["Pendientes", stats.businesses_pending],
-    ["Suspendidos", stats.businesses_suspended],
-    ["Rechazados", stats.businesses_rejected],
-    ["Productos totales", stats.products_total],
-    ["Productos activos", stats.products_active],
-    ["Busquedas", stats.searches_total],
-    ["Contactos WhatsApp", stats.contacts_total],
-    ["Reportes abiertos", openReports],
+    ["Comercios", stats.businesses_total, "Registrados en la plataforma"],
+    ["Productos", stats.products_total, `${stats.products_active} visibles en el marketplace`],
+    ["Busquedas", stats.searches_total, "Intenciones de compra registradas"],
+    ["WhatsApp", stats.contacts_total, "Contactos enviados a comercios"],
   ];
 
   return (
     <>
-      <div className="grid-auto">
-        {cards.map(([label, value]) => (
-          <div className="card" key={label}>
-            <p className="muted">{label}</p>
-            <strong style={{ fontSize: "1.6rem" }}>{value}</strong>
-          </div>
+      <section className="admin-overview-intro panel">
+        <div>
+          <span className="eyebrow">Estado general</span>
+          <h2>Operacion del marketplace</h2>
+          <p className="muted">Supervisa oferta, actividad y asuntos que necesitan una decision del equipo.</p>
+        </div>
+        <span className={openReports || stats.businesses_pending ? "status-badge status-badge-warning" : "status-badge status-badge-success"}>
+          {openReports || stats.businesses_pending ? "Requiere atencion" : "Operacion estable"}
+        </span>
+      </section>
+      <div className="admin-metric-grid">
+        {cards.map(([label, value, detail]) => (
+          <article className="admin-metric-card" key={label}>
+            <span>{label}</span>
+            <strong>{value}</strong>
+            <small>{detail}</small>
+          </article>
         ))}
       </div>
-      <div className="card" style={{ marginTop: 18 }}>
-        <h2 style={{ marginTop: 0 }}>Prioridad operativa</h2>
+      <div className="admin-operations-grid">
+      <section className="admin-priority-card panel">
+        <span className="eyebrow">Siguiente accion</span>
+        <h2>Prioridad operativa</h2>
         <p className="muted">
           {openReports > 0
             ? `Hay ${openReports} reporte(s) abierto(s) que necesitan revision.`
@@ -103,7 +110,7 @@ export function AdminDashboardStats() {
             ? `Hay ${stats.businesses_pending} comercio(s) esperando revision.`
             : "No hay comercios pendientes. Revisa ahora la calidad de los catalogos activos."}
         </p>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
+        <div className="admin-action-row">
           {openReports > 0 ? (
             <Link className="btn" href="/admin/reportes">
               Revisar reportes
@@ -116,6 +123,13 @@ export function AdminDashboardStats() {
             Revisar calidad
           </Link>
         </div>
+      </section>
+      <section className="admin-state-summary panel">
+        <div><span>Comercios activos</span><strong>{stats.businesses_active}</strong></div>
+        <div><span>Pendientes</span><strong>{stats.businesses_pending}</strong></div>
+        <div><span>Suspendidos</span><strong>{stats.businesses_suspended}</strong></div>
+        <div><span>Rechazados</span><strong>{stats.businesses_rejected}</strong></div>
+      </section>
       </div>
     </>
   );

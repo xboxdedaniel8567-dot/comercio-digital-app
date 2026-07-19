@@ -55,11 +55,12 @@ export function CategoryCreateForm() {
   }
 
   return (
-    <form className="card" onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
-      <h2 style={{ margin: 0 }}>Nueva categoria</h2>
-      <p className="muted" style={{ margin: 0 }}>
+    <form className="admin-taxonomy-form panel" onSubmit={handleSubmit}>
+      <div><span className="eyebrow">Nivel principal</span><h2>Nueva categoria</h2></div>
+      <p className="muted">
         Agrega categorias principales para que comerciantes puedan clasificar sus productos.
       </p>
+      <label className="merchant-field"><span>Nombre</span>
       <input
         className="input"
         onChange={(event) => handleNameChange(event.target.value)}
@@ -67,6 +68,8 @@ export function CategoryCreateForm() {
         required
         value={name}
       />
+      </label>
+      <label className="merchant-field"><span>Direccion interna (slug)</span>
       <input
         className="input"
         onChange={(event) => setSlug(event.target.value)}
@@ -74,6 +77,8 @@ export function CategoryCreateForm() {
         required
         value={slug}
       />
+      </label>
+      <label className="merchant-field"><span>Descripcion</span>
       <textarea
         className="input"
         onChange={(event) => setDescription(event.target.value)}
@@ -81,10 +86,11 @@ export function CategoryCreateForm() {
         rows={3}
         value={description}
       />
+      </label>
       <button className="btn" disabled={isSubmitting} type="submit">
         {isSubmitting ? "Creando..." : "Crear categoria"}
       </button>
-      {message ? <p className="muted">{message}</p> : null}
+      {message ? <p className="merchant-form-message" role="status">{message}</p> : null}
     </form>
   );
 }

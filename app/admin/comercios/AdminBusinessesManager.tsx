@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { BusinessModerationActions } from "@/components/BusinessModerationActions";
+import { StatusBadge } from "@/components/StatusBadge";
 import { supabase } from "@/lib/supabase";
 
 type BusinessRow = {
@@ -27,8 +28,18 @@ function statusLabel(status: string) {
   return status;
 }
 
+function statusTone(status: string): "danger" | "info" | "neutral" | "success" | "warning" {
+  if (status === "active") return "success";
+  if (status === "pending_review") return "warning";
+  if (status === "suspended" || status === "rejected") return "danger";
+  if (status === "draft") return "neutral";
+  return "info";
+}
+
 export function AdminBusinessesManager() {
   const [businesses, setBusinesses] = useState<BusinessRow[]>([]);
+  const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [message, setMessage] = useState("Cargando todos los comercios...");
   const [error, setError] = useState("");
 
@@ -57,34 +68,43 @@ export function AdminBusinessesManager() {
     return <p className="muted">{message}</p>;
   }
 
+  const visibleBusinesses = businesses.filter((business) => {
+    const matchesQuery = `${business.name} ${business.city} ${business.categories?.name ?? ""}`
+      .toLowerCase().includes(query.trim().toLowerCase());
+    return matchesQuery && (statusFilter === "all" || business.status === statusFilter);
+  });
+
   return (
-    <div style={{ display: "grid", gap: 10 }}>
+    <div className="admin-workspace">
+      <section className="admin-toolbar panel">
+        <div><span className="eyebrow">Directorio interno</span><h2>{businesses.length} comercios registrados</h2></div>
+        <div className="admin-toolbar-controls">
+          <label><span className="sr-only">Buscar comercios</span><input className="input" onChange={(event) => setQuery(event.target.value)} placeholder="Buscar por nombre, ciudad o categoria" value={query} /></label>
+          <label><span className="sr-only">Filtrar por estado</span><select className="input" onChange={(event) => setStatusFilter(event.target.value)} value={statusFilter}><option value="all">Todos los estados</option><option value="pending_review">Pendientes</option><option value="active">Activos</option><option value="suspended">Suspendidos</option><option value="rejected">Rechazados</option></select></label>
+        </div>
+      </section>
       {error ? (
         <div className="card" style={{ borderColor: "#ef4444" }}>
           <strong>No se pudieron cargar los comercios.</strong>
           <p className="muted">{error}</p>
         </div>
       ) : null}
-      {businesses.map((business) => (
-        <div
-          className="card"
-          key={business.id}
-          style={{ display: "flex", flexWrap: "wrap", gap: 16, justifyContent: "space-between" }}
-        >
-          <div>
-            <strong>{business.name}</strong>
-            <p className="muted" style={{ marginBottom: 6 }}>
+      <div className="admin-record-list">
+      {visibleBusinesses.map((business) => (
+        <article className="admin-business-row" key={business.id}>
+          <div className="admin-record-copy">
+            <div className="admin-record-title"><strong>{business.name}</strong><StatusBadge label={statusLabel(business.status)} tone={statusTone(business.status)} /></div>
+            <p className="muted">
               {business.categories?.name ?? "Sin categoria"} - {business.city}
             </p>
-            <p className="muted" style={{ margin: 0 }}>
+            <p className="muted">
               {business.address ?? "Direccion pendiente"}
             </p>
-            <p className="muted" style={{ margin: 0 }}>
+            <p className="muted">
               WhatsApp: {business.whatsapp ?? "Pendiente"}
             </p>
           </div>
-          <div className="admin-business-actions" style={{ display: "grid", gap: 10, justifyItems: "end", minWidth: 250 }}>
-            <strong>{statusLabel(business.status)}</strong>
+          <div className="admin-business-actions">
             {business.status === "active" ? (
               <Link className="btn btn-dark" href={`/tiendas/${business.slug}`}>
                 Ver tienda
@@ -95,11 +115,13 @@ export function AdminBusinessesManager() {
               currentStatus={business.status}
             />
           </div>
-        </div>
+        </article>
       ))}
+      </div>
       {!error && businesses.length === 0 ? (
         <p className="muted">Todavia no hay comercios registrados.</p>
       ) : null}
+      {!error && businesses.length > 0 && visibleBusinesses.length === 0 ? <div className="admin-empty panel"><strong>No encontramos comercios con esos filtros.</strong><button className="btn btn-dark" onClick={() => { setQuery(""); setStatusFilter("all"); }} type="button">Limpiar filtros</button></div> : null}
     </div>
   );
 }

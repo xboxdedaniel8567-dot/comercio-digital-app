@@ -78,11 +78,12 @@ export function SubcategoryCreateForm() {
   }
 
   return (
-    <form className="card" onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
-      <h2 style={{ margin: 0 }}>Nueva subcategoria</h2>
-      <p className="muted" style={{ margin: 0 }}>
+    <form className="admin-taxonomy-form panel" onSubmit={handleSubmit}>
+      <div><span className="eyebrow">Segundo nivel</span><h2>Nueva subcategoria</h2></div>
+      <p className="muted">
         Divide una categoria en grupos mas precisos para mejorar la busqueda.
       </p>
+      <label className="merchant-field"><span>Categoria principal</span>
       <select
         className="input"
         onChange={(event) => setCategoryId(event.target.value)}
@@ -94,6 +95,8 @@ export function SubcategoryCreateForm() {
           <option key={category.id} value={category.id}>{category.name}</option>
         ))}
       </select>
+      </label>
+      <label className="merchant-field"><span>Nombre</span>
       <input
         className="input"
         onChange={(event) => setName(event.target.value)}
@@ -101,6 +104,8 @@ export function SubcategoryCreateForm() {
         required
         value={name}
       />
+      </label>
+      <label className="merchant-field"><span>Descripcion</span>
       <textarea
         className="input"
         onChange={(event) => setDescription(event.target.value)}
@@ -108,11 +113,11 @@ export function SubcategoryCreateForm() {
         rows={3}
         value={description}
       />
+      </label>
       <button className="btn" disabled={isSubmitting} type="submit">
         {isSubmitting ? "Creando..." : "Crear subcategoria"}
       </button>
-      {message ? <p className="muted">{message}</p> : null}
+      {message ? <p className="merchant-form-message" role="status">{message}</p> : null}
     </form>
   );
 }
-

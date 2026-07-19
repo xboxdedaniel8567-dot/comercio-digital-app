@@ -96,37 +96,42 @@ export function AttributeCreateForm() {
   }
 
   return (
-    <form className="card" onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
-      <h2 style={{ margin: 0 }}>Nuevo atributo adaptativo</h2>
-      <p className="muted" style={{ margin: 0 }}>
+    <form className="admin-taxonomy-form panel" onSubmit={handleSubmit}>
+      <div><span className="eyebrow">Campos adaptativos</span><h2>Nuevo atributo</h2></div>
+      <p className="muted">
         Define la informacion que debe completar el comerciante para este tipo de producto.
       </p>
+      <label className="merchant-field"><span>Categoria principal</span>
       <select className="input" onChange={(event) => setCategoryId(event.target.value)} required value={categoryId}>
         <option value="">Selecciona una categoria</option>
         {categories.map((category) => (
           <option key={category.id} value={category.id}>{category.name}</option>
         ))}
       </select>
+      </label>
+      <label className="merchant-field"><span>Subcategoria</span>
       <select className="input" onChange={(event) => setSubcategoryId(event.target.value)} value={subcategoryId}>
         <option value="">Toda la categoria</option>
         {subcategories.map((subcategory) => (
           <option key={subcategory.id} value={subcategory.id}>{subcategory.name}</option>
         ))}
       </select>
-      <input className="input" onChange={(event) => setName(event.target.value)} placeholder="Nombre. Ej: Memoria RAM" required value={name} />
+      </label>
+      <label className="merchant-field"><span>Nombre del atributo</span><input className="input" onChange={(event) => setName(event.target.value)} placeholder="Ej. Memoria RAM" required value={name} /></label>
+      <label className="merchant-field"><span>Tipo de respuesta</span>
       <select className="input" onChange={(event) => setInputType(event.target.value)} value={inputType}>
         <option value="text">Texto</option>
         <option value="number">Numero</option>
       </select>
-      <label style={{ alignItems: "center", display: "flex", gap: 10 }}>
+      </label>
+      <label className="admin-checkbox-field">
         <input checked={isRequired} onChange={(event) => setIsRequired(event.target.checked)} type="checkbox" />
         Campo obligatorio
       </label>
       <button className="btn" disabled={isSubmitting} type="submit">
         {isSubmitting ? "Creando..." : "Crear atributo"}
       </button>
-      {message ? <p className="muted">{message}</p> : null}
+      {message ? <p className="merchant-form-message" role="status">{message}</p> : null}
     </form>
   );
 }
-

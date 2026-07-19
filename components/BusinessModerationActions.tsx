@@ -44,8 +44,8 @@ export function BusinessModerationActions({
   }
 
   return (
-    <div style={{ display: "grid", gap: 8 }}>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "flex-end" }}>
+    <div className="admin-moderation-actions">
+      <div className="admin-action-row">
         {actions.map((action) => (
           <button
             className={action.status === "active" ? "btn" : "btn btn-dark"}
@@ -58,7 +58,7 @@ export function BusinessModerationActions({
           </button>
         ))}
       </div>
-      {message ? <small className="muted">{message}</small> : null}
+      {message ? <small className="muted" role="status">{message}</small> : null}
     </div>
   );
 }

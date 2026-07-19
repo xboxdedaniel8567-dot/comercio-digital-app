@@ -38,12 +38,6 @@ type QualityIssue = {
   href: string;
 };
 
-function priorityColor(priority: QualityIssue["priority"]) {
-  if (priority === "Alta") return "#ef4444";
-  if (priority === "Media") return "#f59e0b";
-  return "#10b981";
-}
-
 function productIssues(product: ProductRow): QualityIssue[] {
   const issues: QualityIssue[] = [];
   const href = `/productos/${product.slug}`;
@@ -176,21 +170,18 @@ export default async function AdminQualityPage() {
 
   return (
     <DashboardShell title="Calidad del marketplace" eyebrow="Admin" links={adminLinks}>
-      <div className="grid-auto">
+      <section className="admin-quality-summary">
         {[
           ["Alertas altas", String(high)],
           ["Alertas medias", String(medium)],
           ["Alertas bajas", String(low)],
           ["Total por revisar", String(issues.length)],
         ].map(([label, value]) => (
-          <div className="card" key={label}>
-            <p className="muted">{label}</p>
-            <strong style={{ fontSize: "1.6rem" }}>{value}</strong>
-          </div>
+          <article className="admin-metric-card" key={label}><span>{label}</span><strong>{value}</strong><small>Hallazgos del diagnostico actual</small></article>
         ))}
-      </div>
+      </section>
 
-      <div style={{ display: "grid", gap: 10, marginTop: 18 }}>
+      <div className="admin-workspace">
         {productsResult.error || businessesResult.error ? (
           <div className="card" style={{ borderColor: "#ef4444" }}>
             <strong>No se pudo completar el diagnostico.</strong>
@@ -199,22 +190,18 @@ export default async function AdminQualityPage() {
         ) : null}
 
         {issues.map((issue) => (
-          <div
-            className="card"
-            key={issue.id}
-            style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr auto", alignItems: "center" }}
-          >
+          <article className="admin-quality-row" key={issue.id}>
             <div>
-              <p className="kicker" style={{ color: priorityColor(issue.priority) }}>
+              <p className={`kicker admin-priority-${issue.priority.toLowerCase()}`}>
                 {issue.type} - prioridad {issue.priority}
               </p>
               <strong>{issue.title}</strong>
-              <p className="muted" style={{ marginBottom: 0 }}>{issue.detail}</p>
+              <p className="muted">{issue.detail}</p>
             </div>
             <Link className="btn btn-dark" href={issue.href}>
               Revisar
             </Link>
-          </div>
+          </article>
         ))}
 
         {!productsResult.error && !businessesResult.error && issues.length === 0 ? (

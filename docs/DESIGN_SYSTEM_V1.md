@@ -243,7 +243,7 @@ Todo listado o formulario debe definir:
 5. Perfil de tienda y directorio. Completado.
 6. Cuenta del comprador. Completado.
 7. Panel del comerciante. Completado.
-8. Panel administrativo.
+8. Panel administrativo. Completado.
 9. Estados, accesibilidad y responsive final.
 
 La busqueda publica ya cuenta con filtros laterales en escritorio, filtros
@@ -287,3 +287,12 @@ respuesta del comercio. Los formularios de identidad visual, informacion de la
 tienda, ubicacion, horarios, creacion y edicion de productos e inventario por
 variantes usan etiquetas visibles, bloques comprensibles y composicion adaptable
 a movil sin alterar las reglas existentes de Supabase.
+
+El panel administrativo funciona como centro de control operativo. El resumen
+prioriza comercios pendientes, reportes abiertos y solicitudes que requieren
+atencion; los listados de comercios y productos incorporan busqueda, filtros y
+estados legibles. La moderacion, los reportes, las solicitudes de privacidad, la
+calidad del catalogo y la taxonomia del Adaptive Business Engine comparten una
+estructura densa pero ordenada, formularios etiquetados y respuestas de estado
+accesibles. En movil, las filas se convierten en bloques apilados sin perder las
+acciones esenciales ni el contexto necesario para tomar decisiones.

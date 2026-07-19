@@ -74,10 +74,10 @@ export function AdminPrivacyRequestsManager() {
   if (message && requests.length === 0) return <p className="muted">{message}</p>;
 
   return (
-    <div style={{ display: "grid", gap: 12 }}>
-      <div className="card">
+    <div className="admin-workspace">
+      <div className="admin-guidance panel">
         <strong>Proceso responsable</strong>
-        <p className="muted" style={{ marginBottom: 0 }}>
+        <p className="muted">
           Verifica la identidad antes de entregar, corregir o eliminar datos. Registra siempre la respuesta final.
         </p>
       </div>
@@ -106,17 +106,18 @@ function PrivacyReviewCard({
       : request.status === "in_review" ? "info" : "warning";
 
   return (
-    <article className="card" style={{ display: "grid", gap: 10 }}>
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 12, justifyContent: "space-between" }}>
+    <article className="admin-review-card panel">
+      <div className="admin-review-heading">
         <div>
-          <p className="kicker" style={{ marginTop: 0 }}>{typeLabels[request.request_type] ?? request.request_type}</p>
+          <p className="kicker">{typeLabels[request.request_type] ?? request.request_type}</p>
           <strong>{request.contact_email}</strong>
         </div>
         <StatusBadge label={statusLabels[request.status] ?? request.status} tone={tone} />
       </div>
-      <p className="muted" style={{ margin: 0 }}>{request.details}</p>
+      <p className="muted">{request.details}</p>
       <small className="muted">Recibida: {new Date(request.created_at).toLocaleString("es-CO")}</small>
-      <label style={{ display: "grid", gap: 6 }}>
+      <div className="admin-review-form">
+      <label className="merchant-field">
         <span>Estado</span>
         <select onChange={(event) => setStatus(event.target.value)} value={status}>
           <option value="received">Recibida</option>
@@ -125,10 +126,11 @@ function PrivacyReviewCard({
           <option value="rejected">No procede</option>
         </select>
       </label>
-      <label style={{ display: "grid", gap: 6 }}>
+      <label className="merchant-field">
         <span>Respuesta al titular</span>
         <textarea maxLength={2000} onChange={(event) => setResponse(event.target.value)} rows={4} value={response} />
       </label>
+      </div>
       <button
         className="btn"
         disabled={isSaving}

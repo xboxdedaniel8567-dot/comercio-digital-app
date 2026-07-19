@@ -30,7 +30,11 @@ export function DashboardShell({
         </header>
         <div className="dashboard-grid">
           <aside className="dashboard-nav panel" aria-label="Navegacion del panel">
-            <p className="dashboard-nav-label">Gestion de tienda</p>
+            <p className="dashboard-nav-label">
+              {eyebrow.toLowerCase().includes("admin") || eyebrow.toLowerCase().includes("operacion")
+                ? "Control de plataforma"
+                : "Gestion de tienda"}
+            </p>
             {links.map((link) => (
               <Link
                 aria-current={pathname === link.href ? "page" : undefined}

@@ -52,13 +52,14 @@ export default async function AdminCategoriesPage() {
 
   return (
     <DashboardShell title="Categorias" eyebrow="Admin" links={adminLinks}>
-      <div className="grid-auto" style={{ alignItems: "start", marginBottom: 28 }}>
+      <section className="admin-taxonomy-intro panel"><span className="eyebrow">Adaptive Business Engine</span><h2>Estructura del catalogo</h2><p className="muted">Crea categorias con cuidado: determinan filtros, formularios y la forma en que los compradores encuentran productos.</p></section>
+      <div className="admin-taxonomy-forms">
         <CategoryCreateForm />
         <SubcategoryCreateForm />
         <AttributeCreateForm />
       </div>
-      <h2>Categorias principales</h2>
-      <div className="grid-auto">
+      <section className="admin-taxonomy-section"><div className="admin-section-heading"><div><span className="eyebrow">Nivel 1</span><h2>Categorias principales</h2></div><span>{categories.length} registradas</span></div>
+      <div className="admin-taxonomy-grid">
         {error ? (
           <div className="card" style={{ borderColor: "#ef4444" }}>
             <strong>No se pudieron cargar las categorias.</strong>
@@ -66,36 +67,37 @@ export default async function AdminCategoriesPage() {
           </div>
         ) : null}
         {categories.map((category) => (
-          <div className="card" key={category.id}>
+          <article className="admin-taxonomy-item" key={category.id}>
             <strong>{category.name}</strong>
             <p className="muted">{category.description ?? "Sin descripcion"}</p>
             <p className="muted" style={{ marginBottom: 0 }}>Slug: {category.slug}</p>
-          </div>
+          </article>
         ))}
         {!error && categories.length === 0 ? (
           <p className="muted">Todavia no hay categorias registradas.</p>
         ) : null}
       </div>
-      <section style={{ marginTop: 36 }}>
-        <h2>Subcategorias</h2>
-        <div className="grid-auto">
+      </section>
+      <section className="admin-taxonomy-section">
+        <div className="admin-section-heading"><div><span className="eyebrow">Nivel 2</span><h2>Subcategorias</h2></div><span>{subcategories.length} registradas</span></div>
+        <div className="admin-taxonomy-grid">
           {subcategories.map((subcategory) => (
-            <div className="card" key={subcategory.id}>
+            <article className="admin-taxonomy-item" key={subcategory.id}>
               <span className="kicker">
                 {categoryNames.get(subcategory.category_id) ?? "Categoria"}
               </span>
               <strong style={{ display: "block", marginTop: 8 }}>{subcategory.name}</strong>
               <p className="muted" style={{ marginBottom: 0 }}>Slug: {subcategory.slug}</p>
-            </div>
+            </article>
           ))}
           {subcategories.length === 0 ? <p className="muted">Todavia no hay subcategorias.</p> : null}
         </div>
       </section>
-      <section style={{ marginTop: 36 }}>
-        <h2>Atributos adaptativos</h2>
-        <div className="grid-auto">
+      <section className="admin-taxonomy-section">
+        <div className="admin-section-heading"><div><span className="eyebrow">Datos especializados</span><h2>Atributos adaptativos</h2></div><span>{attributes.length} configurados</span></div>
+        <div className="admin-taxonomy-grid">
           {attributes.map((attribute) => (
-            <div className="card" key={attribute.id}>
+            <article className="admin-taxonomy-item" key={attribute.id}>
               <span className="kicker">
                 {categoryNames.get(attribute.category_id) ?? "Categoria"}
                 {attribute.subcategory_id
@@ -107,7 +109,7 @@ export default async function AdminCategoriesPage() {
                 Tipo: {attribute.input_type === "number" ? "Numero" : "Texto"}
                 {attribute.is_required ? " - Obligatorio" : " - Opcional"}
               </p>
-            </div>
+            </article>
           ))}
           {attributes.length === 0 ? <p className="muted">Todavia no hay atributos.</p> : null}
         </div>

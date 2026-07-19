@@ -47,7 +47,8 @@ export function ProductModerationActions({
   }
 
   return (
-    <div className="product-moderation-actions" style={{ display: "grid", gap: 8, minWidth: 250 }}>
+    <div className="product-moderation-actions admin-moderation-actions">
+      <label className="merchant-field"><span>Nota para el comerciante</span>
       <input
         className="input"
         disabled={isSaving}
@@ -55,7 +56,8 @@ export function ProductModerationActions({
         placeholder="Nota para el comerciante"
         value={note}
       />
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "flex-end" }}>
+      </label>
+      <div className="admin-action-row">
         {actions.map((action) => (
           <button
             className={action.status === "approved" ? "btn" : "btn btn-dark"}
@@ -68,7 +70,7 @@ export function ProductModerationActions({
           </button>
         ))}
       </div>
-      {message ? <small className="muted">{message}</small> : null}
+      {message ? <small className="muted" role="status">{message}</small> : null}
     </div>
   );
 }
