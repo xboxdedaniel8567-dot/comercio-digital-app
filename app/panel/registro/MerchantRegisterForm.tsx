@@ -55,6 +55,7 @@ export function MerchantRegisterForm() {
       password,
       options: {
         data: {
+          account_type: "merchant",
           address: address.trim(),
           business_name: businessName.trim(),
           category_id: categoryId,

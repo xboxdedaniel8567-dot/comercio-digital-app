@@ -1,5 +1,5 @@
--- Comercio Digital: registro atomico de comerciante.
--- Crea automaticamente el perfil y el comercio cuando Supabase Auth crea el usuario.
+-- Comercio Digital: registro atomico de cuentas.
+-- Crea el perfil correcto y, para comerciantes, su comercio pendiente de revision.
 
 create or replace function public.make_business_slug(
   business_name text,
@@ -57,9 +57,16 @@ set search_path = ''
 as $$
 declare
   metadata jsonb := coalesce(new.raw_user_meta_data, '{}'::jsonb);
+  account_type_value text := lower(coalesce(nullif(trim(metadata ->> 'account_type'), ''), 'merchant'));
   business_name_value text := nullif(trim(metadata ->> 'business_name'), '');
   category_id_value uuid;
+  profile_role public.user_role;
 begin
+  profile_role := case
+    when account_type_value = 'buyer' then 'buyer'::public.user_role
+    else 'merchant'::public.user_role
+  end;
+
   insert into public.profiles (
     id,
     full_name,
@@ -68,16 +75,20 @@ begin
   )
   values (
     new.id,
-    coalesce(nullif(trim(metadata ->> 'full_name'), ''), 'Comerciante'),
+    coalesce(
+      nullif(trim(metadata ->> 'full_name'), ''),
+      case when profile_role = 'buyer' then 'Comprador' else 'Comerciante' end
+    ),
     coalesce(nullif(trim(metadata ->> 'phone'), ''), ''),
-    'merchant'::public.user_role
+    profile_role
   )
   on conflict (id) do update
   set
     full_name = excluded.full_name,
-    phone = excluded.phone;
+    phone = excluded.phone,
+    role = excluded.role;
 
-  if business_name_value is not null then
+  if profile_role = 'merchant' and business_name_value is not null then
     begin
       category_id_value := nullif(trim(metadata ->> 'category_id'), '')::uuid;
     exception

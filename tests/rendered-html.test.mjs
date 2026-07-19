@@ -38,10 +38,11 @@ test("server-renders the Comercio Digital marketplace shell", async () => {
 });
 
 test("keeps launch-critical application files in place", async () => {
-  const [layout, manifest, sqlFiles] = await Promise.all([
+  const [layout, manifest, sqlFiles, pilotGuide] = await Promise.all([
     readFile(new URL("../app/layout.tsx", import.meta.url), "utf8"),
     readFile(new URL("../public/manifest.webmanifest", import.meta.url), "utf8"),
     readdir(new URL("../supabase/", import.meta.url)),
+    readFile(new URL("../docs/PILOT_READINESS.md", import.meta.url), "utf8"),
   ]);
 
   assert.match(layout, /lang="es"/);
@@ -51,4 +52,6 @@ test("keeps launch-critical application files in place", async () => {
   assert.ok(sqlFiles.includes("notifications.sql"));
   assert.ok(sqlFiles.includes("privacy_requests.sql"));
   assert.ok(sqlFiles.includes("legal_consents.sql"));
+  assert.ok(sqlFiles.includes("pilot_readiness_check.sql"));
+  assert.match(pilotGuide, /Piloto controlado de Comercio Digital/i);
 });

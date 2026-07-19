@@ -52,6 +52,8 @@ npm test
 
 Los scripts SQL incrementales estan en `supabase/`. Deben ejecutarse en el SQL Editor del proyecto correspondiente y conservarse como historial tecnico.
 
+Antes de invitar usuarios reales, ejecuta `supabase/pilot_readiness_check.sql`. Este diagnostico es de solo lectura y muestra tablas, RLS, politicas, registro automatico y Storage que necesitan revision.
+
 ## Seguridad
 
 - `.env.local` esta excluido de Git.
@@ -61,4 +63,4 @@ Los scripts SQL incrementales estan en `supabase/`. Deben ejecutarse en el SQL E
 
 ## Proxima fase
 
-Preparar un entorno publico de prueba, realizar pruebas con comercios piloto y aplicar el sistema visual definitivo a partir de prototipos aprobados.
+La siguiente fase es un piloto controlado. El procedimiento completo esta en `docs/PILOT_READINESS.md`.
