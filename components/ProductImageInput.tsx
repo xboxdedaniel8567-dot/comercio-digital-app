@@ -55,47 +55,49 @@ export function ProductImageInput({
   }
 
   return (
-    <div className="card" style={{ display: "grid", gap: 12, padding: 16 }}>
-      <div>
+    <div className="merchant-image-input">
+      <div className="merchant-image-input-heading">
         <strong>Foto del producto</strong>
-        <p className="muted" style={{ margin: "4px 0 0" }}>
+        <p className="muted">
           Elige una imagen JPG, PNG o WebP de hasta 5 MB.
         </p>
       </div>
-      <input
-        accept="image/jpeg,image/png,image/webp"
-        className="input"
-        disabled={disabled}
-        onChange={handleFileChange}
-        type="file"
-      />
-      {previewUrl ? (
-        <img
-          alt="Vista previa del producto"
-          src={previewUrl}
-          style={{
-            aspectRatio: "4 / 3",
-            border: "1px solid var(--line)",
-            maxWidth: 320,
-            objectFit: "contain",
-            width: "100%",
-          }}
-        />
-      ) : null}
-      <details>
-        <summary className="muted" style={{ cursor: "pointer" }}>
-          Usar un enlace de imagen en su lugar
-        </summary>
-        <input
-          className="input"
-          disabled={disabled || Boolean(file)}
-          onChange={(event) => onUrlChange(event.target.value)}
-          placeholder="https://ejemplo.com/imagen.webp"
-          style={{ marginTop: 10 }}
-          type="url"
-          value={imageUrl}
-        />
-      </details>
+      <div className="merchant-image-input-body">
+        <div className="merchant-image-preview">
+          {previewUrl ? (
+            <img alt="Vista previa del producto" src={previewUrl} />
+          ) : (
+            <span>La vista previa aparecera aqui</span>
+          )}
+        </div>
+        <div className="merchant-image-controls">
+          <label className="merchant-field">
+            <span>Seleccionar archivo</span>
+            <input
+              accept="image/jpeg,image/png,image/webp"
+              className="input"
+              disabled={disabled}
+              onChange={handleFileChange}
+              type="file"
+            />
+          </label>
+          {file ? <small className="muted">Archivo: {file.name}</small> : null}
+          <details>
+            <summary className="muted">Usar un enlace de imagen</summary>
+            <label className="merchant-field">
+              <span>URL de la imagen</span>
+              <input
+                className="input"
+                disabled={disabled || Boolean(file)}
+                onChange={(event) => onUrlChange(event.target.value)}
+                placeholder="https://ejemplo.com/imagen.webp"
+                type="url"
+                value={imageUrl}
+              />
+            </label>
+          </details>
+        </div>
+      </div>
     </div>
   );
 }

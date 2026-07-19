@@ -147,32 +147,33 @@ export function BusinessBrandingForm() {
   }
 
   return (
-    <section className="card" style={{ display: "grid", gap: 18 }}>
-      <div>
-        <h2 style={{ margin: 0 }}>Identidad visual</h2>
-        <p className="muted" style={{ marginBottom: 0 }}>
+    <section className="merchant-form-section panel">
+      <div className="merchant-form-heading">
+        <p className="kicker">Presentacion</p>
+        <h2>Identidad visual</h2>
+        <p>
           Agrega un logo cuadrado y una portada horizontal de hasta 5 MB.
         </p>
       </div>
 
-      <div className="grid-auto">
-        <fieldset style={{ border: "1px solid var(--line)", display: "grid", gap: 12, margin: 0, padding: 16 }}>
+      <div className="merchant-branding-grid">
+        <fieldset className="merchant-image-fieldset">
           <legend>Logo</legend>
           {logoPreview ? (
-            <img alt="Logo de la tienda" src={logoPreview} style={{ aspectRatio: "1", border: "1px solid var(--line)", objectFit: "cover", width: 150 }} />
+            <img alt="Logo de la tienda" className="merchant-logo-preview" src={logoPreview} />
           ) : (
-            <div className="muted" style={{ alignItems: "center", aspectRatio: "1", border: "1px solid var(--line)", display: "flex", justifyContent: "center", width: 150 }}>Sin logo</div>
+            <div className="merchant-logo-preview merchant-image-empty">Sin logo</div>
           )}
           <input accept="image/jpeg,image/png,image/webp" className="input" disabled={isSaving} onChange={(event) => selectImage(event, "logo")} type="file" />
           {logoUrl ? <button className="btn btn-dark" disabled={isSaving} onClick={() => void removeImage("logo")} type="button">Quitar logo</button> : null}
         </fieldset>
 
-        <fieldset style={{ border: "1px solid var(--line)", display: "grid", gap: 12, margin: 0, padding: 16 }}>
+        <fieldset className="merchant-image-fieldset">
           <legend>Portada</legend>
           {coverPreview ? (
-            <img alt="Portada de la tienda" src={coverPreview} style={{ aspectRatio: "16 / 6", border: "1px solid var(--line)", objectFit: "cover", width: "100%" }} />
+            <img alt="Portada de la tienda" className="merchant-cover-preview" src={coverPreview} />
           ) : (
-            <div className="muted" style={{ alignItems: "center", aspectRatio: "16 / 6", border: "1px solid var(--line)", display: "flex", justifyContent: "center", width: "100%" }}>Sin portada</div>
+            <div className="merchant-cover-preview merchant-image-empty">Sin portada</div>
           )}
           <input accept="image/jpeg,image/png,image/webp" className="input" disabled={isSaving} onChange={(event) => selectImage(event, "cover")} type="file" />
           {coverUrl ? <button className="btn btn-dark" disabled={isSaving} onClick={() => void removeImage("cover")} type="button">Quitar portada</button> : null}
@@ -182,7 +183,7 @@ export function BusinessBrandingForm() {
       <button className="btn" disabled={isSaving || !businessId} onClick={() => void saveBranding()} type="button">
         {isSaving ? "Guardando..." : "Guardar identidad visual"}
       </button>
-      {message ? <p className="muted" style={{ margin: 0 }}>{message}</p> : null}
+      {message ? <p className="merchant-form-message" role="status">{message}</p> : null}
     </section>
   );
 }

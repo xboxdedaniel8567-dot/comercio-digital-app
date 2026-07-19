@@ -242,7 +242,7 @@ Todo listado o formulario debe definir:
 4. Detalle de producto. Completado.
 5. Perfil de tienda y directorio. Completado.
 6. Cuenta del comprador. Completado.
-7. Panel del comerciante.
+7. Panel del comerciante. Completado.
 8. Panel administrativo.
 9. Estados, accesibilidad y responsive final.
 
@@ -283,5 +283,7 @@ El panel del comerciante ya tiene una estructura operativa compartida con
 navegacion activa, resumen de tienda, indicadores, prioridad recomendada,
 inventario, reservas y estadisticas. Las filas de producto priorizan stock,
 moderacion y acciones; las reservas separan la informacion del comprador de la
-respuesta del comercio. La siguiente iteracion cubrira los formularios de tienda
-y de creacion o edicion de productos antes de declarar completa esta etapa.
+respuesta del comercio. Los formularios de identidad visual, informacion de la
+tienda, ubicacion, horarios, creacion y edicion de productos e inventario por
+variantes usan etiquetas visibles, bloques comprensibles y composicion adaptable
+a movil sin alterar las reglas existentes de Supabase.

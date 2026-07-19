@@ -9,7 +9,7 @@ export default function StoreSettingsPage() {
   return (
     <DashboardShell title="Configurar tienda" eyebrow="Panel comerciante" links={merchantLinks}>
       <AuthGuard>
-        <div style={{ display: "grid", gap: 18 }}>
+        <div className="merchant-settings-stack">
           <BusinessBrandingForm />
           <StoreSettingsForm />
           <BusinessHoursForm />

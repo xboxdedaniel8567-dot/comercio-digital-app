@@ -168,22 +168,19 @@ export function BusinessHoursForm() {
   }
 
   return (
-    <form className="card" onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
-      <h2 style={{ margin: 0 }}>Horario de atencion</h2>
-      <p className="muted" style={{ margin: 0 }}>
+    <form className="merchant-form-section panel" onSubmit={handleSubmit}>
+      <div className="merchant-form-heading">
+      <p className="kicker">Disponibilidad</p>
+      <h2>Horario de atencion</h2>
+      <p>
         Indica cuando pueden visitar tu local. Marca &quot;Cerrado&quot; cuando no atiendas.
       </p>
+      </div>
+      <div className="merchant-hours-list">
       {schedule.map((day) => (
         <div
           className="hours-row"
           key={day.dayOfWeek}
-          style={{
-            alignItems: "center",
-            borderTop: "1px solid var(--line)",
-            display: "grid",
-            gap: 10,
-            paddingTop: 12,
-          }}
         >
           <strong>{day.name}</strong>
           <Time12HourInput
@@ -209,10 +206,11 @@ export function BusinessHoursForm() {
           </label>
         </div>
       ))}
+      </div>
       <button className="btn" disabled={isLoading || isSaving} type="submit">
         {isSaving ? "Guardando..." : "Guardar horarios"}
       </button>
-      {message ? <p className="muted">{message}</p> : null}
+      {message ? <p className="merchant-form-message" role="status">{message}</p> : null}
     </form>
   );
 }

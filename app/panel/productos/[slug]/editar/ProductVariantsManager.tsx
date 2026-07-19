@@ -205,14 +205,16 @@ export function ProductVariantsManager({ slug }: ProductVariantsManagerProps) {
   }
 
   return (
-    <section className="panel" style={{ marginTop: 18, padding: 20 }}>
-      <h2 style={{ marginTop: 0 }}>Variantes</h2>
-      <p className="muted">
-        Crea presentaciones con stock propio, como Negro / 128 GB o Talla 42 / Blanco.
-      </p>
+    <section className="merchant-form-section panel merchant-variants-section">
+      <div className="merchant-form-heading">
+        <div><span className="eyebrow">Inventario avanzado</span><h2>Variantes</h2></div>
+        <p>Crea presentaciones con stock propio, como Negro / 128 GB o Talla 42 / Blanco.</p>
+      </div>
 
-      <form onSubmit={handleSave} style={{ display: "grid", gap: 10 }}>
-        <div className="grid-auto">
+      <form className="merchant-variant-form" onSubmit={handleSave}>
+        <div className="merchant-form-grid">
+          <label className="merchant-field">
+            <span>Nombre de la variante</span>
           <input
             className="input"
             disabled={isSaving}
@@ -221,6 +223,9 @@ export function ProductVariantsManager({ slug }: ProductVariantsManagerProps) {
             required
             value={name}
           />
+          </label>
+          <label className="merchant-field">
+            <span>SKU</span>
           <input
             className="input"
             disabled={isSaving}
@@ -228,8 +233,12 @@ export function ProductVariantsManager({ slug }: ProductVariantsManagerProps) {
             placeholder="SKU opcional"
             value={sku}
           />
+          </label>
         </div>
-        <div className="grid-auto">
+        <fieldset className="merchant-form-fieldset">
+          <legend>Opciones</legend>
+          <div className="merchant-form-grid">
+          <label className="merchant-field"><span>Primer tipo de opcion</span>
           <input
             className="input"
             disabled={isSaving}
@@ -237,6 +246,8 @@ export function ProductVariantsManager({ slug }: ProductVariantsManagerProps) {
             placeholder="Tipo de opcion. Ej: Color"
             value={optionOneName}
           />
+          </label>
+          <label className="merchant-field"><span>Primer valor</span>
           <input
             className="input"
             disabled={isSaving}
@@ -244,6 +255,8 @@ export function ProductVariantsManager({ slug }: ProductVariantsManagerProps) {
             placeholder="Valor. Ej: Negro"
             value={optionOneValue}
           />
+          </label>
+          <label className="merchant-field"><span>Segundo tipo de opcion</span>
           <input
             className="input"
             disabled={isSaving}
@@ -251,6 +264,8 @@ export function ProductVariantsManager({ slug }: ProductVariantsManagerProps) {
             placeholder="Segunda opcion. Ej: Capacidad"
             value={optionTwoName}
           />
+          </label>
+          <label className="merchant-field"><span>Segundo valor</span>
           <input
             className="input"
             disabled={isSaving}
@@ -258,8 +273,11 @@ export function ProductVariantsManager({ slug }: ProductVariantsManagerProps) {
             placeholder="Valor. Ej: 128 GB"
             value={optionTwoValue}
           />
-        </div>
-        <div className="grid-auto">
+          </label>
+          </div>
+        </fieldset>
+        <div className="merchant-form-grid">
+          <label className="merchant-field"><span>Precio propio</span>
           <input
             className="input"
             disabled={isSaving}
@@ -269,6 +287,8 @@ export function ProductVariantsManager({ slug }: ProductVariantsManagerProps) {
             type="number"
             value={price}
           />
+          </label>
+          <label className="merchant-field"><span>Unidades disponibles</span>
           <input
             className="input"
             disabled={isSaving}
@@ -279,8 +299,9 @@ export function ProductVariantsManager({ slug }: ProductVariantsManagerProps) {
             type="number"
             value={stock}
           />
+          </label>
         </div>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+        <div className="merchant-action-row">
           <button className="btn" disabled={isSaving || !productId} type="submit">
             {isSaving ? "Guardando..." : editingId ? "Guardar variante" : "Agregar variante"}
           </button>
@@ -292,20 +313,10 @@ export function ProductVariantsManager({ slug }: ProductVariantsManagerProps) {
         </div>
       </form>
 
-      <div style={{ display: "grid", gap: 10, marginTop: 18 }}>
+      <div className="merchant-variant-list">
         {variants.map((variant) => (
-          <div
-            key={variant.id}
-            style={{
-              alignItems: "center",
-              borderTop: "1px solid var(--line)",
-              display: "grid",
-              gap: 12,
-              gridTemplateColumns: "minmax(180px, 1fr) auto auto",
-              paddingTop: 14,
-            }}
-          >
-            <div style={{ display: "grid", gap: 5 }}>
+          <article className="merchant-variant-row" key={variant.id}>
+            <div className="merchant-variant-copy">
               <strong>{variant.name}</strong>
               <span className="muted">{formatPrice(variant.price)}</span>
               {Object.entries(variant.option_values ?? {}).length > 0 ? (
@@ -317,14 +328,13 @@ export function ProductVariantsManager({ slug }: ProductVariantsManagerProps) {
               ) : null}
               {variant.sku ? <small className="muted">SKU: {variant.sku}</small> : null}
             </div>
-            <div style={{ alignItems: "center", display: "flex", gap: 6 }}>
+            <div className="merchant-stock-stepper">
               <InventoryBadge stock={variant.stock} />
               <button
                 aria-label={`Restar stock a ${variant.name}`}
                 className="btn btn-dark"
                 disabled={variant.stock === 0}
                 onClick={() => void updateVariant(variant, { stock: variant.stock - 1 })}
-                style={{ minHeight: 36, minWidth: 36, padding: 0 }}
                 type="button"
               >
                 -
@@ -333,13 +343,12 @@ export function ProductVariantsManager({ slug }: ProductVariantsManagerProps) {
                 aria-label={`Sumar stock a ${variant.name}`}
                 className="btn btn-dark"
                 onClick={() => void updateVariant(variant, { stock: variant.stock + 1 })}
-                style={{ minHeight: 36, minWidth: 36, padding: 0 }}
                 type="button"
               >
                 +
               </button>
             </div>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "flex-end" }}>
+            <div className="merchant-variant-actions">
               <button className="btn btn-dark" onClick={() => startEditing(variant)} type="button">
                 Editar
               </button>
@@ -354,13 +363,13 @@ export function ProductVariantsManager({ slug }: ProductVariantsManagerProps) {
                 Eliminar
               </button>
             </div>
-          </div>
+          </article>
         ))}
         {!message && variants.length === 0 ? (
           <p className="muted">Este producto todavia no tiene variantes.</p>
         ) : null}
       </div>
-      {message ? <p className="muted">{message}</p> : null}
+      {message ? <p className="merchant-form-message" role="status">{message}</p> : null}
     </section>
   );
 }

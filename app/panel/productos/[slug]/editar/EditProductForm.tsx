@@ -277,18 +277,12 @@ export function EditProductForm({ slug }: EditProductFormProps) {
   }
 
   return (
-    <form className="card" onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
-      <p className="muted" style={{ margin: 0 }}>
-        Edita la informacion que ven los clientes en el marketplace.
-      </p>
-      <input
-        className="input"
-        disabled={isLoading}
-        onChange={(event) => setName(event.target.value)}
-        placeholder="Nombre del producto"
-        required
-        value={name}
-      />
+    <form className="merchant-product-form" onSubmit={handleSubmit}>
+      <section className="merchant-form-section panel">
+        <div className="merchant-form-heading"><div><span className="eyebrow">Informacion publica</span><h2>Datos del producto</h2></div><p>Estos datos son los que veran los compradores en el marketplace.</p></div>
+        <div className="merchant-form-grid">
+      <label className="merchant-field merchant-field-wide"><span>Nombre del producto</span><input className="input" disabled={isLoading} onChange={(event) => setName(event.target.value)} placeholder="Nombre del producto" required value={name} /></label>
+      <label className="merchant-field"><span>Categoria</span>
       <select
         className="input"
         disabled={isLoading}
@@ -303,7 +297,9 @@ export function EditProductForm({ slug }: EditProductFormProps) {
           </option>
         ))}
       </select>
+      </label>
       {isLoadingSubcategories || subcategories.length > 0 ? (
+        <label className="merchant-field"><span>Subcategoria</span>
         <select
           className="input"
           disabled={isLoading || isLoadingSubcategories}
@@ -319,7 +315,12 @@ export function EditProductForm({ slug }: EditProductFormProps) {
             </option>
           ))}
         </select>
+        </label>
       ) : null}
+        </div>
+      </section>
+      <section className="merchant-form-section panel">
+        <div className="merchant-form-heading"><div><span className="eyebrow">Caracteristicas</span><h2>Detalles para comparar</h2></div><p>Manten actualizados los atributos que ayudan a filtrar este producto.</p></div>
       <AdaptiveAttributeFields
         categoryId={categoryId}
         disabled={isLoading || isSaving}
@@ -328,26 +329,13 @@ export function EditProductForm({ slug }: EditProductFormProps) {
         subcategoryId={subcategoryId}
         values={attributeValues}
       />
-      <input
-        className="input"
-        disabled={isLoading}
-        min="0"
-        onChange={(event) => setPrice(event.target.value)}
-        placeholder="Precio"
-        required
-        type="number"
-        value={price}
-      />
-      <input
-        className="input"
-        disabled={isLoading}
-        min="0"
-        onChange={(event) => setStock(event.target.value)}
-        placeholder="Stock"
-        required
-        type="number"
-        value={stock}
-      />
+      </section>
+      <section className="merchant-form-section panel">
+        <div className="merchant-form-heading"><div><span className="eyebrow">Venta e inventario</span><h2>Disponibilidad</h2></div><p>Controla el precio, el stock y la visibilidad del producto.</p></div>
+        <div className="merchant-form-grid">
+      <label className="merchant-field"><span>Precio en pesos colombianos</span><input className="input" disabled={isLoading} min="0" onChange={(event) => setPrice(event.target.value)} placeholder="Precio" required type="number" value={price} /></label>
+      <label className="merchant-field"><span>Unidades disponibles</span><input className="input" disabled={isLoading} min="0" onChange={(event) => setStock(event.target.value)} placeholder="Stock" required type="number" value={stock} /></label>
+      <label className="merchant-field merchant-field-wide"><span>Estado de publicacion</span>
       <select
         className="input"
         disabled={isLoading}
@@ -358,15 +346,12 @@ export function EditProductForm({ slug }: EditProductFormProps) {
         <option value="draft">Borrador</option>
         <option value="pending_review">Pendiente de revision</option>
       </select>
-      <textarea
-        className="input"
-        disabled={isLoading}
-        onChange={(event) => setDescription(event.target.value)}
-        placeholder="Descripcion"
-        required
-        rows={5}
-        value={description}
-      />
+      </label>
+      <label className="merchant-field merchant-field-wide"><span>Descripcion</span><textarea className="input" disabled={isLoading} onChange={(event) => setDescription(event.target.value)} placeholder="Descripcion" required rows={5} value={description} /></label>
+        </div>
+      </section>
+      <section className="merchant-form-section panel">
+        <div className="merchant-form-heading"><div><span className="eyebrow">Imagen principal</span><h2>Presentacion visual</h2></div><p>Reemplaza la foto actual solo cuando tengas una version mejor.</p></div>
       <ProductImageInput
         disabled={isLoading}
         file={imageFile}
@@ -375,6 +360,9 @@ export function EditProductForm({ slug }: EditProductFormProps) {
         onUrlChange={setImageUrl}
         onValidationError={setMessage}
       />
+      </section>
+      <div className="merchant-form-submit panel">
+        <div><strong>Guardar actualizacion</strong><p className="muted">Los cambios se reflejaran en la ficha publica.</p></div>
       <button
         className="btn"
         disabled={isLoading || isSaving || isLoadingSubcategories}
@@ -382,7 +370,8 @@ export function EditProductForm({ slug }: EditProductFormProps) {
       >
         {isSaving ? "Guardando..." : "Guardar cambios"}
       </button>
-      {message ? <p className="muted">{message}</p> : null}
+      </div>
+      {message ? <p className="merchant-form-message" role="status">{message}</p> : null}
     </form>
   );
 }

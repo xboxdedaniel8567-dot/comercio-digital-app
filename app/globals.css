@@ -2942,3 +2942,280 @@ h3 {
     grid-template-columns: 1fr;
   }
 }
+
+/* Merchant forms */
+.merchant-settings-stack,
+.merchant-product-form {
+  display: grid;
+  gap: 20px;
+}
+
+.merchant-form-section {
+  display: grid;
+  gap: 22px;
+  padding: 24px;
+}
+
+.merchant-form-heading {
+  align-items: start;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  gap: 28px;
+  justify-content: space-between;
+  padding-bottom: 18px;
+}
+
+.merchant-form-heading > div {
+  display: grid;
+  gap: 5px;
+}
+
+.merchant-form-heading h2 {
+  font-size: clamp(1.35rem, 2.4vw, 1.85rem);
+  margin: 0;
+}
+
+.merchant-form-heading p {
+  color: var(--muted);
+  margin: 0;
+  max-width: 430px;
+}
+
+.merchant-form-grid,
+.merchant-branding-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.merchant-field {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.merchant-field > span,
+.merchant-form-fieldset legend {
+  color: var(--foreground);
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+
+.merchant-field-wide {
+  grid-column: 1 / -1;
+}
+
+.merchant-form-fieldset,
+.merchant-image-fieldset {
+  border: 1px solid var(--line);
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  min-width: 0;
+  padding: 18px;
+}
+
+.merchant-form-fieldset legend,
+.merchant-image-fieldset legend {
+  padding: 0 8px;
+}
+
+.merchant-form-message {
+  background: color-mix(in srgb, var(--info) 9%, var(--panel));
+  border: 1px solid var(--info);
+  margin: 0;
+  padding: 12px 14px;
+}
+
+.merchant-branding-grid img,
+.merchant-logo-preview,
+.merchant-cover-preview {
+  border: 1px solid var(--line);
+  display: block;
+  object-fit: contain;
+  width: 100%;
+}
+
+.merchant-logo-preview {
+  aspect-ratio: 1;
+  max-width: 180px;
+}
+
+.merchant-cover-preview {
+  aspect-ratio: 16 / 6;
+}
+
+.merchant-image-empty {
+  align-items: center;
+  aspect-ratio: 16 / 6;
+  border: 1px dashed var(--line-strong);
+  color: var(--muted);
+  display: flex;
+  justify-content: center;
+  padding: 18px;
+  text-align: center;
+}
+
+.merchant-hours-list {
+  display: grid;
+  gap: 8px;
+}
+
+.merchant-hours-list .hours-row {
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  gap: 12px;
+  grid-template-columns: minmax(100px, 0.7fr) auto minmax(150px, 1fr) minmax(150px, 1fr);
+  padding: 10px 0;
+}
+
+.merchant-hours-list .hours-row:last-child {
+  border-bottom: 0;
+}
+
+.merchant-image-input {
+  display: grid;
+  gap: 18px;
+}
+
+.merchant-image-input-heading p {
+  margin: 4px 0 0;
+}
+
+.merchant-image-input-body {
+  align-items: start;
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(220px, 0.8fr) minmax(260px, 1.2fr);
+}
+
+.merchant-image-preview {
+  align-items: center;
+  aspect-ratio: 4 / 3;
+  background: var(--panel-interactive);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  padding: 14px;
+  text-align: center;
+}
+
+.merchant-image-preview img {
+  height: 100%;
+  object-fit: contain;
+  width: 100%;
+}
+
+.merchant-image-controls {
+  display: grid;
+  gap: 14px;
+}
+
+.merchant-image-controls details {
+  border-top: 1px solid var(--line);
+  padding-top: 14px;
+}
+
+.merchant-image-controls summary {
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+
+.merchant-form-submit {
+  align-items: center;
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  padding: 20px 24px;
+}
+
+.merchant-form-submit p {
+  margin: 4px 0 0;
+}
+
+.merchant-variant-form,
+.merchant-variant-list {
+  display: grid;
+  gap: 16px;
+}
+
+.merchant-variant-row {
+  align-items: center;
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(180px, 1fr) auto auto;
+  padding-top: 16px;
+}
+
+.merchant-variant-copy {
+  display: grid;
+  gap: 5px;
+}
+
+.merchant-stock-stepper,
+.merchant-variant-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.merchant-stock-stepper .btn {
+  min-height: 36px;
+  min-width: 36px;
+  padding: 0;
+}
+
+.merchant-variant-actions {
+  justify-content: flex-end;
+}
+
+@media (max-width: 760px) {
+  .merchant-form-heading,
+  .merchant-form-submit {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .merchant-form-grid,
+  .merchant-branding-grid,
+  .merchant-image-input-body {
+    grid-template-columns: 1fr;
+  }
+
+  .merchant-form-submit .btn {
+    width: 100%;
+  }
+
+  .merchant-hours-list .hours-row {
+    grid-template-columns: 1fr auto;
+  }
+
+  .merchant-hours-list .hours-row > :nth-child(n + 3) {
+    grid-column: 1 / -1;
+  }
+
+  .merchant-variant-row {
+    align-items: stretch;
+    grid-template-columns: 1fr;
+  }
+
+  .merchant-variant-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 430px) {
+  .merchant-form-section {
+    padding: 18px;
+  }
+
+  .merchant-variant-actions {
+    grid-template-columns: 1fr;
+  }
+}

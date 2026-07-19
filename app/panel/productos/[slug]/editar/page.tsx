@@ -14,7 +14,7 @@ export default async function EditProductPage({ params }: EditProductPageProps) 
   return (
     <DashboardShell title="Editar producto" eyebrow="Panel comerciante" links={merchantLinks}>
       <AuthGuard>
-        <div>
+        <div className="merchant-settings-stack">
           <EditProductForm slug={slug} />
           <ProductVariantsManager slug={slug} />
         </div>

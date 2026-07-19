@@ -125,10 +125,15 @@ export function StoreSettingsForm() {
   }
 
   return (
-    <form className="card" onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
-      <p className="muted" style={{ margin: 0 }}>
-        Estos datos son los que veran los clientes cuando entren a tu tienda.
-      </p>
+    <form className="merchant-form-section panel" onSubmit={handleSubmit}>
+      <div className="merchant-form-heading">
+        <p className="kicker">Informacion publica</p>
+        <h2>Datos de la tienda</h2>
+        <p>Estos datos son los que veran los clientes cuando entren a tu tienda.</p>
+      </div>
+      <div className="merchant-form-grid">
+      <label className="merchant-field">
+      <span>Nombre del negocio</span>
       <input
         className="input"
         disabled={isLoading}
@@ -137,6 +142,9 @@ export function StoreSettingsForm() {
         required
         value={name}
       />
+      </label>
+      <label className="merchant-field">
+      <span>Categoria principal</span>
       <select
         className="input"
         disabled={isLoading}
@@ -151,6 +159,9 @@ export function StoreSettingsForm() {
           </option>
         ))}
       </select>
+      </label>
+      <label className="merchant-field">
+      <span>Ciudad</span>
       <input
         className="input"
         disabled={isLoading}
@@ -159,6 +170,9 @@ export function StoreSettingsForm() {
         required
         value={city}
       />
+      </label>
+      <label className="merchant-field">
+      <span>Direccion</span>
       <input
         className="input"
         disabled={isLoading}
@@ -166,20 +180,17 @@ export function StoreSettingsForm() {
         placeholder="Direccion"
         value={address}
       />
+      </label>
+      </div>
       <fieldset
-        style={{
-          border: 0,
-          borderTop: "1px solid var(--line)",
-          display: "grid",
-          gap: 12,
-          margin: "4px 0 0",
-          padding: "18px 0 0",
-        }}
+        className="merchant-form-fieldset"
       >
-        <legend style={{ paddingRight: 12 }}><strong>Ubicacion exacta</strong></legend>
-        <p className="muted" style={{ margin: 0 }}>
+        <legend>Ubicacion exacta</legend>
+        <p className="muted">
           Completa solo los datos que apliquen a tu negocio.
         </p>
+        <div className="merchant-form-grid">
+        <label className="merchant-field"><span>Barrio o sector</span>
         <input
           className="input"
           disabled={isLoading}
@@ -187,6 +198,8 @@ export function StoreSettingsForm() {
           placeholder="Barrio o sector"
           value={neighborhood}
         />
+        </label>
+        <label className="merchant-field"><span>Centro comercial o edificio</span>
         <input
           className="input"
           disabled={isLoading}
@@ -194,7 +207,8 @@ export function StoreSettingsForm() {
           placeholder="Centro comercial o edificio"
           value={shoppingCenter}
         />
-        <div style={{ display: "grid", gap: 12, gridTemplateColumns: "1fr 1fr" }}>
+        </label>
+        <label className="merchant-field"><span>Piso</span>
           <input
             className="input"
             disabled={isLoading}
@@ -202,6 +216,8 @@ export function StoreSettingsForm() {
             placeholder="Piso"
             value={floor}
           />
+        </label>
+        <label className="merchant-field"><span>Numero de local</span>
           <input
             className="input"
             disabled={isLoading}
@@ -209,7 +225,8 @@ export function StoreSettingsForm() {
             placeholder="Local"
             value={localNumber}
           />
-        </div>
+        </label>
+        <label className="merchant-field merchant-field-wide"><span>Punto de referencia</span>
         <input
           className="input"
           disabled={isLoading}
@@ -217,7 +234,12 @@ export function StoreSettingsForm() {
           placeholder="Punto de referencia. Ej: frente al concesionario"
           value={landmark}
         />
+        </label>
+        </div>
       </fieldset>
+      <div className="merchant-form-grid">
+      <label className="merchant-field">
+      <span>WhatsApp del negocio</span>
       <input
         className="input"
         disabled={isLoading}
@@ -225,6 +247,9 @@ export function StoreSettingsForm() {
         placeholder="WhatsApp"
         value={whatsapp}
       />
+      </label>
+      <label className="merchant-field merchant-field-wide">
+      <span>Descripcion del negocio</span>
       <textarea
         className="input"
         disabled={isLoading}
@@ -233,10 +258,12 @@ export function StoreSettingsForm() {
         rows={5}
         value={description}
       />
+      </label>
+      </div>
       <button className="btn" disabled={isLoading || isSaving} type="submit">
         {isSaving ? "Guardando..." : "Guardar cambios"}
       </button>
-      {message ? <p className="muted">{message}</p> : null}
+      {message ? <p className="merchant-form-message" role="status">{message}</p> : null}
     </form>
   );
 }
