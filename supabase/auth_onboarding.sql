@@ -2,7 +2,7 @@
 -- Crea el perfil correcto y, para comerciantes, su comercio pendiente de revision.
 
 create or replace function public.make_business_slug(
-  business_name text,
+  value text,
   user_id uuid
 )
 returns text
@@ -17,7 +17,7 @@ declare
 begin
   base_slug := lower(
     translate(
-      coalesce(nullif(trim(business_name), ''), 'tienda'),
+      coalesce(nullif(trim(value), ''), 'tienda'),
       U&'\00E1\00E9\00ED\00F3\00FA\00FC\00F1\00C1\00C9\00CD\00D3\00DA\00DC\00D1',
       'aeiouunAEIOUUN'
     )
