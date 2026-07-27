@@ -9,17 +9,23 @@ interface InstallPromptEvent extends Event {
 
 export function InstallAppButton() {
   const [installPrompt, setInstallPrompt] = useState<InstallPromptEvent | null>(null);
+  const [installed, setInstalled] = useState(false);
 
   useEffect(() => {
-    const standalone = window.matchMedia("(display-mode: standalone)").matches;
-    if (standalone) return;
+    if (window.matchMedia("(display-mode: standalone)").matches) {
+      setInstalled(true);
+      return;
+    }
 
     const capturePrompt = (event: Event) => {
       event.preventDefault();
       setInstallPrompt(event as InstallPromptEvent);
     };
 
-    const clearPrompt = () => setInstallPrompt(null);
+    const clearPrompt = () => {
+      setInstallPrompt(null);
+      setInstalled(true);
+    };
 
     window.addEventListener("beforeinstallprompt", capturePrompt);
     window.addEventListener("appinstalled", clearPrompt);
@@ -30,7 +36,7 @@ export function InstallAppButton() {
     };
   }, []);
 
-  if (!installPrompt) return null;
+  if (installed || !installPrompt) return null;
 
   const install = async () => {
     await installPrompt.prompt();
