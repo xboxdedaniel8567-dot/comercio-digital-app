@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -15,7 +14,64 @@ type AccountLink = {
 type MobileNavLink = {
   href: string;
   label: string;
+  icon: string;
 };
+
+function Icon({ name }: { name: string }) {
+  const common = {
+    width: 20,
+    height: 20,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 2,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+    "aria-hidden": true,
+  };
+  switch (name) {
+    case "home":
+      return (
+        <svg {...common}>
+          <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1V9.5z" />
+        </svg>
+      );
+    case "search":
+      return (
+        <svg {...common}>
+          <circle cx="11" cy="11" r="7" />
+          <path d="m21 21-4.3-4.3" />
+        </svg>
+      );
+    case "store":
+      return (
+        <svg {...common}>
+          <path d="M3 9l1.5-5h15L21 9M3 9v11a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V9M3 9h18M9 21v-6h6v6" />
+        </svg>
+      );
+    case "heart":
+      return (
+        <svg {...common}>
+          <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.29 1.51 4.04 3 5.5l7 7Z" />
+        </svg>
+      );
+    case "user":
+      return (
+        <svg {...common}>
+          <circle cx="12" cy="8" r="4" />
+          <path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1" />
+        </svg>
+      );
+    case "bell":
+      return (
+        <svg {...common}>
+          <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0" />
+        </svg>
+      );
+    default:
+      return null;
+  }
+}
 
 export function AppHeader() {
   const pathname = usePathname();
@@ -31,11 +87,15 @@ export function AppHeader() {
   const favoritesHref = accountLink.label === "Mi cuenta" ? "/cuenta" : "/panel/login?next=/cuenta";
 
   const mobileLinks: MobileNavLink[] = [
-    { href: "/", label: "Inicio" },
-    { href: "/buscar", label: "Buscar" },
-    { href: "/comerciantes", label: "Tiendas" },
-    { href: favoritesHref, label: "Favoritos" },
-    { href: accountLink.href, label: accountLink.label === "Iniciar sesion" ? "Cuenta" : accountLink.label },
+    { href: "/", label: "Inicio", icon: "home" },
+    { href: "/buscar", label: "Buscar", icon: "search" },
+    { href: "/comerciantes", label: "Tiendas", icon: "store" },
+    { href: favoritesHref, label: "Favoritos", icon: "heart" },
+    {
+      href: accountLink.href,
+      label: accountLink.label === "Iniciar sesion" ? "Cuenta" : accountLink.label,
+      icon: "user",
+    },
   ];
 
   useEffect(() => {
@@ -108,16 +168,19 @@ export function AppHeader() {
       <header className="site-header">
         <div className={`container site-header-inner${isInternalArea ? " site-header-inner-compact" : ""}`}>
           <Link className="site-brand" href="/" aria-label="Comercio Digital, ir al inicio">
-            <Image alt="" aria-hidden="true" height={32} priority src="/favicon.svg" width={32} />
-            <span className="site-brand-copy">
-              <strong>Comercio Digital</strong>
-              <span>by Gregor Magnus</span>
-            </span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              alt="Comercio Digital"
+              className="site-brand-logo"
+              height={30}
+              src="/logo_de_la_empresa_cdigital.png"
+            />
           </Link>
 
           {!isInternalArea ? (
             <form action="/buscar" className="site-header-search" method="get" role="search">
               <label className="sr-only" htmlFor="global-search">Buscar productos o tiendas</label>
+              <Icon name="search" />
               <input
                 autoComplete="off"
                 id="global-search"
@@ -148,8 +211,14 @@ export function AppHeader() {
           {mobileLinks.map((link) => {
             const isCurrent = isCurrentPath(link.href);
             return (
-              <Link aria-current={isCurrent ? "page" : undefined} href={link.href} key={`${link.href}-${link.label}`}>
-                {link.label}
+              <Link
+                aria-current={isCurrent ? "page" : undefined}
+                className={isCurrent ? "is-active" : ""}
+                href={link.href}
+                key={`${link.href}-${link.label}`}
+              >
+                <Icon name={link.icon} />
+                <span>{link.label}</span>
               </Link>
             );
           })}

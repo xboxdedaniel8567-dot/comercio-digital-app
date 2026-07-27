@@ -7,16 +7,22 @@
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#050505",
-  "theme_color": "#050505",
+  "background_color": "#090a0c",
+  "theme_color": "#090a0c",
   "lang": "es-CO",
   "categories": ["shopping", "business", "lifestyle"],
   "icons": [
     {
+      "src": "/logo_de_la_empresa_cdigital.png",
+      "sizes": "1448x1086",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
       "src": "/favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
-      "purpose": "any"
+      "purpose": "maskable"
     }
   ]
 }

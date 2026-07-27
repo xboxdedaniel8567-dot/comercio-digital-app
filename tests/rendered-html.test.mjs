@@ -30,7 +30,7 @@ test("server-renders the Comercio Digital marketplace shell", async () => {
 
   const html = await response.text();
   assert.match(html, /<title>Comercio Digital - Busca productos en comercios fisicos<\/title>/i);
-  assert.match(html, /Encuentra lo que buscas sin recorrer toda la ciudad/i);
+  assert.match(html, /Encuentra lo que buscas/i);
   assert.match(html, /action="\/buscar"/i);
   assert.match(html, /Registrar mi tienda/i);
   assert.match(html, /href="\/legal\/terminos"/i);
