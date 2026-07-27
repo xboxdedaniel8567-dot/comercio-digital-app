@@ -64,30 +64,46 @@ export function LoginForm() {
   }
 
   return (
-    <form className="card" onSubmit={handleSubmit} style={{ display: "grid", gap: 12 }}>
-      <input
-        className="input"
-        onChange={(event) => setEmail(event.target.value)}
-        placeholder="Correo"
-        required
-        type="email"
-        value={email}
-      />
-      <input
-        className="input"
-        onChange={(event) => setPassword(event.target.value)}
-        placeholder="Contrasena"
-        required
-        type="password"
-        value={password}
-      />
-      <button className="btn" disabled={isSubmitting} type="submit">
+    <form className="card" onSubmit={handleSubmit} style={{ display: "grid", gap: 18 }}>
+      <div style={{ display: "grid", gap: 6 }}>
+        <label htmlFor="login-email" style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--foreground)" }}>
+          Correo electronico
+        </label>
+        <input
+          autoComplete="email"
+          className="input"
+          id="login-email"
+          onChange={(event) => setEmail(event.target.value)}
+          placeholder="tu@correo.com"
+          required
+          type="email"
+          value={email}
+        />
+      </div>
+      <div style={{ display: "grid", gap: 6 }}>
+        <label htmlFor="login-password" style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--foreground)" }}>
+          Contrasena
+        </label>
+        <input
+          autoComplete="current-password"
+          className="input"
+          id="login-password"
+          onChange={(event) => setPassword(event.target.value)}
+          placeholder="Tu contrasena"
+          required
+          type="password"
+          value={password}
+        />
+      </div>
+      <button className="btn" disabled={isSubmitting} type="submit" style={{ minHeight: 50 }}>
         {isSubmitting ? "Entrando..." : "Iniciar sesion"}
       </button>
-      <Link className="muted" href="/panel/recuperar">
+      <Link className="muted" href="/panel/recuperar" style={{ fontSize: "0.88rem", textDecoration: "none", transition: "color var(--transition)" }}>
         Olvide mi contrasena
       </Link>
-      {message ? <p className="muted">{message}</p> : null}
+      {message ? (
+        <p className="muted" style={{ fontSize: "0.88rem", margin: 0 }}>{message}</p>
+      ) : null}
     </form>
   );
 }

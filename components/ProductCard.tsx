@@ -27,7 +27,7 @@ export function ProductCard({ product }: ProductCardProps) {
             src={product.imageUrl}
           />
         ) : (
-          <span>Sin imagen</span>
+          <span style={{ color: "var(--subtle)", fontSize: "0.85rem" }}>Sin imagen</span>
         )}
       </div>
       <div className="product-card-body">
