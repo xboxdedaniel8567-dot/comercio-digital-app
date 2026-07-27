@@ -43,7 +43,6 @@ function businessStatusLabel(status: string) {
 export function MerchantOverview() {
   const [business, setBusiness] = useState<Business | null>(null);
   const [products, setProducts] = useState<ProductRow[]>([]);
-  const [contactClicks, setContactClicks] = useState(0);
   const [pendingReservations, setPendingReservations] = useState(0);
   const [message, setMessage] = useState("Cargando resumen...");
   const [error, setError] = useState("");
@@ -69,27 +68,20 @@ export function MerchantOverview() {
         return;
       }
 
-      const [contactResult, reservationResult] = await Promise.all([
-        supabase
-          .from("contact_events")
-          .select("*", { count: "exact", head: true })
-          .eq("business_id", businessRow.id),
-        supabase
-          .from("reservation_requests")
-          .select("*", { count: "exact", head: true })
-          .eq("business_id", businessRow.id)
-          .eq("status", "pending"),
-      ]);
+      const reservationResult = await supabase
+        .from("reservation_requests")
+        .select("*", { count: "exact", head: true })
+        .eq("business_id", businessRow.id)
+        .eq("status", "pending");
 
-      if (contactResult.error || reservationResult.error) {
-        setError(contactResult.error?.message || reservationResult.error?.message || "No se pudieron cargar las metricas.");
+      if (reservationResult.error) {
+        setError(reservationResult.error.message);
         setMessage("");
         return;
       }
 
       setBusiness(businessRow as Business);
       setProducts((productRows ?? []) as ProductRow[]);
-      setContactClicks(contactResult.count ?? 0);
       setPendingReservations(reservationResult.count ?? 0);
       setMessage("");
     }
@@ -99,40 +91,17 @@ export function MerchantOverview() {
 
   const stats = useMemo(() => {
     const active = products.filter((product) => product.status === "active").length;
-    const hidden = products.filter((product) => product.status !== "active").length;
     const lowStock = products.filter(
       (product) => getInventoryState(product.stock) === "low",
     ).length;
     const outOfStock = products.filter(
       (product) => getInventoryState(product.stock) === "out",
     ).length;
-    const inventoryValue = products.reduce((total, product) => {
-      return total + (product.price ?? 0) * (product.stock ?? 0);
-    }, 0);
 
-    const completedFields = [
-      business?.name,
-      business?.description,
-      business?.city,
-      business?.address,
-      business?.whatsapp,
-      products.length > 0 ? "products" : "",
-    ].filter(Boolean).length;
+    return { active, lowStock, outOfStock, total: products.length };
+  }, [products]);
 
-    return {
-      active,
-      completion: Math.round((completedFields / 6) * 100),
-      hidden,
-      inventoryValue,
-      lowStock,
-      outOfStock,
-      total: products.length,
-    };
-  }, [business, products]);
-
-  if (message) {
-    return <p className="muted">{message}</p>;
-  }
+  if (message) return <p className="muted">{message}</p>;
 
   if (error || !business) {
     return (
@@ -143,82 +112,93 @@ export function MerchantOverview() {
     );
   }
 
+  const hasAlerts = pendingReservations > 0 || stats.lowStock > 0 || stats.outOfStock > 0;
+
   return (
     <div className="merchant-overview">
-      <section className="merchant-welcome panel">
-        <div>
-          <p className="kicker">Resumen de hoy</p>
-          <h2>{business.name}</h2>
-          <p>Controla el catalogo, las reservas y el estado de tu tienda desde un solo lugar.</p>
+      {/* Identidad del comercio */}
+      <section className="merchant-id-card panel">
+        <div className="merchant-id-avatar" aria-hidden="true">
+          {business.name.charAt(0).toUpperCase()}
         </div>
-        <span className={`merchant-store-state merchant-store-state-${business.status}`}>
-          {businessStatusLabel(business.status)}
-        </span>
-      </section>
-
-      <section aria-labelledby="merchant-metrics-title">
-        <div className="merchant-section-heading">
-          <div>
-            <p className="kicker">Indicadores</p>
-            <h2 id="merchant-metrics-title">Estado del negocio</h2>
-          </div>
-          <Link href="/panel/estadisticas">Ver estadisticas</Link>
-        </div>
-        <div className="merchant-stat-grid">
-          {[
-            ["Perfil completo", `${stats.completion}%`, "Completa los datos que ven tus clientes"],
-            ["Productos activos", String(stats.active), `${stats.total} productos en total`],
-            ["Reservas pendientes", String(pendingReservations), "Solicitudes por responder"],
-            ["Contactos WhatsApp", String(contactClicks), "Interes generado por tu catalogo"],
-            ["Pocas unidades", String(stats.lowStock), `${stats.outOfStock} productos agotados`],
-            ["Valor del inventario", formatMoney(stats.inventoryValue), "Precio por unidades registradas"],
-          ].map(([label, value, detail]) => (
-            <article className="merchant-stat-card" key={label}>
-              <span>{label}</span>
-              <strong>{value}</strong>
-              <small>{detail}</small>
-            </article>
-          ))}
+        <div className="merchant-id-info">
+          <h2 className="merchant-id-name">{business.name}</h2>
+          <span className={`merchant-store-state merchant-store-state-${business.status}`}>
+            {businessStatusLabel(business.status)}
+          </span>
         </div>
       </section>
 
-      <section className="merchant-next-action panel">
-        <div>
-          <p className="kicker">Prioridad operativa</p>
-          <h2>Siguiente accion recomendada</h2>
-        </div>
-        <p className="muted">
-          {pendingReservations > 0
-            ? `Tienes ${pendingReservations} reserva(s) nueva(s) esperando confirmacion.`
-            : business.status === "pending_review"
-            ? "Tu tienda esta en revision. Puedes completar el perfil y cargar productos mientras el equipo administrativo valida la informacion."
-            : business.status === "suspended"
-              ? "La tienda esta suspendida y no aparece publicamente. Contacta al equipo administrativo para revisar el caso."
-              : business.status === "rejected"
-                ? "La solicitud fue rechazada. Revisa los datos del negocio y contacta al equipo administrativo antes de solicitar otra revision."
-                : stats.total < 10
-                  ? "Publica al menos 10 productos con foto, precio y descripcion para que tu tienda tenga mejor presencia en las busquedas."
-                  : "Revisa los productos ocultos y manten actualizado el stock para evitar consultas por productos no disponibles."}
-        </p>
-        <div className="merchant-action-row">
+      {/* Resumen breve — solo 3 numeros */}
+      <section className="merchant-mini-stats">
+        <article className="merchant-mini-stat">
+          <strong>{stats.active}</strong>
+          <span>Productos activos</span>
+        </article>
+        <article className="merchant-mini-stat">
+          <strong>{pendingReservations}</strong>
+          <span>Reservas pendientes</span>
+        </article>
+        <article className="merchant-mini-stat">
+          <strong>{stats.lowStock + stats.outOfStock}</strong>
+          <span>Alertas de stock</span>
+        </article>
+      </section>
+
+      {/* Boton principal — una pantalla, una tarea */}
+      <section className="merchant-primary-action">
+        <Link className="btn merchant-primary-btn" href="/panel/productos/nuevo">
+          + Anadir producto
+        </Link>
+      </section>
+
+      {/* Alertas importantes — solo si las hay */}
+      {hasAlerts ? (
+        <section className="merchant-alerts">
           {pendingReservations > 0 ? (
-            <Link className="btn" href="/panel/reservas">
-              Revisar reservas
+            <Link className="merchant-alert-card" href="/panel/reservas">
+              <span className="merchant-alert-badge merchant-alert-badge-warning">
+                {pendingReservations}
+              </span>
+              <span className="merchant-alert-text">
+                Reserva(s) nueva(s) esperando confirmacion
+              </span>
             </Link>
           ) : null}
-          <Link className="btn" href="/panel/productos/nuevo">
-            Crear producto
+          {stats.lowStock > 0 ? (
+            <Link className="merchant-alert-card" href="/panel/productos">
+              <span className="merchant-alert-badge merchant-alert-badge-warning">
+                {stats.lowStock}
+              </span>
+              <span className="merchant-alert-text">
+                Producto(s) con pocas unidades
+              </span>
+            </Link>
+          ) : null}
+          {stats.outOfStock > 0 ? (
+            <Link className="merchant-alert-card" href="/panel/productos">
+              <span className="merchant-alert-badge merchant-alert-badge-danger">
+                {stats.outOfStock}
+              </span>
+              <span className="merchant-alert-text">
+                Producto(s) agotados
+              </span>
+            </Link>
+          ) : null}
+        </section>
+      ) : null}
+
+      {/* Acceso directo a la tienda publica */}
+      {business.status === "active" ? (
+        <section className="merchant-quick-links">
+          <Link className="btn btn-dark" href={`/tiendas/${business.slug}`}>
+            Ver tienda publica
           </Link>
           <Link className="btn btn-dark" href="/panel/tienda">
-            Editar tienda
+            Editar perfil
           </Link>
-          {business.status === "active" ? (
-            <Link className="btn btn-dark" href={`/tiendas/${business.slug}`}>
-              Ver tienda publica
-            </Link>
-          ) : null}
-        </div>
-      </section>
+        </section>
+      ) : null}
     </div>
   );
 }
