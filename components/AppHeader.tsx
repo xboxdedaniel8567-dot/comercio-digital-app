@@ -173,7 +173,7 @@ export function AppHeader() {
               alt="Comercio Digital"
               className="site-brand-logo"
               height={30}
-              src="/logo_de_la_empresa_cdigital.png"
+              src="/logo.png"
             />
           </Link>
 
