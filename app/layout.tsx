@@ -13,9 +13,9 @@ export const metadata: Metadata = {
   alternates: { canonical: "/" },
   manifest: "/manifest.webmanifest",
   icons: {
-    icon: "/favicon.svg",
+    icon: "/logo_de_la_empresa_cdigital.png",
     shortcut: "/favicon.svg",
-    apple: "/favicon.svg",
+    apple: "/logo_de_la_empresa_cdigital.png",
   },
   appleWebApp: {
     capable: true,
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#080a0c",
+  themeColor: "#090a0c",
   colorScheme: "dark",
 };
 

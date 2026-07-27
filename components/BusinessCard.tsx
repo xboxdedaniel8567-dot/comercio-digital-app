@@ -17,23 +17,15 @@ export function BusinessCard({ business }: BusinessCardProps) {
     <article className="card" style={{ display: "grid", gap: 12, alignContent: "start" }}>
       <div>
         <p className="kicker">{business.category}</p>
-        <h3 style={{ margin: "8px 0 6px", fontSize: "1.2rem", fontWeight: 700, letterSpacing: "-0.01em" }}>
-          <Link href={`/tiendas/${business.slug}`} style={{ textDecoration: "none", color: "inherit" }}>
+        <h3 className="business-card-title">
+          <Link href={`/tiendas/${business.slug}`}>
             {business.name}
           </Link>
         </h3>
-        <p className="muted" style={{ fontSize: "0.92rem" }}>{business.address}</p>
+        <p className="business-card-address">{business.address}</p>
+        <p className="business-card-city">{business.city}</p>
       </div>
-      <div
-        style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: 10,
-          borderTop: "1px solid var(--line)",
-          marginTop: 4,
-          paddingTop: 14,
-        }}
-      >
+      <div className="business-card-actions">
         <Link className="btn" href={`/tiendas/${business.slug}`}>Ver tienda</Link>
         <DirectionsLink address={business.address} city={business.city} />
       </div>
