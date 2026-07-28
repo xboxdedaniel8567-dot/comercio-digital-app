@@ -77,7 +77,7 @@ type SubcategoryOption = {
 };
 
 
-=======
+
 type SortOption =
   | "relevance"
   | "price_asc"
