@@ -6,6 +6,7 @@ import { ContactButton } from "@/components/ContactButton";
 import { DirectionsLink } from "@/components/DirectionsLink";
 import { ProductCard } from "@/components/ProductCard";
 import { ReportButton } from "@/components/ReportButton";
+import { StoreGalleryLightbox } from "@/components/StoreGalleryLightbox";
 import { StoreProfileTabs } from "./StoreProfileTabs";
 import { supabase } from "@/lib/supabase";
 
@@ -297,19 +298,7 @@ export default async function StorePage({ params }: StorePageProps) {
         {galleryImages.length > 0 ? (
           <section className="store-profile-gallery-section" aria-label="Fotografias del establecimiento">
             <h2 className="store-profile-section-title">Fotografias del establecimiento</h2>
-            <div className="store-profile-gallery-scroll">
-              {galleryImages.map((image, index) => (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  alt={image.alt}
-                  className="store-profile-gallery-img"
-                  decoding="async"
-                  key={image.url + index}
-                  loading="lazy"
-                  src={image.url}
-                />
-              ))}
-            </div>
+            <StoreGalleryLightbox images={galleryImages} />
           </section>
         ) : null}
 

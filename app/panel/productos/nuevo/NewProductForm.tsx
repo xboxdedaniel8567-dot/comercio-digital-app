@@ -2,9 +2,8 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { AdaptiveAttributeFields } from "@/components/AdaptiveAttributeFields";
-import { ProductImageInput } from "@/components/ProductImageInput";
+import { MultiPhotoUploader } from "@/components/MultiPhotoUploader";
 import { getCurrentBusiness } from "@/lib/current-business";
-import { uploadProductImage } from "@/lib/product-image-upload";
 import { getUniqueProductSlug } from "@/lib/product-slug";
 import { supabase } from "@/lib/supabase";
 
@@ -29,8 +28,7 @@ export function NewProductForm() {
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("");
   const [description, setDescription] = useState("");
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imageUrl, setImageUrl] = useState("");
+  const [uploadedImages, setUploadedImages] = useState<{ url: string; alt_text: string }[]>([]);
   const [message, setMessage] = useState("Cargando categorias...");
   const [isLoadingCategories, setIsLoadingCategories] = useState(true);
   const [isLoadingSubcategories, setIsLoadingSubcategories] = useState(false);
@@ -142,35 +140,21 @@ export function NewProductForm() {
       return;
     }
 
-    let finalImageUrl = imageUrl.trim();
+    let finalImageUrl = uploadedImages[0]?.url ?? "";
 
-    if (imageFile && product) {
-      setMessage("Subiendo imagen...");
-      const uploadResult = await uploadProductImage(imageFile, product.id);
-
-      if (uploadResult.error) {
-        setIsSubmitting(false);
-        setMessage(
-          `El producto fue creado, pero no se pudo subir la imagen: ${uploadResult.error}`,
-        );
-        return;
-      }
-
-      finalImageUrl = uploadResult.publicUrl;
-    }
-
-    if (finalImageUrl && product) {
-      const { error: imageError } = await supabase.from("product_images").insert({
+    if (uploadedImages.length > 0 && product) {
+      const imageRows = uploadedImages.map((img, index) => ({
         alt_text: `Imagen de ${name}`,
         product_id: product.id,
-        sort_order: 1,
-        url: finalImageUrl,
-      });
+        sort_order: index + 1,
+        url: img.url,
+      }));
+      const { error: imageError } = await supabase.from("product_images").insert(imageRows);
 
       if (imageError) {
         setIsSubmitting(false);
         setMessage(
-          `El producto fue creado, pero no se pudo guardar la imagen: ${imageError.message}`,
+          `El producto fue creado, pero no se pudieron guardar las imagenes: ${imageError.message}`,
         );
         return;
       }
@@ -263,14 +247,12 @@ export function NewProductForm() {
         </div>
       </section>
       <section className="merchant-form-section panel">
-        <div className="merchant-form-heading"><div><span className="eyebrow">Imagen principal</span><h2>Presenta el producto</h2></div><p>Una fotografia clara aumenta la confianza del comprador.</p></div>
-      <ProductImageInput
-        disabled={isSubmitting}
-        file={imageFile}
-        imageUrl={imageUrl}
-        onFileChange={setImageFile}
-        onUrlChange={setImageUrl}
+        <div className="merchant-form-heading"><div><span className="eyebrow">Fotografias</span><h2>Presenta el producto</h2></div><p>Sube hasta 20 fotografias. La primera sera la imagen principal.</p></div>
+      <MultiPhotoUploader
+        bucket="product-images"
+        onUploaded={setUploadedImages}
         onValidationError={setMessage}
+        pathPrefix="nuevos"
       />
       </section>
       <div className="merchant-form-submit panel">

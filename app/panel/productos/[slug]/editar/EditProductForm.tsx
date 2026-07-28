@@ -2,8 +2,7 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { AdaptiveAttributeFields } from "@/components/AdaptiveAttributeFields";
-import { ProductImageInput } from "@/components/ProductImageInput";
-import { uploadProductImage } from "@/lib/product-image-upload";
+import { MultiPhotoUploader } from "@/components/MultiPhotoUploader";
 import { getUniqueProductSlug } from "@/lib/product-slug";
 import { supabase } from "@/lib/supabase";
 
@@ -50,8 +49,7 @@ export function EditProductForm({ slug }: EditProductFormProps) {
   const [stock, setStock] = useState("");
   const [status, setStatus] = useState("active");
   const [description, setDescription] = useState("");
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imageUrl, setImageUrl] = useState("");
+  const [uploadedImages, setUploadedImages] = useState<{ url: string; alt_text: string }[]>([]);
   const [message, setMessage] = useState("Cargando producto...");
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingSubcategories, setIsLoadingSubcategories] = useState(false);
@@ -224,21 +222,8 @@ export function EditProductForm({ slug }: EditProductFormProps) {
       }
     }
 
-    let cleanImageUrl = imageUrl.trim();
+    let cleanImageUrl = uploadedImages[0]?.url ?? "";
     const currentImage = product.product_images?.[0];
-
-    if (imageFile) {
-      setMessage("Subiendo imagen...");
-      const uploadResult = await uploadProductImage(imageFile, product.id);
-
-      if (uploadResult.error) {
-        setIsSaving(false);
-        setMessage(`El producto se actualizo, pero fallo la imagen: ${uploadResult.error}`);
-        return;
-      }
-
-      cleanImageUrl = uploadResult.publicUrl;
-    }
 
     if (cleanImageUrl && currentImage) {
       const { error: imageError } = await supabase
@@ -351,14 +336,13 @@ export function EditProductForm({ slug }: EditProductFormProps) {
         </div>
       </section>
       <section className="merchant-form-section panel">
-        <div className="merchant-form-heading"><div><span className="eyebrow">Imagen principal</span><h2>Presentacion visual</h2></div><p>Reemplaza la foto actual solo cuando tengas una version mejor.</p></div>
-      <ProductImageInput
-        disabled={isLoading}
-        file={imageFile}
-        imageUrl={imageUrl}
-        onFileChange={setImageFile}
-        onUrlChange={setImageUrl}
+        <div className="merchant-form-heading"><div><span className="eyebrow">Fotografias</span><h2>Presenta el producto</h2></div><p>Sube nuevas fotografias para reemplazar las actuales. La primera sera la imagen principal.</p></div>
+      <MultiPhotoUploader
+        bucket="product-images"
+        existingImages={(product?.product_images ?? []).map((img) => ({ id: img.id, url: img.url, alt_text: `Imagen de ${name}` }))}
+        onUploaded={setUploadedImages}
         onValidationError={setMessage}
+        pathPrefix="ediciones"
       />
       </section>
       <div className="merchant-form-submit panel">
