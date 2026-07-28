@@ -1,19 +1,15 @@
-const CACHE_NAME = "comercio-digital-v2";
+const CACHE_NAME = "comercio-digital-v3";
 const OFFLINE_URL = "/offline.html";
 
-const CORE_ASSETS = [
-  OFFLINE_URL,
-  "/favicon.svg",
-  "/manifest.webmanifest",
-  "/icons/icon-192x192.png",
-  "/icons/icon-512x512.png",
-];
+const CORE_ASSETS = [OFFLINE_URL, "/favicon.svg", "/manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches
       .open(CACHE_NAME)
-      .then((cache) => cache.addAll(CORE_ASSETS))
+      .then((cache) =>
+        Promise.allSettled(CORE_ASSETS.map((asset) => cache.add(asset))).then(() => undefined),
+      )
       .then(() => self.skipWaiting()),
   );
 });
@@ -27,6 +23,12 @@ self.addEventListener("activate", (event) => {
       )
       .then(() => self.clients.claim()),
   );
+});
+
+self.addEventListener("message", (event) => {
+  if (event.data?.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener("fetch", (event) => {
@@ -59,7 +61,6 @@ self.addEventListener("fetch", (event) => {
 
   // Archivos estaticos publicos: cache-first
   if (
-    url.pathname.startsWith("/icons/") ||
     url.pathname.startsWith("/_next/static/") ||
     url.pathname === "/favicon.svg" ||
     url.pathname === "/manifest.webmanifest" ||

@@ -11,6 +11,7 @@ import { ProductGallery } from "@/components/ProductGallery";
 import { ProductVariantSelector } from "@/components/ProductVariantSelector";
 import { ReportButton } from "@/components/ReportButton";
 import { ReservationButton } from "@/components/ReservationButton";
+import { formatPrice } from "@/lib/format-price";
 import { getInventoryState } from "@/lib/inventory";
 import { supabase } from "@/lib/supabase";
 
@@ -103,16 +104,6 @@ type RelatedProductRow = {
   }[];
 };
 
-function formatPrice(price: number | null, currency: string) {
-  if (price === null) return "Precio por consultar";
-
-  return new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 0,
-  }).format(price);
-}
-
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;
   const { data, error } = await supabase
@@ -126,7 +117,12 @@ export default async function ProductPage({ params }: ProductPageProps) {
     .eq("businesses.status", "active")
     .single();
 
-  if (error || !data) notFound();
+  if (error || !data) {
+    if (error) {
+      console.error("[product-page] load failed:", error.code, error.message);
+    }
+    notFound();
+  }
 
   const product = data as ProductDetail;
   const business = product.businesses;

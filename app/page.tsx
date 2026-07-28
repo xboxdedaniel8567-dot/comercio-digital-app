@@ -4,6 +4,7 @@ import { AppHeader } from "@/components/AppHeader";
 import { AppFooter } from "@/components/AppFooter";
 import { BusinessCard } from "@/components/BusinessCard";
 import { ProductCard } from "@/components/ProductCard";
+import { formatPrice } from "@/lib/format-price";
 import { supabase } from "@/lib/supabase";
 
 export const metadata: Metadata = {
@@ -47,16 +48,6 @@ type BusinessRow = {
     name: string;
   } | null;
 };
-
-function formatPrice(price: number | null, currency: string) {
-  if (price === null) return "Precio por consultar";
-
-  return new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 0,
-  }).format(price);
-}
 
 const CATEGORY_ICONS: Record<string, string> = {
   electronica: "📱",
@@ -122,10 +113,28 @@ export default async function Home() {
     ).values(),
   ];
   const defaultCitySlug = cities[0]?.slug ?? "cali-valle-del-cauca";
+  const loadErrors = [
+    categoriesResult.error ? `Categorias: ${categoriesResult.error.message}` : null,
+    productsResult.error ? `Productos: ${productsResult.error.message}` : null,
+    businessesResult.error ? `Comercios: ${businessesResult.error.message}` : null,
+  ].filter(Boolean) as string[];
 
   return (
     <main className="shell">
       <AppHeader />
+
+      {loadErrors.length > 0 ? (
+        <section className="container" style={{ paddingTop: 24 }}>
+          <div className="card" style={{ borderColor: "#ef4444" }} role="alert">
+            <strong>Parte del contenido no se pudo cargar.</strong>
+            {loadErrors.map((line) => (
+              <p className="muted" key={line} style={{ marginBottom: 0 }}>
+                {line}
+              </p>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       {/* ─── HERO ─── */}
       <section className="home-hero">

@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
+import { resolvePostResetPath } from "@/lib/auth-redirects";
 import { supabase } from "@/lib/supabase";
 
 export function ResetPasswordForm() {
@@ -11,9 +12,13 @@ export function ResetPasswordForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    async function checkRecoverySession() {
-      const { data } = await supabase.auth.getSession();
-      if (data.session) {
+    let cancelled = false;
+
+    async function verifyRecoveryAccess() {
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (cancelled) return;
+
+      if (sessionData.session) {
         setCanReset(true);
         setMessage("Escribe una nueva contrasena para tu cuenta.");
         return;
@@ -22,8 +27,20 @@ export function ResetPasswordForm() {
       setMessage("El enlace no es valido o ya vencio. Solicita uno nuevo.");
     }
 
-    const timeout = window.setTimeout(() => void checkRecoverySession(), 400);
-    return () => window.clearTimeout(timeout);
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY" || (session && event === "SIGNED_IN")) {
+        setCanReset(true);
+        setMessage("Escribe una nueva contrasena para tu cuenta.");
+      }
+    });
+
+    const timeout = window.setTimeout(() => void verifyRecoveryAccess(), 100);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeout);
+      authListener.subscription.unsubscribe();
+    };
   }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -44,8 +61,20 @@ export function ResetPasswordForm() {
       return;
     }
 
-    setMessage("Contrasena actualizada. Entrando al panel...");
-    window.location.href = "/panel";
+    const { data: userData } = await supabase.auth.getUser();
+    let redirectPath = "/panel";
+
+    if (userData.user) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role")
+        .eq("id", userData.user.id)
+        .maybeSingle();
+      redirectPath = resolvePostResetPath(profile?.role);
+    }
+
+    setMessage("Contrasena actualizada. Redirigiendo...");
+    window.location.href = redirectPath;
   }
 
   return (

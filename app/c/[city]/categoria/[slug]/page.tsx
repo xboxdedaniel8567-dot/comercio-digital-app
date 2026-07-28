@@ -1,5 +1,7 @@
+import type { Metadata } from "next";
 import { AppHeader } from "@/components/AppHeader";
 import { ProductCard } from "@/components/ProductCard";
+import { formatPrice } from "@/lib/format-price";
 import { supabase } from "@/lib/supabase";
 
 type CategoryPageProps = {
@@ -58,16 +60,6 @@ function formatCity(value: string) {
     .filter(Boolean)
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
-}
-
-function formatPrice(price: number | null, currency: string) {
-  if (price === null) return "Precio por consultar";
-
-  return new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 0,
-  }).format(price);
 }
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
@@ -136,4 +128,4 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     </main>
   );
 }
-import type { Metadata } from "next";
+

@@ -2,6 +2,10 @@ import assert from "node:assert/strict";
 import { readFile, readdir } from "node:fs/promises";
 import test from "node:test";
 
+process.env.NEXT_PUBLIC_SUPABASE_URL ??= "https://example.supabase.co";
+process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??= "ci-public-key";
+process.env.NEXT_PUBLIC_SITE_URL ??= "http://localhost:3000";
+
 async function render(pathname = "/") {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
   workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}`);

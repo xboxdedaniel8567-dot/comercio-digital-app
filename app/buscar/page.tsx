@@ -4,6 +4,7 @@ import { CompareButton } from "@/components/CompareButton";
 import { CompareTray } from "@/components/CompareTray";
 import { ProductCard } from "@/components/ProductCard";
 import { SearchLogger } from "@/components/SearchLogger";
+import { formatPrice } from "@/lib/format-price";
 import { supabase } from "@/lib/supabase";
 
 type SearchPageProps = {
@@ -72,16 +73,6 @@ type SubcategoryOption = {
     name: string;
   } | null;
 };
-
-function formatPrice(price: number | null, currency: string) {
-  if (price === null) return "Precio por consultar";
-
-  return new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 0,
-  }).format(price);
-}
 
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
