@@ -143,7 +143,7 @@ export default async function StorePage({ params }: StorePageProps) {
     `)
     .eq("slug", slug)
     .eq("status", "active")
-    .single();
+    .maybeSingle();
 
   if (businessError || !businessData) {
     notFound();
@@ -311,7 +311,17 @@ export default async function StorePage({ params }: StorePageProps) {
           allProducts={allProducts}
           featuredProducts={featuredProducts}
           mostViewedProducts={mostViewedProducts}
-          business={business}
+          business={{
+            description: business.description,
+            city: business.city,
+            address: business.address,
+            neighborhood: business.neighborhood,
+            shopping_center: business.shopping_center,
+            floor: business.floor,
+            local_number: business.local_number,
+            landmark: business.landmark,
+            whatsapp: business.whatsapp,
+          }}
           hours={hours}
           dayNames={dayNames}
           formatTime12Hour={formatTime12Hour}
