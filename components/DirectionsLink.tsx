@@ -16,7 +16,7 @@ export function DirectionsLink({
   }
 
   const destination = [address.trim(), city?.trim(), "Colombia"].filter(Boolean).join(", ");
-  const href = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(destination)}`;
+  const href = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(destination)}`;
 
   return (
     <a className={className} href={href} rel="noreferrer" target="_blank">
@@ -24,4 +24,3 @@ export function DirectionsLink({
     </a>
   );
 }
-

@@ -55,16 +55,16 @@ export function ReportButton({ targetId, targetName, targetType, returnPath }: R
   }
 
   return (
-    <div style={{ display: "grid", gap: 10, width: "100%" }}>
+    <div className="report-wrap">
       <button className="btn btn-dark" onClick={() => setIsOpen((current) => !current)} type="button">
         {isOpen ? "Cancelar reporte" : "Reportar informacion"}
       </button>
       {isOpen ? (
-        <form className="card" onSubmit={submitReport} style={{ display: "grid", gap: 10 }}>
+        <form className="card report-form" onSubmit={submitReport}>
           <strong>Reportar {targetName}</strong>
-          <label style={{ display: "grid", gap: 6 }}>
+          <label className="report-field">
             <span>Motivo</span>
-            <select onChange={(event) => setReason(event.target.value)} value={reason}>
+            <select className="input" onChange={(event) => setReason(event.target.value)} value={reason}>
               <option value="incorrect_information">Informacion incorrecta</option>
               <option value="unavailable">No esta disponible</option>
               <option value="misleading">Publicacion enganosa</option>
@@ -72,9 +72,10 @@ export function ReportButton({ targetId, targetName, targetType, returnPath }: R
               <option value="other">Otro motivo</option>
             </select>
           </label>
-          <label style={{ display: "grid", gap: 6 }}>
+          <label className="report-field">
             <span>Explica lo ocurrido</span>
             <textarea
+              className="input"
               maxLength={1000}
               minLength={10}
               onChange={(event) => setDetails(event.target.value)}
@@ -89,7 +90,7 @@ export function ReportButton({ targetId, targetName, targetType, returnPath }: R
           </button>
         </form>
       ) : null}
-      {message ? <p className="muted" role="status" style={{ margin: 0 }}>{message}</p> : null}
+      {message ? <p className="muted report-message" role="status">{message}</p> : null}
       {needsLogin ? (
         <Link className="btn" href={`/panel/login?next=${encodeURIComponent(returnPath)}`}>
           Iniciar sesion
@@ -98,4 +99,3 @@ export function ReportButton({ targetId, targetName, targetType, returnPath }: R
     </div>
   );
 }
-

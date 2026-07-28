@@ -72,25 +72,13 @@ export function BusinessOpenStatus({ hours }: BusinessOpenStatusProps) {
     return () => window.clearInterval(timer);
   }, [hours]);
 
-  const presentation = state === "open"
-    ? { color: "#34d399", label: "Abierto ahora" }
-    : state === "closed"
-      ? { color: "#f87171", label: "Cerrado ahora" }
-      : { color: "var(--muted)", label: "Horario por confirmar" };
+  const label = state === "open" ? "Abierto ahora" : state === "closed" ? "Cerrado ahora" : "Horario por confirmar";
+  const tone = state === "open" ? "open" : state === "closed" ? "closed" : "unknown";
 
   return (
-    <span
-      style={{
-        border: `1px solid ${presentation.color}`,
-        color: presentation.color,
-        display: "inline-flex",
-        fontWeight: 700,
-        marginTop: 8,
-        padding: "7px 10px",
-      }}
-    >
-      {presentation.label}
+    <span className={`business-open-status business-open-status-${tone}`} aria-live="polite">
+      <span className="business-open-status-dot" aria-hidden="true" />
+      {label}
     </span>
   );
 }
-

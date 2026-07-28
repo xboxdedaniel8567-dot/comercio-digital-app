@@ -12,6 +12,7 @@ import { ProductVariantSelector } from "@/components/ProductVariantSelector";
 import { ReportButton } from "@/components/ReportButton";
 import { ReservationButton } from "@/components/ReservationButton";
 import { getInventoryState } from "@/lib/inventory";
+import { formatPrice } from "@/lib/format";
 import { supabase } from "@/lib/supabase";
 
 type ProductPageProps = {
@@ -103,16 +104,6 @@ type RelatedProductRow = {
   }[];
 };
 
-function formatPrice(price: number | null, currency: string) {
-  if (price === null) return "Precio por consultar";
-
-  return new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 0,
-  }).format(price);
-}
-
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug } = await params;
   const { data, error } = await supabase
@@ -177,7 +168,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         <nav aria-label="Ruta de navegacion" className="product-breadcrumbs">
           <Link href="/buscar">Buscar</Link>
           <span aria-hidden="true">/</span>
-          <Link href={`/buscar?category=${encodeURIComponent(product.categories?.name ?? "")}`}>
+          <Link href={`/buscar?category=${encodeURIComponent(product.categories?.slug ?? "")}`}>
             {product.categories?.name ?? "Productos"}
           </Link>
           <span aria-hidden="true">/</span>
@@ -272,7 +263,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
             <section className="product-context-block">
               <p className="product-context-kicker">Compra en tienda fisica</p>
               <h2>Ubicacion y disponibilidad</h2>
-              <div className="product-context-status">
+              <div className={`product-context-status product-context-status-${isOutOfStock ? "out" : "in"}`}>
                 <span aria-hidden="true" />
                 <strong>{isOutOfStock ? "Agotado actualmente" : "Disponible para consultar"}</strong>
               </div>
@@ -281,7 +272,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <br />
                 {business?.city ?? "Ciudad por confirmar"}
               </address>
-              <DirectionsLink address={business?.address ?? null} city={business?.city ?? null} />
             </section>
 
             <section className="product-context-block product-store-summary">
@@ -302,13 +292,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 Ver perfil de la tienda
               </Link>
             </section>
-
-            <section className="product-context-block product-trust-note">
-              <h2>Antes de desplazarte</h2>
-              <p>Confirma por WhatsApp la variante, el precio y la disponibilidad con la tienda.</p>
-            </section>
           </aside>
         </div>
+
+        <section className="product-context-block product-trust-note">
+          <h2>Antes de desplazarte</h2>
+          <p>Confirma por WhatsApp la variante, el precio y la disponibilidad con la tienda.</p>
+        </section>
 
         {relatedProducts.length > 0 ? (
           <section aria-labelledby="related-products-title" className="product-related-section">
@@ -339,6 +329,31 @@ export default async function ProductPage({ params }: ProductPageProps) {
             targetType="product"
           />
         </section>
+      </div>
+
+      <div className="product-mobile-action-bar">
+        <div className="product-mobile-action-bar-info">
+          <strong>{formatPrice(product.price, product.currency)}</strong>
+          <span className={`product-mobile-stock product-mobile-stock-${isOutOfStock ? "out" : "in"}`}>
+            {isOutOfStock ? "Agotado" : "Disponible"}
+          </span>
+        </div>
+        <ContactButton
+          businessId={business?.id ?? ""}
+          businessName={business?.name ?? ""}
+          className="btn"
+          label="WhatsApp"
+          message={`Hola, estoy interesado en ${product.name}. ¿Sigue disponible?`}
+          productId={product.id}
+          source="product_detail"
+          whatsapp={business?.whatsapp ?? null}
+        />
+        <DirectionsLink
+          address={business?.address ?? null}
+          city={business?.city ?? null}
+          className="btn btn-dark"
+          label="Como llegar"
+        />
       </div>
     </main>
   );

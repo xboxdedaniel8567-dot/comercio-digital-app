@@ -6,9 +6,10 @@ import { supabase } from "@/lib/supabase";
 type SearchLoggerProps = {
   query: string;
   resultsCount: number;
+  city?: string;
 };
 
-export function SearchLogger({ query, resultsCount }: SearchLoggerProps) {
+export function SearchLogger({ query, resultsCount, city }: SearchLoggerProps) {
   useEffect(() => {
     async function logSearch() {
       const cleanQuery = query.trim();
@@ -19,7 +20,7 @@ export function SearchLogger({ query, resultsCount }: SearchLoggerProps) {
 
       const { data: userData } = await supabase.auth.getUser();
       const { error } = await supabase.from("search_logs").insert({
-        city: "Cali",
+        city: city?.trim() || null,
         query: cleanQuery,
         results_count: resultsCount,
         user_id: userData.user?.id ?? null,
@@ -31,7 +32,7 @@ export function SearchLogger({ query, resultsCount }: SearchLoggerProps) {
     }
 
     void logSearch();
-  }, [query, resultsCount]);
+  }, [query, resultsCount, city]);
 
   return null;
 }
