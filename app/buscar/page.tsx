@@ -4,6 +4,7 @@ import { CompareButton } from "@/components/CompareButton";
 import { CompareTray } from "@/components/CompareTray";
 import { ProductCard } from "@/components/ProductCard";
 import { SearchLogger } from "@/components/SearchLogger";
+import { SearchSortControl } from "@/components/SearchSortControl";
 import { formatPrice } from "@/lib/format-price";
 import { supabase } from "@/lib/supabase";
 
@@ -15,6 +16,7 @@ type SearchPageProps = {
     min_price?: string;
     page?: string;
     q?: string;
+    sort?: string;
     subcategory?: string;
   }>;
 };
@@ -74,6 +76,22 @@ type SubcategoryOption = {
   } | null;
 };
 
+
+=======
+type SortOption =
+  | "relevance"
+  | "price_asc"
+  | "price_desc"
+  | "availability";
+
+const sortLabels: Record<SortOption, string> = {
+  relevance: "Más relevantes",
+  price_asc: "Precio: menor a mayor",
+  price_desc: "Precio: mayor a menor",
+  availability: "Disponibilidad",
+};
+
+
 export default async function SearchPage({ searchParams }: SearchPageProps) {
   const params = await searchParams;
   const query = params?.q?.trim() ?? "";
@@ -86,6 +104,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const maxPrice = Number.isFinite(parsedMaxPrice) && parsedMaxPrice >= 0 && params?.max_price ? parsedMaxPrice : null;
   const parsedPage = Number.parseInt(params?.page ?? "1", 10);
   const requestedPage = Number.isFinite(parsedPage) && parsedPage > 0 ? parsedPage : 1;
+  const sortParam = (params?.sort?.trim() ?? "relevance") as SortOption;
+  const sort: SortOption = sortParam in sortLabels ? sortParam : "relevance";
   const pageSize = 24;
 
   const [searchResult, categoriesResult, subcategoriesResult] = await Promise.all([
@@ -131,15 +151,30 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const rankByProduct = new Map(
     rankedResults.map((result, index) => [result.product_id, index]),
   );
-  const productRows = ((productsResult.data ?? []) as ProductRow[]).sort(
+
+  let productRows = ((productsResult.data ?? []) as ProductRow[]).sort(
     (first, second) =>
       (rankByProduct.get(first.id) ?? Number.MAX_SAFE_INTEGER) -
       (rankByProduct.get(second.id) ?? Number.MAX_SAFE_INTEGER),
   );
+
+  if (sort === "price_asc") {
+    productRows = [...productRows].sort((a, b) => (a.price ?? Infinity) - (b.price ?? Infinity));
+  } else if (sort === "price_desc") {
+    productRows = [...productRows].sort((a, b) => (b.price ?? -1) - (a.price ?? -1));
+  } else if (sort === "availability") {
+    productRows = [...productRows].sort((a, b) => {
+      const aStock = a.stock ?? Infinity;
+      const bStock = b.stock ?? Infinity;
+      return aStock - bStock;
+    });
+  }
+
   const products = productRows.map((product) => ({
     name: product.name,
     slug: product.slug,
     businessName: product.businesses?.name ?? "Tienda por confirmar",
+    businessCity: product.businesses?.city ?? null,
     category: [product.categories?.name, product.subcategories?.name].filter(Boolean).join(" / ") || "Sin categoria",
     price: formatPrice(product.price, product.currency),
     stock: product.stock,
@@ -166,7 +201,21 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     if (subcategoryFilter) nextParams.set("subcategory", subcategoryFilter);
     if (minPrice !== null) nextParams.set("min_price", String(minPrice));
     if (maxPrice !== null) nextParams.set("max_price", String(maxPrice));
+    if (sort !== "relevance") nextParams.set("sort", sort);
     if (targetPage > 1) nextParams.set("page", String(targetPage));
+    const queryString = nextParams.toString();
+    return queryString ? `/buscar?${queryString}` : "/buscar";
+  }
+
+  function sortHref(targetSort: SortOption) {
+    const nextParams = new URLSearchParams();
+    if (query) nextParams.set("q", query);
+    if (cityFilter) nextParams.set("city", cityFilter);
+    if (categoryFilter) nextParams.set("category", categoryFilter);
+    if (subcategoryFilter) nextParams.set("subcategory", subcategoryFilter);
+    if (minPrice !== null) nextParams.set("min_price", String(minPrice));
+    if (maxPrice !== null) nextParams.set("max_price", String(maxPrice));
+    if (targetSort !== "relevance") nextParams.set("sort", targetSort);
     const queryString = nextParams.toString();
     return queryString ? `/buscar?${queryString}` : "/buscar";
   }
@@ -175,6 +224,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     return (
       <>
         <input name="q" type="hidden" value={query} />
+        {sort !== "relevance" ? <input name="sort" type="hidden" value={sort} /> : null}
         <label className="search-filter-group" htmlFor={`${prefix}-city`}>
           <span>Ubicacion</span>
           <input
@@ -243,7 +293,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   return (
     <main className="shell">
       <AppHeader />
-      <SearchLogger query={query} resultsCount={totalResults} />
+      <SearchLogger query={query} resultsCount={totalResults} city={cityFilter} />
       <section className="container section search-page">
         <header className="search-heading">
           <p className="kicker">Marketplace local</p>
@@ -260,6 +310,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           {subcategoryFilter ? <input name="subcategory" type="hidden" value={subcategoryFilter} /> : null}
           {minPrice !== null ? <input name="min_price" type="hidden" value={minPrice} /> : null}
           {maxPrice !== null ? <input name="max_price" type="hidden" value={maxPrice} /> : null}
+          {sort !== "relevance" ? <input name="sort" type="hidden" value={sort} /> : null}
           <div className="search-submit-row">
             <label className="sr-only" htmlFor="marketplace-search">Buscar productos</label>
             <input
@@ -298,6 +349,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 <p>
                   <strong>{totalResults}</strong> {totalResults === 1 ? "resultado" : "resultados"}
                 </p>
+                <div className="search-sort-group">
+                  <SearchSortControl currentSort={sort} />
+                </div>
                 {totalPages > 1 ? <span>Pagina {currentPage} de {totalPages}</span> : null}
               </div>
             ) : null}

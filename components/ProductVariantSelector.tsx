@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { ContactButton } from "@/components/ContactButton";
 import { InventoryBadge } from "@/components/InventoryBadge";
 import { ReservationButton } from "@/components/ReservationButton";
+import { formatPrice } from "@/lib/format";
 
 type ProductVariant = {
   id: string;
@@ -24,16 +25,6 @@ type ProductVariantSelectorProps = {
   variants: ProductVariant[];
   whatsapp?: string | null;
 };
-
-function formatPrice(price: number | null, currency: string) {
-  if (price === null) return "Precio por consultar";
-
-  return new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 0,
-  }).format(price);
-}
 
 export function ProductVariantSelector({
   basePrice,

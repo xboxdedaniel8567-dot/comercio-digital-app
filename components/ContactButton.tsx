@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 type ContactButtonProps = {
@@ -24,9 +25,12 @@ export function ContactButton({
   whatsapp,
 }: ContactButtonProps) {
   const normalizedWhatsapp = whatsapp?.replace(/\D/g, "") ?? "";
+  const [isOpening, setIsOpening] = useState(false);
 
   async function handleClick() {
-    if (!normalizedWhatsapp) return;
+    if (!normalizedWhatsapp || isOpening) return;
+
+    setIsOpening(true);
 
     const { error } = await supabase.from("contact_events").insert({
       business_id: businessId,
@@ -41,11 +45,12 @@ export function ContactButton({
     }
 
     window.open(`https://wa.me/${normalizedWhatsapp}?text=${message}`, "_blank", "noopener,noreferrer");
+    setIsOpening(false);
   }
 
   return (
-    <button className={className} disabled={!normalizedWhatsapp} onClick={handleClick} type="button">
-      {normalizedWhatsapp ? label : "WhatsApp no disponible"}
+    <button className={className} disabled={!normalizedWhatsapp || isOpening} onClick={handleClick} type="button">
+      {!normalizedWhatsapp ? "WhatsApp no disponible" : isOpening ? "Abriendo..." : label}
     </button>
   );
 }

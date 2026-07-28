@@ -13,9 +13,10 @@ type ProductCardProps = {
     attributes: string[];
     imageUrl?: string | null;
   };
+  favoriteSlot?: React.ReactNode;
 };
 
-export function ProductCard({ product }: ProductCardProps) {
+export function ProductCard({ product, favoriteSlot }: ProductCardProps) {
   return (
     <Link className="product-card" href={`/productos/${product.slug}`}>
       <div className="product-card-media">
@@ -36,6 +37,7 @@ export function ProductCard({ product }: ProductCardProps) {
             </svg>
           </span>
         )}
+        {favoriteSlot ? <div className="product-card-favorite-overlay">{favoriteSlot}</div> : null}
       </div>
       <div className="product-card-body">
         <div className="product-card-header">
