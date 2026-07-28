@@ -142,7 +142,7 @@ export function NewProductForm() {
       return;
     }
 
-    let finalImageUrl = imageUrl.trim();
+   const finalImageUrl = imageUrl.trim();
 
     if (imageFile && product) {
       setMessage("Subiendo imagen...");
