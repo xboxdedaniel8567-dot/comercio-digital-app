@@ -6,38 +6,73 @@ import { supabase } from "@/lib/supabase";
 type ProductStatusButtonProps = {
   slug: string;
   status: string;
+  onStatusChange?: (status: string) => void;
 };
 
-export function ProductStatusButton({ slug, status }: ProductStatusButtonProps) {
+export function ProductStatusButton({ slug, status, onStatusChange }: ProductStatusButtonProps) {
   const [isUpdating, setIsUpdating] = useState(false);
+  const [confirming, setConfirming] = useState(false);
+  const [error, setError] = useState("");
   const isActive = status === "active";
   const nextStatus = isActive ? "draft" : "active";
 
   async function updateStatus() {
     setIsUpdating(true);
+    setError("");
 
-    const { error } = await supabase
+    const { error: updateError } = await supabase
       .from("products")
       .update({ status: nextStatus })
       .eq("slug", slug);
 
-    if (error) {
-      setIsUpdating(false);
-      alert(`No se pudo actualizar el producto: ${error.message}`);
+    setIsUpdating(false);
+    setConfirming(false);
+
+    if (updateError) {
+      setError("No se pudo actualizar el estado. Intenta de nuevo.");
       return;
     }
 
-    window.location.reload();
+    onStatusChange?.(nextStatus);
+  }
+
+  if (confirming) {
+    return (
+      <div className="confirm-inline">
+        <span className="confirm-inline-text">
+          {isActive ? "Ocultar producto?" : "Activar producto?"}
+        </span>
+        <button
+          className="btn btn-dark confirm-inline-btn"
+          disabled={isUpdating}
+          onClick={() => void updateStatus()}
+          type="button"
+        >
+          {isUpdating ? "Guardando..." : "Si"}
+        </button>
+        <button
+          className="btn btn-dark confirm-inline-btn"
+          disabled={isUpdating}
+          onClick={() => setConfirming(false)}
+          type="button"
+        >
+          No
+        </button>
+      </div>
+    );
   }
 
   return (
-    <button
-      className="btn btn-dark"
-      disabled={isUpdating}
-      onClick={updateStatus}
-      type="button"
-    >
-      {isUpdating ? "Actualizando..." : isActive ? "Desactivar" : "Activar"}
-    </button>
+    <div className="product-status-wrap">
+      <button
+        className="btn btn-dark"
+        disabled={isUpdating}
+        onClick={() => setConfirming(true)}
+        type="button"
+      >
+        {isUpdating ? "Actualizando..." : isActive ? "Desactivar" : "Activar"}
+      </button>
+      {error ? <p className="product-status-error">{error}</p> : null}
+    </div>
   );
 }

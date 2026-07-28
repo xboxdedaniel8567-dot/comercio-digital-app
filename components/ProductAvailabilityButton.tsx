@@ -21,20 +21,22 @@ export function ProductAvailabilityButton({
 }: ProductAvailabilityButtonProps) {
   const [updatedAt, setUpdatedAt] = useState(initialUpdatedAt);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [error, setError] = useState("");
 
   async function confirmAvailability() {
     const nextUpdatedAt = new Date().toISOString();
     setIsUpdating(true);
+    setError("");
 
-    const { error } = await supabase
+    const { error: updateError } = await supabase
       .from("products")
       .update({ updated_at: nextUpdatedAt })
       .eq("id", productId);
 
     setIsUpdating(false);
 
-    if (error) {
-      alert(`No se pudo confirmar la disponibilidad: ${error.message}`);
+    if (updateError) {
+      setError("No se pudo confirmar la disponibilidad. Intenta de nuevo.");
       return;
     }
 
@@ -42,7 +44,7 @@ export function ProductAvailabilityButton({
   }
 
   return (
-    <div style={{ display: "grid", gap: 5 }}>
+    <div className="availability-confirm">
       <button
         className="btn btn-dark"
         disabled={isUpdating}
@@ -52,6 +54,7 @@ export function ProductAvailabilityButton({
         {isUpdating ? "Confirmando..." : "Confirmar disponibilidad"}
       </button>
       <small className="muted">Revisado: {formatDate(updatedAt)}</small>
+      {error ? <p className="availability-confirm-error">{error}</p> : null}
     </div>
   );
 }
