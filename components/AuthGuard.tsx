@@ -15,7 +15,8 @@ export function AuthGuard({ children }: AuthGuardProps) {
       const { data } = await supabase.auth.getUser();
 
       if (!data.user) {
-        window.location.href = "/panel/login";
+        const next = encodeURIComponent(window.location.pathname + window.location.search);
+        window.location.href = `/panel/login?next=${next}`;
         return;
       }
 
@@ -26,7 +27,8 @@ export function AuthGuard({ children }: AuthGuardProps) {
         .maybeSingle();
 
       if (error || !profile) {
-        window.location.href = "/panel/login";
+        const next = encodeURIComponent(window.location.pathname + window.location.search);
+        window.location.href = `/panel/login?next=${next}`;
         return;
       }
 

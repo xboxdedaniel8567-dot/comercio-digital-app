@@ -1,6 +1,5 @@
+import { validateImageFile } from "@/lib/image-upload-validation";
 import { supabase } from "@/lib/supabase";
-
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 
 function safeFileName(fileName: string) {
   const extension = fileName.split(".").pop()?.toLowerCase() || "jpg";
@@ -16,15 +15,7 @@ function safeFileName(fileName: string) {
 }
 
 export function validateProductImage(file: File) {
-  if (!file.type.startsWith("image/")) {
-    return "El archivo debe ser una imagen.";
-  }
-
-  if (file.size > MAX_IMAGE_SIZE) {
-    return "La imagen no puede pesar mas de 5 MB.";
-  }
-
-  return "";
+  return validateImageFile(file);
 }
 
 export async function uploadProductImage(file: File, productId: string) {
