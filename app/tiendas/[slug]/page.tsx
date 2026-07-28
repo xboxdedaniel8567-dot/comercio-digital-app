@@ -7,6 +7,7 @@ import { DirectionsLink } from "@/components/DirectionsLink";
 import { ProductCard } from "@/components/ProductCard";
 import { ReportButton } from "@/components/ReportButton";
 import { StoreProfileTabs } from "./StoreProfileTabs";
+import { formatPrice } from "@/lib/format-price";
 import { supabase } from "@/lib/supabase";
 
 type StorePageProps = {
@@ -97,24 +98,6 @@ type ProductRow = {
   }[] | null;
 };
 
-function formatPrice(price: string | number | null, currency: string | null) {
-  if (price === null || price === undefined) return "Precio por consultar";
-
-  const numericPrice = typeof price === "string" ? Number(price) : price;
-  if (!Number.isFinite(numericPrice)) return "Precio por consultar";
-
-  const safeCurrency = currency || "COP";
-  try {
-    return new Intl.NumberFormat("es-CO", {
-      style: "currency",
-      currency: safeCurrency,
-      maximumFractionDigits: 0,
-    }).format(numericPrice);
-  } catch {
-    return `${numericPrice.toLocaleString("es-CO")} ${safeCurrency}`;
-  }
-}
-
 function timeOnPlatform(createdAt: string | null) {
   if (!createdAt) return "Recien unida";
   const created = new Date(createdAt);
@@ -187,7 +170,7 @@ export default async function StorePage({ params }: StorePageProps) {
 
   const featuredProducts = allProducts.filter((p) => p.isFeatured);
   const mostViewedProducts = [...allProducts]
-    .filter((p) => p.view_count > 0)
+    .filter((p) => p.viewCount > 0)
     .sort((a, b) => b.viewCount - a.viewCount)
     .slice(0, 8);
   const galleryImages = (business.business_gallery_images ?? []).map((img) => ({
