@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { getSiteUrl } from "@/lib/site-url";
 
 export function RecoveryForm() {
   const [email, setEmail] = useState("");
@@ -14,7 +15,7 @@ export function RecoveryForm() {
     setMessage("Enviando instrucciones...");
 
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-      redirectTo: `${window.location.origin}/panel/restablecer`,
+      redirectTo: `${getSiteUrl()}/actualizar-contrasena`,
     });
 
     setIsSubmitting(false);
