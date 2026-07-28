@@ -84,27 +84,35 @@ type ProductRow = {
   id: string;
   name: string;
   slug: string;
-  price: number | null;
-  currency: string;
+  price: string | number | null;
+  currency: string | null;
   stock: number | null;
-  is_featured: boolean;
-  view_count: number;
+  is_featured: boolean | null;
+  view_count: number | null;
   categories: {
     name: string;
   } | null;
   product_images: {
     url: string;
-  }[];
+  }[] | null;
 };
 
-function formatPrice(price: number | null, currency: string) {
-  if (price === null) return "Precio por consultar";
+function formatPrice(price: string | number | null, currency: string | null) {
+  if (price === null || price === undefined) return "Precio por consultar";
 
-  return new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 0,
-  }).format(price);
+  const numericPrice = typeof price === "string" ? Number(price) : price;
+  if (!Number.isFinite(numericPrice)) return "Precio por consultar";
+
+  const safeCurrency = currency || "COP";
+  try {
+    return new Intl.NumberFormat("es-CO", {
+      style: "currency",
+      currency: safeCurrency,
+      maximumFractionDigits: 0,
+    }).format(numericPrice);
+  } catch {
+    return `${numericPrice.toLocaleString("es-CO")} ${safeCurrency}`;
+  }
 }
 
 function formatTime12Hour(value: string | null) {
@@ -117,8 +125,10 @@ function formatTime12Hour(value: string | null) {
   return `${hour12}:${minutePart} ${period}`;
 }
 
-function timeOnPlatform(createdAt: string) {
+function timeOnPlatform(createdAt: string | null) {
+  if (!createdAt) return "Recien unida";
   const created = new Date(createdAt);
+  if (isNaN(created.getTime())) return "Recien unida";
   const now = new Date();
   const months = (now.getFullYear() - created.getFullYear()) * 12 + (now.getMonth() - created.getMonth());
   if (months <= 0) return "Recien unida";
@@ -145,13 +155,16 @@ export default async function StorePage({ params }: StorePageProps) {
     .eq("status", "active")
     .maybeSingle();
 
-  if (businessError || !businessData) {
+  if (businessError) {
+    console.error("[store-page] Error loading business:", businessError.message, businessError.code, businessError.details);
+  }
+  if (!businessData) {
     notFound();
   }
 
   const business = businessData as unknown as BusinessDetail;
 
-  const { data: productsData } = await supabase
+  const { data: productsData, error: productsError } = await supabase
     .from("products")
     .select(`
       id, name, slug, price, currency, stock, is_featured, view_count,
@@ -163,6 +176,10 @@ export default async function StorePage({ params }: StorePageProps) {
     .or("stock.gt.0,stock.is.null")
     .order("name");
 
+  if (productsError) {
+    console.error("[store-page] Error loading products:", productsError.message, productsError.code);
+  }
+
   const allProducts = ((productsData ?? []) as ProductRow[]).map((product) => ({
     id: product.id,
     name: product.name,
@@ -171,11 +188,11 @@ export default async function StorePage({ params }: StorePageProps) {
     businessCity: business.city,
     category: product.categories?.name ?? "Sin categoria",
     price: formatPrice(product.price, product.currency),
-    stock: product.stock,
+    stock: product.stock ?? null,
     attributes: [],
     imageUrl: product.product_images?.[0]?.url ?? null,
-    isFeatured: product.is_featured,
-    viewCount: product.view_count,
+    isFeatured: product.is_featured ?? false,
+    viewCount: product.view_count ?? 0,
   }));
 
   const featuredProducts = allProducts.filter((p) => p.isFeatured);
