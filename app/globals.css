@@ -1350,195 +1350,306 @@ h3 {
   font-size: 0.86rem;
 }
 
+/* ─── Store profile (Instagram/TikTok-inspired, store not social) ─── */
+
 .store-page {
-  padding-top: 28px;
+  padding-top: 18px;
   padding-bottom: 72px;
 }
 
-.store-hero {
+/* Hero: cover + overlapping circular logo + identity */
+.store-profile-hero {
+  border-radius: var(--radius-xl);
   overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  background: var(--panel);
 }
 
-.store-cover,
-.store-cover-placeholder {
-  display: block;
+.store-profile-cover-wrap {
+  position: relative;
   width: 100%;
   aspect-ratio: 16 / 5;
-  border-bottom: 1px solid var(--line);
-  background: var(--panel-raised);
+  background: var(--bg-raised);
+  overflow: hidden;
+}
+
+.store-profile-cover {
+  display: block;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
 }
 
-.store-hero-content {
-  display: grid;
-  align-items: end;
-  gap: 18px 28px;
-  grid-template-columns: minmax(0, 1fr) auto;
-  padding: 24px;
+.store-profile-cover-placeholder {
+  background: linear-gradient(135deg, var(--bg-raised), var(--bg-interactive));
 }
 
-.store-identity {
+.store-profile-id-row {
   display: flex;
-  min-width: 0;
-  align-items: center;
   gap: 18px;
+  align-items: flex-end;
+  padding: 0 20px;
+  margin-top: -44px;
+  position: relative;
+  z-index: 2;
 }
 
-.store-logo {
-  display: grid;
-  width: 92px;
-  height: 92px;
+.store-profile-logo {
   flex: 0 0 auto;
-  place-items: center;
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius-lg);
-  background: #0a0d11;
+  width: 88px;
+  height: 88px;
+  border-radius: var(--radius-full);
+  border: 4px solid var(--bg-card);
+  background: var(--bg-raised);
   object-fit: cover;
+  display: grid;
+  place-items: center;
+  box-shadow: var(--shadow-md);
 }
 
-.store-logo-placeholder {
+.store-profile-logo-placeholder {
   color: var(--foreground);
-  font-size: 1.1rem;
-  font-weight: 800;
-}
-
-.store-category,
-.store-section-heading p {
-  margin: 0;
-  color: var(--accent);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.store-identity h1 {
-  margin: 6px 0 8px;
-  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-size: 1.4rem;
   font-weight: 800;
   letter-spacing: -0.02em;
 }
 
-.store-description {
-  max-width: 720px;
-  grid-column: 1 / 2;
-  margin: 0;
-  color: var(--muted);
-}
-
-.store-hero-actions {
-  display: grid;
-  min-width: 220px;
-  gap: 8px;
-  grid-column: 2;
-  grid-row: 1 / span 2;
-}
-
-.store-hero-actions .btn {
-  width: 100%;
-}
-
-.store-content-layout {
-  display: grid;
-  align-items: start;
-  gap: 28px;
-  grid-template-columns: minmax(0, 1fr) 290px;
-  margin-top: 40px;
-}
-
-.store-catalog {
+.store-profile-id-info {
+  padding-bottom: 8px;
   min-width: 0;
 }
 
-.store-section-heading {
-  display: flex;
-  align-items: end;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 18px;
+.store-profile-name {
+  margin: 0;
+  font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
 }
 
-.store-section-heading h2 {
-  margin: 6px 0 0;
-  font-size: 1.5rem;
+.store-profile-category {
+  margin: 4px 0 0;
+  color: var(--brand);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.store-profile-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin-top: 8px;
+}
+
+.store-profile-address-line {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+/* Action buttons row */
+.store-profile-actions {
+  display: flex;
+  gap: 10px;
+  padding: 20px 20px 0;
+}
+
+.store-profile-action-btn {
+  flex: 1 1 0;
+  min-height: 48px;
+  font-size: 0.92rem;
+}
+
+.store-profile-action-primary {
+  flex: 1.4 1 0;
+}
+
+.store-profile-action-report {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: flex-start;
+}
+
+.store-profile-action-report .btn {
+  min-height: 48px;
+  white-space: nowrap;
+}
+
+/* Compact summary stats */
+.store-profile-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  padding: 18px 20px 0;
+}
+
+.store-profile-stat {
+  display: grid;
+  gap: 4px;
+  text-align: center;
+  padding: 16px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
+}
+
+.store-profile-stat strong {
+  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.store-profile-stat span {
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  line-height: 1.3;
+}
+
+/* Gallery carousel */
+.store-profile-gallery-section {
+  padding: 24px 20px 0;
+}
+
+.store-profile-section-title {
+  margin: 0 0 14px;
+  font-size: 1.1rem;
   font-weight: 800;
   letter-spacing: -0.01em;
 }
 
-.store-section-heading > span {
-  color: var(--muted);
-  font-size: 0.84rem;
+.store-profile-gallery-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x mandatory;
 }
 
+.store-profile-gallery-img {
+  flex: 0 0 auto;
+  width: 220px;
+  height: 220px;
+  border-radius: var(--radius-lg);
+  object-fit: cover;
+  border: 1px solid var(--border);
+  scroll-snap-align: start;
+}
+
+/* Tabs */
+.store-profile-tabs-section {
+  padding: 28px 20px 0;
+}
+
+.store-profile-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.store-profile-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.store-profile-tab {
+  flex: 0 0 auto;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.92rem;
+  font-weight: 700;
+  min-height: 48px;
+  padding: 14px 16px;
+  transition: color var(--t-base), border-color var(--t-base);
+  white-space: nowrap;
+}
+
+.store-profile-tab:hover {
+  color: var(--foreground);
+}
+
+.store-profile-tab-active {
+  color: var(--foreground);
+  border-bottom-color: var(--brand);
+}
+
+.store-profile-tab-content {
+  padding-top: 20px;
+}
+
+/* Product grid inside tabs */
 .store-product-grid {
   display: grid;
-  gap: 18px;
+  gap: 16px;
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .store-empty-catalog {
-  min-height: 260px;
-  border: 1px solid var(--line);
+  min-height: 220px;
+  border: 1px solid var(--border);
   border-radius: var(--radius-lg);
-  padding: 56px 20px;
+  padding: 48px 20px;
   text-align: center;
 }
 
 .store-empty-catalog h3 {
-  margin: 0;
+  margin: 0 0 6px;
+  font-size: 1.1rem;
 }
 
 .store-empty-catalog p {
-  color: var(--muted);
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
 }
 
-.store-sidebar {
-  border: 1px solid var(--line);
-  border-radius: var(--radius-lg);
-  background: var(--panel);
-}
-
-.store-info-block {
+/* Info tab */
+.store-info-grid {
   display: grid;
   gap: 14px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.store-info-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-card);
   padding: 20px;
 }
 
-.store-info-block + .store-info-block {
-  border-top: 1px solid var(--line);
-}
-
-.store-info-block h2,
-.store-report-section h2 {
-  margin: 0;
+.store-info-card h3 {
+  margin: 0 0 12px;
   font-size: 1rem;
+  font-weight: 800;
 }
 
-.store-info-block address {
+.store-info-card p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.store-info-card address {
   display: grid;
-  gap: 5px;
-  color: var(--muted);
-  font-size: 0.82rem;
+  gap: 6px;
+  color: var(--text-secondary);
+  font-size: 0.86rem;
   font-style: normal;
 }
 
-.store-info-block address strong {
+.store-info-card address strong {
   color: var(--foreground);
-}
-
-.store-info-block .btn {
-  width: 100%;
-  min-width: 0;
-  padding-inline: 10px;
-  font-size: 0.82rem;
 }
 
 .store-hours-list {
   display: grid;
-  gap: 9px;
+  gap: 8px;
   margin: 0;
 }
 
@@ -1546,11 +1657,11 @@ h3 {
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  font-size: 0.76rem;
+  font-size: 0.84rem;
 }
 
 .store-hours-list dt {
-  color: var(--muted);
+  color: var(--text-secondary);
 }
 
 .store-hours-list dd {
@@ -1563,26 +1674,83 @@ h3 {
   color: var(--danger);
 }
 
-.store-contact-block p {
-  margin: 0;
-  color: var(--muted);
-  font-size: 0.82rem;
+/* Responsive */
+@media (max-width: 820px) {
+  .store-profile-cover-wrap {
+    aspect-ratio: 16 / 7;
+  }
+
+  .store-profile-id-row {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-top: -50px;
+    gap: 10px;
+  }
+
+  .store-profile-id-info {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .store-profile-meta-row {
+    justify-content: center;
+  }
+
+  .store-profile-actions {
+    flex-wrap: wrap;
+  }
+
+  .store-profile-action-btn {
+    flex: 1 1 calc(50% - 5px);
+  }
+
+  .store-profile-action-primary {
+    flex: 1 1 100%;
+  }
+
+  .store-product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .store-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .store-profile-gallery-img {
+    width: 180px;
+    height: 180px;
+  }
 }
 
-.store-report-section {
-  display: grid;
-  align-items: center;
-  gap: 20px;
-  grid-template-columns: minmax(0, 1fr) minmax(220px, 0.35fr);
-  margin-top: 48px;
-  border-top: 1px solid var(--line);
-  padding-top: 24px;
-}
+@media (max-width: 480px) {
+  .store-profile-summary {
+    grid-template-columns: 1fr;
+  }
 
-.store-report-section > div > p {
-  margin: 6px 0 0;
-  color: var(--muted);
-  font-size: 0.86rem;
+  .store-profile-stat {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-align: left;
+    padding: 14px 16px;
+  }
+
+  .store-profile-stat strong {
+    font-size: 1.2rem;
+  }
+
+  .store-profile-gallery-img {
+    width: 160px;
+    height: 160px;
+  }
+
+  .store-product-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
 }
 
 @media (max-width: 1080px) {
