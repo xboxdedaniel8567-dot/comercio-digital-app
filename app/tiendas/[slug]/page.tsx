@@ -6,6 +6,7 @@ import { ContactButton } from "@/components/ContactButton";
 import { DirectionsLink } from "@/components/DirectionsLink";
 import { ProductCard } from "@/components/ProductCard";
 import { ReportButton } from "@/components/ReportButton";
+import { StoreProfileTabs } from "./StoreProfileTabs";
 import { supabase } from "@/lib/supabase";
 
 type StorePageProps = {
@@ -63,6 +64,7 @@ type BusinessDetail = {
   whatsapp: string | null;
   logo_url: string | null;
   cover_url: string | null;
+  created_at: string;
   categories: {
     name: string;
   } | null;
@@ -72,14 +74,21 @@ type BusinessDetail = {
     closes_at: string | null;
     is_closed: boolean;
   }[];
+  business_gallery_images: {
+    url: string;
+    alt_text: string | null;
+  }[];
 };
 
 type ProductRow = {
+  id: string;
   name: string;
   slug: string;
   price: number | null;
   currency: string;
   stock: number | null;
+  is_featured: boolean;
+  view_count: number;
   categories: {
     name: string;
   } | null;
@@ -108,39 +117,77 @@ function formatTime12Hour(value: string | null) {
   return `${hour12}:${minutePart} ${period}`;
 }
 
+function timeOnPlatform(createdAt: string) {
+  const created = new Date(createdAt);
+  const now = new Date();
+  const months = (now.getFullYear() - created.getFullYear()) * 12 + (now.getMonth() - created.getMonth());
+  if (months <= 0) return "Recien unida";
+  if (months === 1) return "1 mes en Comercio Digital";
+  if (months < 12) return `${months} meses en Comercio Digital`;
+  const years = Math.floor(months / 12);
+  const remaining = months % 12;
+  if (remaining === 0) return `${years} ${years === 1 ? "año" : "años"} en Comercio Digital`;
+  return `${years} ${years === 1 ? "año" : "años"} y ${remaining} ${remaining === 1 ? "mes" : "meses"} en Comercio Digital`;
+}
+
 export default async function StorePage({ params }: StorePageProps) {
   const { slug } = await params;
   const { data: businessData, error: businessError } = await supabase
     .from("businesses")
-    .select("id, name, slug, description, city, address, neighborhood, shopping_center, floor, local_number, landmark, whatsapp, logo_url, cover_url, categories(name), business_hours(day_of_week, opens_at, closes_at, is_closed)")
+    .select(`
+      id, name, slug, description, city, address, neighborhood, shopping_center,
+      floor, local_number, landmark, whatsapp, logo_url, cover_url, created_at,
+      categories(name),
+      business_hours(day_of_week, opens_at, closes_at, is_closed),
+      business_gallery_images(url, alt_text)
+    `)
     .eq("slug", slug)
     .eq("status", "active")
-    .single();
+    .maybeSingle();
 
   if (businessError || !businessData) {
     notFound();
   }
 
-  const business = businessData as BusinessDetail;
+  const business = businessData as unknown as BusinessDetail;
+
   const { data: productsData } = await supabase
     .from("products")
-    .select("name, slug, price, currency, stock, categories(name), product_images(url)")
+    .select(`
+      id, name, slug, price, currency, stock, is_featured, view_count,
+      categories(name), product_images(url)
+    `)
     .eq("business_id", business.id)
     .eq("status", "active")
     .eq("moderation_status", "approved")
     .or("stock.gt.0,stock.is.null")
     .order("name");
 
-  const storeProducts = ((productsData ?? []) as ProductRow[]).map((product) => ({
+  const allProducts = ((productsData ?? []) as ProductRow[]).map((product) => ({
+    id: product.id,
     name: product.name,
     slug: product.slug,
     businessName: business.name,
+    businessCity: business.city,
     category: product.categories?.name ?? "Sin categoria",
     price: formatPrice(product.price, product.currency),
     stock: product.stock,
     attributes: [],
     imageUrl: product.product_images?.[0]?.url ?? null,
+    isFeatured: product.is_featured,
+    viewCount: product.view_count,
   }));
+
+  const featuredProducts = allProducts.filter((p) => p.isFeatured);
+  const mostViewedProducts = [...allProducts]
+    .filter((p) => p.view_count > 0)
+    .sort((a, b) => b.viewCount - a.viewCount)
+    .slice(0, 8);
+  const galleryImages = (business.business_gallery_images ?? []).map((img) => ({
+    url: img.url,
+    alt: img.alt_text ?? `${business.name} - fotografia del establecimiento`,
+  }));
+
   const message = encodeURIComponent(
     `Hola, vi la tienda ${business.name} en Comercio Digital. Quiero mas informacion.`
   );
@@ -153,135 +200,132 @@ export default async function StorePage({ params }: StorePageProps) {
     <main className="shell">
       <AppHeader />
       <div className="container store-page">
-        <section className="store-hero">
-          {business.cover_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img alt={`Portada de ${business.name}`} className="store-cover" src={business.cover_url} />
-          ) : (
-            <div className="store-cover-placeholder" />
-          )}
-          <div className="store-hero-content">
-            <div className="store-identity">
-            {business.logo_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img alt={`Logo de ${business.name}`} className="store-logo" src={business.logo_url} />
-              ) : (
-                <span className="store-logo store-logo-placeholder" aria-hidden="true">
-                  {business.name.slice(0, 2).toUpperCase()}
-                </span>
-              )}
-            <div>
-                <p className="store-category">{business.categories?.name ?? "Sin categoria"}</p>
-                <h1>{business.name}</h1>
-                <BusinessOpenStatus hours={hours} />
-              </div>
-            </div>
-            <p className="store-description">
-              {business.description || "Descubre los productos disponibles y contacta directamente con la tienda."}
-            </p>
-            <div className="store-hero-actions">
-              <ContactButton
-                businessId={business.id}
-                businessName={business.name}
-                label="Escribir por WhatsApp"
-                message={message}
-                source="store_detail"
-                whatsapp={business.whatsapp}
+        {/* ─── Portada + Logo + Identidad ─── */}
+        <section className="store-profile-hero">
+          <div className="store-profile-cover-wrap">
+            {business.cover_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                alt={`Portada de ${business.name}`}
+                className="store-profile-cover"
+                src={business.cover_url}
               />
-              <DirectionsLink address={business.address} city={business.city} />
-            </div>
-          </div>
-        </section>
-
-        <div className="store-content-layout">
-          <section aria-labelledby="store-products-title" className="store-catalog">
-            <div className="store-section-heading">
-              <div>
-                <p>Catalogo</p>
-                <h2 id="store-products-title">Productos disponibles</h2>
-              </div>
-              <span>{storeProducts.length} {storeProducts.length === 1 ? "producto" : "productos"}</span>
-            </div>
-            {storeProducts.length > 0 ? (
-              <div className="store-product-grid">
-                {storeProducts.map((product) => (
-                  <ProductCard key={product.slug} product={product} />
-                ))}
-              </div>
             ) : (
-              <div className="store-empty-catalog">
-                <h3>Catalogo en preparacion</h3>
-                <p>Esta tienda todavia no tiene productos activos.</p>
-              </div>
+              <div className="store-profile-cover store-profile-cover-placeholder" />
             )}
-          </section>
-
-          <aside className="store-sidebar" aria-label="Informacion de la tienda">
-            <section className="store-info-block">
-              <h2>Ubicacion</h2>
-              <address>
-                <strong>{business.address ?? "Direccion por confirmar"}</strong>
-                {business.neighborhood ? <span>Barrio: {business.neighborhood}</span> : null}
-                {business.shopping_center ? (
-                  <span>
-                    {business.shopping_center}
-                    {business.floor ? ` - Piso ${business.floor}` : ""}
-                    {business.local_number ? ` - Local ${business.local_number}` : ""}
-                  </span>
-                ) : null}
-                {business.landmark ? <span>Referencia: {business.landmark}</span> : null}
-                <span>{business.city}</span>
-              </address>
-              <DirectionsLink address={business.address} city={business.city} />
-            </section>
-
-            <section className="store-info-block">
-              <h2>Horario de atencion</h2>
-              {hours.length > 0 ? (
-                <dl className="store-hours-list">
-                  {hours.map((day) => (
-                    <div key={day.day_of_week}>
-                      <dt>{dayNames[day.day_of_week]}</dt>
-                      <dd className={day.is_closed ? "store-hours-closed" : undefined}>
-                        {day.is_closed
-                          ? "Cerrado"
-                          : `${formatTime12Hour(day.opens_at)} - ${formatTime12Hour(day.closes_at)}`}
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
-              ) : (
-                <p className="muted">Horario por confirmar.</p>
-              )}
-            </section>
-
-            <section className="store-info-block store-contact-block">
-              <h2>Contacto directo</h2>
-              <p>Confirma existencias, variantes y precio antes de desplazarte.</p>
-              <ContactButton
-                businessId={business.id}
-                businessName={business.name}
-                label="Abrir WhatsApp"
-                message={message}
-                source="store_detail"
-                whatsapp={business.whatsapp}
-              />
-            </section>
-          </aside>
-        </div>
-
-        <section className="store-report-section" aria-label="Seguridad del comercio">
-          <div>
-            <h2>¿La informacion de esta tienda no coincide?</h2>
-            <p>Envia un reporte para que el equipo administrativo pueda revisarla.</p>
           </div>
-          <ReportButton
-            returnPath={`/tiendas/${business.slug}`}
-            targetId={business.id}
-            targetName={business.name}
-            targetType="business"
-          />
+
+          <div className="store-profile-id-row">
+            {business.logo_url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                alt={`Logo de ${business.name}`}
+                className="store-profile-logo"
+                src={business.logo_url}
+              />
+            ) : (
+              <span className="store-profile-logo store-profile-logo-placeholder" aria-hidden="true">
+                {business.name.slice(0, 2).toUpperCase()}
+              </span>
+            )}
+
+            <div className="store-profile-id-info">
+              <h1 className="store-profile-name">{business.name}</h1>
+              <p className="store-profile-category">{business.categories?.name ?? "Sin categoria"}</p>
+              <div className="store-profile-meta-row">
+                <BusinessOpenStatus hours={hours} />
+                <span className="store-profile-address-line">
+                  {business.address ? business.address : "Direccion por confirmar"}
+                  {business.city ? ` - ${business.city}` : ""}
+                </span>
+              </div>
+            </div>
+          </div>
         </section>
+
+        {/* ─── Botones de accion ─── */}
+        <section className="store-profile-actions">
+          <ContactButton
+            businessId={business.id}
+            businessName={business.name}
+            className="btn store-profile-action-btn store-profile-action-primary"
+            label="WhatsApp"
+            message={message}
+            source="store_detail"
+            whatsapp={business.whatsapp}
+          />
+          <DirectionsLink
+            address={business.address}
+            city={business.city}
+            className="btn btn-dark store-profile-action-btn"
+            label="Como llegar"
+          />
+          <div className="store-profile-action-report">
+            <ReportButton
+              returnPath={`/tiendas/${business.slug}`}
+              targetId={business.id}
+              targetName={business.name}
+              targetType="business"
+            />
+          </div>
+        </section>
+
+        {/* ─── Resumen compacto ─── */}
+        <section className="store-profile-summary">
+          <article className="store-profile-stat">
+            <strong>{allProducts.length}</strong>
+            <span>Productos</span>
+          </article>
+          <article className="store-profile-stat">
+            <strong>{featuredProducts.length}</strong>
+            <span>Destacados</span>
+          </article>
+          <article className="store-profile-stat">
+            <strong>{timeOnPlatform(business.created_at)}</strong>
+            <span>En Comercio Digital</span>
+          </article>
+        </section>
+
+        {/* ─── Carrusel de fotografias del establecimiento ─── */}
+        {galleryImages.length > 0 ? (
+          <section className="store-profile-gallery-section" aria-label="Fotografias del establecimiento">
+            <h2 className="store-profile-section-title">Fotografias del establecimiento</h2>
+            <div className="store-profile-gallery-scroll">
+              {galleryImages.map((image, index) => (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  alt={image.alt}
+                  className="store-profile-gallery-img"
+                  decoding="async"
+                  key={image.url + index}
+                  loading="lazy"
+                  src={image.url}
+                />
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        {/* ─── Pestañas: Productos / Destacados / Mas consultados / Informacion ─── */}
+        <StoreProfileTabs
+          allProducts={allProducts}
+          featuredProducts={featuredProducts}
+          mostViewedProducts={mostViewedProducts}
+          business={{
+            description: business.description,
+            city: business.city,
+            address: business.address,
+            neighborhood: business.neighborhood,
+            shopping_center: business.shopping_center,
+            floor: business.floor,
+            local_number: business.local_number,
+            landmark: business.landmark,
+            whatsapp: business.whatsapp,
+          }}
+          hours={hours}
+          dayNames={dayNames}
+          formatTime12Hour={formatTime12Hour}
+        />
       </div>
     </main>
   );

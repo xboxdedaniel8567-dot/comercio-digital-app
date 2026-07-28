@@ -10,7 +10,7 @@ export function AppFooter() {
             alt="Comercio Digital"
             className="app-footer-logo"
             height={26}
-            src="/logo_de_la_empresa_cdigital.png"
+            src="/logo.png"
           />
           <span className="muted app-footer-tagline">by Gregor Magnus</span>
         </div>

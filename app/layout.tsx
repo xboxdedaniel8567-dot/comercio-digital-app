@@ -15,10 +15,10 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: "/favicon.svg", type: "image/svg+xml" },
-      { url: "/logo_de_la_empresa_cdigital.png", type: "image/png", sizes: "1448x1086" },
+      { url: "/logo.png", type: "image/png", sizes: "1536x1024" },
     ],
     shortcut: "/favicon.svg",
-    apple: "/logo_de_la_empresa_cdigital.png",
+    apple: "/logo.png",
   },
   appleWebApp: {
     capable: true,
