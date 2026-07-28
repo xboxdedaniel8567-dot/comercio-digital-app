@@ -224,7 +224,7 @@ export function EditProductForm({ slug }: EditProductFormProps) {
       }
     }
 
-    let cleanImageUrl = imageUrl.trim();
+    const cleanImageUrl = imageUrl.trim();
     const currentImage = product.product_images?.[0];
 
     if (imageFile) {
