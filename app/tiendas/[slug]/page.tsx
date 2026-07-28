@@ -4,7 +4,6 @@ import { AppHeader } from "@/components/AppHeader";
 import { BusinessOpenStatus } from "@/components/BusinessOpenStatus";
 import { ContactButton } from "@/components/ContactButton";
 import { DirectionsLink } from "@/components/DirectionsLink";
-import { ProductCard } from "@/components/ProductCard";
 import { ReportButton } from "@/components/ReportButton";
 import { StoreProfileTabs } from "./StoreProfileTabs";
 import { formatPrice } from "@/lib/format-price";
