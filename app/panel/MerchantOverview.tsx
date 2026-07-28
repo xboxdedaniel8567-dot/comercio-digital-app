@@ -32,11 +32,11 @@ function formatMoney(value: number) {
 }
 
 function businessStatusLabel(status: string) {
-  if (status === "active") return "Activa";
-  if (status === "draft") return "Borrador";
+  if (status === "active") return "Activo";
+  if (status === "draft") return "Oculto";
   if (status === "pending_review") return "Pendiente";
-  if (status === "suspended") return "Suspendida";
-  if (status === "rejected") return "Rechazada";
+  if (status === "suspended") return "Suspendido";
+  if (status === "rejected") return "Rechazado";
   return status;
 }
 
@@ -105,7 +105,7 @@ export function MerchantOverview() {
 
   if (error || !business) {
     return (
-      <div className="card" style={{ borderColor: "#ef4444" }}>
+      <div className="card card-error">
         <strong>No se pudo cargar el resumen.</strong>
         <p className="muted">{error}</p>
       </div>
