@@ -23,14 +23,6 @@ type ProductRow = {
   status: string;
 };
 
-function formatMoney(value: number) {
-  return new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  }).format(value);
-}
-
 function businessStatusLabel(status: string) {
   if (status === "active") return "Activo";
   if (status === "draft") return "Oculto";
