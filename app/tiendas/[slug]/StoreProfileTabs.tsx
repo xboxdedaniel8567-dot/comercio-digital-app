@@ -34,8 +34,17 @@ type StoreProfileTabsProps = {
   business: BusinessInfo;
   hours: { day_of_week: number; opens_at: string | null; closes_at: string | null; is_closed: boolean }[];
   dayNames: string[];
-  formatTime12Hour: (value: string | null) => string;
 };
+
+function formatTime12Hour(value: string | null) {
+  if (!value) return "Por confirmar";
+
+  const [hourPart, minutePart = "00"] = value.split(":");
+  const hour24 = Number(hourPart);
+  const hour12 = hour24 % 12 || 12;
+  const period = hour24 >= 12 ? "p. m." : "a. m.";
+  return `${hour12}:${minutePart} ${period}`;
+}
 
 type TabId = "products" | "featured" | "viewed" | "info";
 
@@ -48,7 +57,6 @@ export function StoreProfileTabs({
   business,
   hours,
   dayNames,
-  formatTime12Hour,
 }: StoreProfileTabsProps) {
   const tabs: TabDef[] = [
     { id: "products", label: "Productos", show: true },

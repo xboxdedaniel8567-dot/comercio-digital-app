@@ -115,16 +115,6 @@ function formatPrice(price: string | number | null, currency: string | null) {
   }
 }
 
-function formatTime12Hour(value: string | null) {
-  if (!value) return "Por confirmar";
-
-  const [hourPart, minutePart = "00"] = value.split(":");
-  const hour24 = Number(hourPart);
-  const hour12 = hour24 % 12 || 12;
-  const period = hour24 >= 12 ? "p. m." : "a. m.";
-  return `${hour12}:${minutePart} ${period}`;
-}
-
 function timeOnPlatform(createdAt: string | null) {
   if (!createdAt) return "Recien unida";
   const created = new Date(createdAt);
@@ -341,7 +331,6 @@ export default async function StorePage({ params }: StorePageProps) {
           }}
           hours={hours}
           dayNames={dayNames}
-          formatTime12Hour={formatTime12Hour}
         />
       </div>
     </main>

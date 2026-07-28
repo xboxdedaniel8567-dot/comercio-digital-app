@@ -55,3 +55,17 @@ test("keeps launch-critical application files in place", async () => {
   assert.ok(sqlFiles.includes("pilot_readiness_check.sql"));
   assert.match(pilotGuide, /Piloto controlado de Comercio Digital/i);
 });
+
+test("server-renders /tiendas/[slug] without crashing (no function props)", async () => {
+  const response = await render("/tiendas/fruver");
+  assert.equal(response.status, 200);
+  assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
+
+  const html = await response.text();
+  assert.match(html, /Fruver/i);
+  assert.match(html, /Manzana roja/i);
+  assert.match(html, /1\.400/i);
+  assert.match(html, /Informacion/i);
+  assert.match(html, /Horario por confirmar/i);
+  assert.doesNotMatch(html, /formatTime12Hour/);
+});
