@@ -13,7 +13,6 @@ import { ReportButton } from "@/components/ReportButton";
 import { ReservationButton } from "@/components/ReservationButton";
 import { formatPrice } from "@/lib/format-price";
 import { getInventoryState } from "@/lib/inventory";
-import { formatPrice } from "@/lib/format";
 import { supabase } from "@/lib/supabase";
 
 type ProductPageProps = {
