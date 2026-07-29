@@ -7,6 +7,7 @@ import { QuickStockControl } from "@/components/QuickStockControl";
 import { ProductAvailabilityButton } from "@/components/ProductAvailabilityButton";
 import { StatusBadge } from "@/components/StatusBadge";
 import { getCurrentBusiness } from "@/lib/current-business";
+import { formatPrice } from "@/lib/format-price";
 import { getInventoryState } from "@/lib/inventory";
 import { supabase } from "@/lib/supabase";
 
@@ -25,16 +26,6 @@ type ProductRow = {
     url: string;
   }[];
 };
-
-function formatPrice(price: number | null, currency: string) {
-  if (price === null) return "Precio por consultar";
-
-  return new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 0,
-  }).format(price);
-}
 
 function statusLabel(status: string) {
   if (status === "active") return "Activo";

@@ -2,6 +2,8 @@
 
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import { InventoryBadge } from "@/components/InventoryBadge";
+import { PriceInput } from "@/components/PriceInput";
+import { formatPrice, getPriceError, parsePriceInput } from "@/lib/format-price";
 import { supabase } from "@/lib/supabase";
 
 type ProductVariant = {
@@ -17,16 +19,6 @@ type ProductVariant = {
 type ProductVariantsManagerProps = {
   slug: string;
 };
-
-function formatPrice(price: number | null) {
-  if (price === null) return "Usa el precio general";
-
-  return new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  }).format(price);
-}
 
 export function ProductVariantsManager({ slug }: ProductVariantsManagerProps) {
   const [productId, setProductId] = useState("");
@@ -124,6 +116,13 @@ export function ProductVariantsManager({ slug }: ProductVariantsManagerProps) {
       return;
     }
 
+    const priceError = getPriceError(price, true);
+    const numericPrice = parsePriceInput(price);
+    if (priceError) {
+      setMessage(priceError);
+      return;
+    }
+
     const options: Record<string, string> = {};
     if (optionOneName.trim() && optionOneValue.trim()) {
       options[optionOneName.trim()] = optionOneValue.trim();
@@ -138,7 +137,7 @@ export function ProductVariantsManager({ slug }: ProductVariantsManagerProps) {
     const variantValues = {
         name: name.trim(),
         option_values: options,
-        price: price ? Number(price) : null,
+        price: price ? numericPrice : null,
         sku: sku.trim() || null,
         stock: Number(stock),
       };
@@ -277,17 +276,14 @@ export function ProductVariantsManager({ slug }: ProductVariantsManagerProps) {
           </div>
         </fieldset>
         <div className="merchant-form-grid">
-          <label className="merchant-field"><span>Precio propio</span>
-          <input
-            className="input"
+          <PriceInput
             disabled={isSaving}
-            min="0"
-            onChange={(event) => setPrice(event.target.value)}
-            placeholder="Precio propio (opcional)"
-            type="number"
+            id="variant-price"
+            label="Precio propio"
+            onValueChange={setPrice}
+            optional
             value={price}
           />
-          </label>
           <label className="merchant-field"><span>Unidades disponibles</span>
           <input
             className="input"
@@ -318,7 +314,9 @@ export function ProductVariantsManager({ slug }: ProductVariantsManagerProps) {
           <article className="merchant-variant-row" key={variant.id}>
             <div className="merchant-variant-copy">
               <strong>{variant.name}</strong>
-              <span className="muted">{formatPrice(variant.price)}</span>
+              <span className="muted">
+                {variant.price === null ? "Usa el precio general" : formatPrice(variant.price)}
+              </span>
               {Object.entries(variant.option_values ?? {}).length > 0 ? (
                 <span className="muted">
                   {Object.entries(variant.option_values)

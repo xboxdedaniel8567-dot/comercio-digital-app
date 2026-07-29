@@ -3387,10 +3387,46 @@ h3 {
 }
 
 .merchant-field > span,
+.merchant-field > label,
 .merchant-form-fieldset legend {
   color: var(--foreground);
   font-size: 0.82rem;
   font-weight: 750;
+}
+
+.price-input-control {
+  font-variant-numeric: tabular-nums;
+  font-weight: 750;
+}
+
+.price-input-guidance {
+  display: grid;
+  gap: 6px;
+}
+
+.price-input-guidance:empty {
+  display: none;
+}
+
+.price-input-words,
+.price-input-preview {
+  color: var(--muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.price-input-error,
+.price-input-warning {
+  border-left: 2px solid var(--danger);
+  color: var(--danger);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  padding-left: 9px;
+}
+
+.price-input-warning {
+  border-left-color: var(--warning);
+  color: var(--warning);
 }
 
 .merchant-field-wide {

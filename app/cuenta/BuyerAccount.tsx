@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { LogoutButton } from "@/components/LogoutButton";
 import { ProductCard } from "@/components/ProductCard";
 import { StatusBadge } from "@/components/StatusBadge";
+import { formatPrice } from "@/lib/format-price";
 import { supabase } from "@/lib/supabase";
 import { PrivacyRequestCenter } from "./PrivacyRequestCenter";
 
@@ -83,15 +84,6 @@ const reportReasonLabels: Record<string, string> = {
   prohibited: "Contenido prohibido",
   unavailable: "No esta disponible",
 };
-
-function formatPrice(price: number | null, currency: string) {
-  if (price === null) return "Precio por consultar";
-  return new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 0,
-  }).format(price);
-}
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("es-CO", {

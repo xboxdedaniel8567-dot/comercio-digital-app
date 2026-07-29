@@ -2,8 +2,10 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { AdaptiveAttributeFields } from "@/components/AdaptiveAttributeFields";
+import { PriceInput } from "@/components/PriceInput";
 import { ProductImageInput } from "@/components/ProductImageInput";
 import { getCurrentBusiness } from "@/lib/current-business";
+import { getPriceError, parsePriceInput } from "@/lib/format-price";
 import { uploadProductImage } from "@/lib/product-image-upload";
 import { getUniqueProductSlug } from "@/lib/product-slug";
 import { supabase } from "@/lib/supabase";
@@ -100,6 +102,13 @@ export function NewProductForm() {
       return;
     }
 
+    const priceError = getPriceError(price);
+    const numericPrice = parsePriceInput(price);
+    if (priceError || numericPrice === null) {
+      setMessage(priceError ?? "Revisa el precio antes de publicar.");
+      return;
+    }
+
     setIsSubmitting(true);
     setMessage("Guardando producto...");
 
@@ -127,7 +136,7 @@ export function NewProductForm() {
         currency: "COP",
         description,
         name,
-        price: Number(price),
+        price: numericPrice,
         slug: slugResult.slug,
         status: "active",
         stock: Number(stock),
@@ -257,7 +266,12 @@ export function NewProductForm() {
       <section className="merchant-form-section panel">
         <div className="merchant-form-heading"><div><span className="eyebrow">Venta e inventario</span><h2>Precio y disponibilidad</h2></div><p>El stock debe coincidir con las unidades disponibles en tu local.</p></div>
         <div className="merchant-form-grid">
-          <label className="merchant-field"><span>Precio en pesos colombianos</span><input className="input" min="0" onChange={(event) => setPrice(event.target.value)} placeholder="Ej. 1800000" required type="number" value={price} /></label>
+          <PriceInput
+            disabled={isSubmitting}
+            id="new-product-price"
+            onValueChange={setPrice}
+            value={price}
+          />
           <label className="merchant-field"><span>Unidades disponibles</span><input className="input" min="0" onChange={(event) => setStock(event.target.value)} placeholder="Ej. 2" required type="number" value={stock} /></label>
           <label className="merchant-field merchant-field-wide"><span>Descripcion</span><textarea className="input" onChange={(event) => setDescription(event.target.value)} placeholder="Estado, beneficios y detalles importantes del producto" required rows={5} value={description} /></label>
         </div>

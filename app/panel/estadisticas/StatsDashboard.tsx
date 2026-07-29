@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { getCurrentBusiness } from "@/lib/current-business";
+import { formatPrice } from "@/lib/format-price";
 import { getInventoryState } from "@/lib/inventory";
 import { supabase } from "@/lib/supabase";
 
@@ -20,14 +21,6 @@ type SearchLog = {
   results_count: number | null;
   created_at: string;
 };
-
-function formatMoney(value: number) {
-  return new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency: "COP",
-    maximumFractionDigits: 0,
-  }).format(value);
-}
 
 export function StatsDashboard() {
   const [products, setProducts] = useState<ProductRow[]>([]);
@@ -159,7 +152,7 @@ export function StatsDashboard() {
           ["Pocas unidades", String(stats.lowStock)],
           ["Clics WhatsApp", String(contactClicks)],
           ["Busquedas", String(searchCount)],
-          ["Valor inventario", formatMoney(stats.inventoryValue)],
+          ["Valor inventario", formatPrice(stats.inventoryValue)],
         ].map(([label, value]) => (
           <div className="merchant-stat-card" key={label}>
             <span>{label}</span>
@@ -200,7 +193,7 @@ export function StatsDashboard() {
             Producto mas caro:{" "}
             <strong>
               {stats.mostExpensive
-                ? `${stats.mostExpensive.name} (${formatMoney(stats.mostExpensive.price ?? 0)})`
+                ? `${stats.mostExpensive.name} (${formatPrice(stats.mostExpensive.price)})`
                 : "Sin datos"}
             </strong>
           </p>

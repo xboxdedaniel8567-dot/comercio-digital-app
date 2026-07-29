@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { ContactButton } from "@/components/ContactButton";
 import { InventoryBadge } from "@/components/InventoryBadge";
 import { readComparison, writeComparison } from "@/lib/comparison";
+import { formatPrice } from "@/lib/format-price";
 import { supabase } from "@/lib/supabase";
 
 type ComparisonProduct = {
@@ -30,15 +31,6 @@ type ComparisonProduct = {
     category_attributes: { name: string } | null;
   }[];
 };
-
-function formatPrice(price: number | null, currency: string) {
-  if (price === null) return "Precio por consultar";
-  return new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 0,
-  }).format(price);
-}
 
 export function CompareProducts() {
   const [products, setProducts] = useState<ComparisonProduct[]>([]);
