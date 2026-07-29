@@ -279,45 +279,16 @@ export function EditProductForm({ slug }: EditProductFormProps) {
   return (
     <form className="merchant-product-form" onSubmit={handleSubmit}>
       <section className="merchant-form-section panel">
-        <div className="merchant-form-heading"><div><span className="eyebrow">Informacion publica</span><h2>Datos del producto</h2></div><p>Estos datos son los que veran los compradores en el mar[...]
-        <div className="merchant-form-grid">
-      <label className="merchant-field merchant-field-wide"><span>Nombre del producto</span><input className="input" disabled={isLoading} onChange={(event) => setName(event.target.value)} placeho[...]
-      <label className="merchant-field"><span>Categoria</span>
-      <select
-        className="input"
-        disabled={isLoading}
-        onChange={(event) => setCategoryId(event.target.value)}
-        required
-        value={categoryId}
-      >
-        <option value="">Selecciona una categoria</option>
-        {categories.map((category) => (
-          <option key={category.id} value={category.id}>
-            {category.name}
-          </option>
-        ))}
-      </select>
-      </label>
-      {isLoadingSubcategories || subcategories.length > 0 ? (
-        <label className="merchant-field"><span>Subcategoria</span>
-        <select
-          className="input"
-          disabled={isLoading || isLoadingSubcategories}
-          onChange={(event) => setSubcategoryId(event.target.value)}
-          value={subcategoryId}
-        >
-          <option value="">
-            {isLoadingSubcategories ? "Cargando subcategorias..." : "Selecciona una subcategoria (opcional)"}
-          </option>
-          {subcategories.map((subcategory) => (
-            <option key={subcategory.id} value={subcategory.id}>
-              {subcategory.name}
-            </option>
-          ))}
-        </select>
-        </label>
-      ) : null}
-        </div>
+      <div className="merchant-form-heading">
+  <div>
+    <span className="eyebrow">Información pública</span>
+    <h2>Datos del producto</h2>
+  </div>
+
+  <p>
+    Estos datos son los que verán los compradores en el marketplace.
+  </p>
+</div>
       </section>
       <section className="merchant-form-section panel">
         <div className="merchant-form-heading"><div><span className="eyebrow">Caracteristicas</span><h2>Detalles para comparar</h2></div><p>Manten actualizados los atributos que ayudan a filtrar [...]
