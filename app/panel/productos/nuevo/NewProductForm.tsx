@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { FormEvent, useEffect, useState } from "react";
 import { AdaptiveAttributeFields } from "@/components/AdaptiveAttributeFields";
@@ -142,7 +142,7 @@ export function NewProductForm() {
       return;
     }
 
-  let finalImageUrl = imageUrl.trim();
+   let finalImageUrl = imageUrl.trim();
 
     if (imageFile && product) {
       setMessage("Subiendo imagen...");
@@ -287,3 +287,4 @@ export function NewProductForm() {
     </form>
   );
 }
+
