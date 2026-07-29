@@ -172,9 +172,11 @@ export function AppHeader() {
             <img
               alt="Comercio Digital"
               className="site-brand-logo"
-              height={30}
-              src="/logo.png"
+              height={32}
+              src="/brand-icon.png"
+              width={32}
             />
+            <span className="site-brand-copy">Comercio Digital</span>
           </Link>
 
           {!isInternalArea ? (

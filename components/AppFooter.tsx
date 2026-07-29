@@ -10,9 +10,13 @@ export function AppFooter() {
             alt="Comercio Digital"
             className="app-footer-logo"
             height={26}
-            src="/logo.png"
+            src="/brand-icon.png"
+            width={26}
           />
-          <span className="muted app-footer-tagline">by Gregor Magnus</span>
+          <span className="app-footer-brand-copy">
+            <strong>Comercio Digital</strong>
+            <span className="muted app-footer-tagline">by Gregor Magnus</span>
+          </span>
         </div>
         <nav className="app-footer-nav" aria-label="Informacion legal">
           <Link className="muted" href="/legal/terminos">Terminos</Link>

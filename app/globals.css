@@ -456,14 +456,20 @@ h3 {
 }
 
 .site-brand-logo {
- height: 32px;
- width: auto;
- object-fit: contain;
- display: block;
+  display: block;
+  flex: 0 0 32px;
+  height: 32px;
+  object-fit: contain;
+  width: 32px;
 }
 
 .site-brand-copy {
-  display: none;
+  color: var(--foreground);
+  display: inline-block;
+  font-size: 0.96rem;
+  font-weight: 750;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .site-header-search {
@@ -1978,7 +1984,13 @@ h3 {
 
 @media (max-width: 560px) {
   .site-brand-logo {
-    height: 26px;
+    flex-basis: 28px;
+    height: 28px;
+    width: 28px;
+  }
+
+  .site-brand-copy {
+    font-size: 0.84rem;
   }
 
   .site-header-actions a {
@@ -4595,9 +4607,15 @@ h3 {
 }
 
 .app-footer-logo {
+  flex: 0 0 26px;
   height: 26px;
-  width: auto;
   object-fit: contain;
+  width: 26px;
+}
+
+.app-footer-brand-copy {
+  display: grid;
+  gap: 3px;
 }
 
 .app-footer-tagline {
