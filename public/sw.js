@@ -1,7 +1,7 @@
 const CACHE_NAME = "comercio-digital-v3";
 const OFFLINE_URL = "/offline.html";
 
-const CORE_ASSETS = [OFFLINE_URL, "/favicon.svg", "/manifest.webmanifest"];
+const CORE_ASSETS = [OFFLINE_URL, "/brand-icon.png", "/manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
@@ -62,7 +62,7 @@ self.addEventListener("fetch", (event) => {
   // Archivos estaticos publicos: cache-first
   if (
     url.pathname.startsWith("/_next/static/") ||
-    url.pathname === "/favicon.svg" ||
+    url.pathname === "/brand-icon.png" ||
     url.pathname === "/manifest.webmanifest" ||
     url.pathname === "/offline.html"
   ) {

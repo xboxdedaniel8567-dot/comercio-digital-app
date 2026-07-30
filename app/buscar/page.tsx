@@ -2,6 +2,7 @@ import Link from "next/link";
 import { AppHeader } from "@/components/AppHeader";
 import { CompareButton } from "@/components/CompareButton";
 import { CompareTray } from "@/components/CompareTray";
+import { PriceFilterInputs } from "@/components/PriceFilterInputs";
 import { ProductCard } from "@/components/ProductCard";
 import { SearchLogger } from "@/components/SearchLogger";
 import { SearchSortControl } from "@/components/SearchSortControl";
@@ -257,28 +258,11 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         </label>
         <fieldset className="search-filter-group">
           <legend>Rango de precio</legend>
-          <div className="search-price-grid">
-            <label className="sr-only" htmlFor={`${prefix}-min-price`}>Precio minimo</label>
-            <input
-              className="input"
-              defaultValue={params?.min_price ?? ""}
-              id={`${prefix}-min-price`}
-              min="0"
-              name="min_price"
-              placeholder="Minimo"
-              type="number"
-            />
-            <label className="sr-only" htmlFor={`${prefix}-max-price`}>Precio maximo</label>
-            <input
-              className="input"
-              defaultValue={params?.max_price ?? ""}
-              id={`${prefix}-max-price`}
-              min="0"
-              name="max_price"
-              placeholder="Maximo"
-              type="number"
-            />
-          </div>
+          <PriceFilterInputs
+            initialMax={params?.max_price}
+            initialMin={params?.min_price}
+            prefix={prefix}
+          />
         </fieldset>
         <div className="search-filter-actions">
           <button className="btn" type="submit">Aplicar filtros</button>

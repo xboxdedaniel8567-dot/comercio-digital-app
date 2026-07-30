@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { ContactButton } from "@/components/ContactButton";
 import { InventoryBadge } from "@/components/InventoryBadge";
 import { ReservationButton } from "@/components/ReservationButton";
-import { formatPrice } from "@/lib/format";
+import { formatPrice } from "@/lib/format-price";
 
 type ProductVariant = {
   id: string;

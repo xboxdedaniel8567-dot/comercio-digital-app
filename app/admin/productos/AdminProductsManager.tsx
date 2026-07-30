@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ProductModerationActions } from "@/components/ProductModerationActions";
 import { StatusBadge } from "@/components/StatusBadge";
+import { formatPrice } from "@/lib/format-price";
 import { supabase } from "@/lib/supabase";
 
 type ProductRow = {
@@ -20,15 +21,6 @@ type ProductRow = {
   categories: { name: string } | null;
   product_images: { url: string }[];
 };
-
-function formatPrice(price: number | null, currency: string) {
-  if (price === null) return "Precio por consultar";
-  return new Intl.NumberFormat("es-CO", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 0,
-  }).format(price);
-}
 
 function publicationLabel(status: string) {
   if (status === "active") return "Publicado";

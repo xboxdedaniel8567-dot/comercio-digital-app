@@ -2,7 +2,9 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { AdaptiveAttributeFields } from "@/components/AdaptiveAttributeFields";
+import { PriceInput } from "@/components/PriceInput";
 import { ProductImageInput } from "@/components/ProductImageInput";
+import { getPriceError, parsePriceInput } from "@/lib/format-price";
 import { uploadProductImage } from "@/lib/product-image-upload";
 import { getUniqueProductSlug } from "@/lib/product-slug";
 import { supabase } from "@/lib/supabase";
@@ -162,6 +164,13 @@ export function EditProductForm({ slug }: EditProductFormProps) {
       return;
     }
 
+    const priceError = getPriceError(price);
+    const numericPrice = parsePriceInput(price);
+    if (priceError || numericPrice === null) {
+      setMessage(priceError ?? "Revisa el precio antes de guardar.");
+      return;
+    }
+
     setIsSaving(true);
     setMessage("Guardando cambios...");
 
@@ -179,7 +188,7 @@ export function EditProductForm({ slug }: EditProductFormProps) {
         category_id: categoryId || null,
         description,
         name,
-        price: Number(price),
+        price: numericPrice,
         slug: slugResult.slug,
         status,
         stock: Number(stock),
@@ -333,7 +342,12 @@ export function EditProductForm({ slug }: EditProductFormProps) {
       <section className="merchant-form-section panel">
         <div className="merchant-form-heading"><div><span className="eyebrow">Venta e inventario</span><h2>Disponibilidad</h2></div><p>Controla el precio, el stock y la visibilidad del producto.</p></div>
         <div className="merchant-form-grid">
-      <label className="merchant-field"><span>Precio en pesos colombianos</span><input className="input" disabled={isLoading} min="0" onChange={(event) => setPrice(event.target.value)} placeholder="Precio" required type="number" value={price} /></label>
+      <PriceInput
+        disabled={isLoading || isSaving}
+        id="edit-product-price"
+        onValueChange={setPrice}
+        value={price}
+      />
       <label className="merchant-field"><span>Unidades disponibles</span><input className="input" disabled={isLoading} min="0" onChange={(event) => setStock(event.target.value)} placeholder="Stock" required type="number" value={stock} /></label>
       <label className="merchant-field merchant-field-wide"><span>Estado de publicacion</span>
       <select
