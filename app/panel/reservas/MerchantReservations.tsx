@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getCurrentBusiness } from "@/lib/current-business";
 import { supabase } from "@/lib/supabase";
+import { firstRelation } from "@/lib/supabase-relations";
 import { StatusBadge } from "@/components/StatusBadge";
 
 type ReservationRow = {
@@ -59,7 +60,13 @@ export function MerchantReservations() {
       return;
     }
 
-    setReservations((data ?? []) as ReservationRow[]);
+    setReservations(
+      (data ?? []).map((reservation) => ({
+        ...reservation,
+        products: firstRelation(reservation.products),
+        product_variants: firstRelation(reservation.product_variants),
+      })),
+    );
     setMessage("");
   }
 

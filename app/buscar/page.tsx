@@ -8,6 +8,7 @@ import { SearchLogger } from "@/components/SearchLogger";
 import { SearchSortControl } from "@/components/SearchSortControl";
 import { formatPrice } from "@/lib/format-price";
 import { supabase } from "@/lib/supabase";
+import { firstRelation } from "@/lib/supabase-relations";
 
 type SearchPageProps = {
   searchParams?: Promise<{
@@ -148,12 +149,26 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     : { data: [], error: null };
   const error = searchResult.error ?? productsResult.error;
   const categories = (categoriesResult.data ?? []) as CategoryOption[];
-  const subcategories = (subcategoriesResult.data ?? []) as SubcategoryOption[];
+  const subcategories: SubcategoryOption[] = (subcategoriesResult.data ?? []).map(
+    (subcategory) => ({
+      ...subcategory,
+      categories: firstRelation(subcategory.categories),
+    }),
+  );
   const rankByProduct = new Map(
     rankedResults.map((result, index) => [result.product_id, index]),
   );
 
-  let productRows = ((productsResult.data ?? []) as ProductRow[]).sort(
+  let productRows: ProductRow[] = (productsResult.data ?? []).map((product) => ({
+    ...product,
+    businesses: firstRelation(product.businesses),
+    categories: firstRelation(product.categories),
+    subcategories: firstRelation(product.subcategories),
+    product_attribute_values: product.product_attribute_values.map((attribute) => ({
+      ...attribute,
+      category_attributes: firstRelation(attribute.category_attributes),
+    })),
+  })).sort(
     (first, second) =>
       (rankByProduct.get(first.id) ?? Number.MAX_SAFE_INTEGER) -
       (rankByProduct.get(second.id) ?? Number.MAX_SAFE_INTEGER),

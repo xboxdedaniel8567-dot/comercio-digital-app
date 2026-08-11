@@ -14,6 +14,7 @@ import { ReservationButton } from "@/components/ReservationButton";
 import { formatPrice } from "@/lib/format-price";
 import { getInventoryState } from "@/lib/inventory";
 import { supabase } from "@/lib/supabase";
+import { firstRelation } from "@/lib/supabase-relations";
 
 type ProductPageProps = {
   params: Promise<{ slug: string }>;
@@ -31,11 +32,9 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 
   if (!data) return { title: "Producto no disponible | Comercio Digital" };
 
-  const product = data as {
-    name: string;
-    description: string | null;
-    product_images: { url: string }[];
-    businesses: { name: string } | null;
+  const product = {
+    ...data,
+    businesses: firstRelation(data.businesses),
   };
   const title = `${product.name} en ${product.businesses?.name ?? "Comercio Digital"}`;
   const description = product.description || `Consulta precio, disponibilidad y tienda de ${product.name}.`;
@@ -74,7 +73,7 @@ type ProductDetail = {
     slug: string;
     whatsapp: string | null;
   } | null;
-  categories: { name: string } | null;
+  categories: { name: string; slug: string } | null;
   subcategories: { name: string } | null;
   product_images: { url: string; alt_text: string | null }[];
   product_attribute_values: {
@@ -109,7 +108,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const { data, error } = await supabase
     .from("products")
     .select(
-      "id, name, slug, description, price, currency, stock, updated_at, businesses!inner(id, address, city, description, logo_url, name, slug, whatsapp), categories(name), subcategories(name), product_images(url, alt_text), product_attribute_values(value, category_attributes(name, sort_order)), product_variants(id, name, option_values, price, stock)",
+      "id, name, slug, description, price, currency, stock, updated_at, businesses!inner(id, address, city, description, logo_url, name, slug, whatsapp), categories(name, slug), subcategories(name), product_images(url, alt_text), product_attribute_values(value, category_attributes(name, sort_order)), product_variants(id, name, option_values, price, stock)",
     )
     .eq("slug", slug)
     .eq("status", "active")
@@ -124,7 +123,16 @@ export default async function ProductPage({ params }: ProductPageProps) {
     notFound();
   }
 
-  const product = data as ProductDetail;
+  const product: ProductDetail = {
+    ...data,
+    businesses: firstRelation(data.businesses),
+    categories: firstRelation(data.categories),
+    subcategories: firstRelation(data.subcategories),
+    product_attribute_values: data.product_attribute_values.map((attribute) => ({
+      ...attribute,
+      category_attributes: firstRelation(attribute.category_attributes),
+    })),
+  };
   const business = product.businesses;
   const attributes = [...(product.product_attribute_values ?? [])].sort(
     (first, second) =>
@@ -148,7 +156,15 @@ export default async function ProductPage({ params }: ProductPageProps) {
     .order("updated_at", { ascending: false })
     .limit(4);
 
-  const relatedProducts = ((relatedData ?? []) as RelatedProductRow[]).map((related) => ({
+  const relatedRows: RelatedProductRow[] = (relatedData ?? []).map((related) => ({
+    ...related,
+    categories: firstRelation(related.categories),
+    product_attribute_values: related.product_attribute_values.map((attribute) => ({
+      ...attribute,
+      category_attributes: firstRelation(attribute.category_attributes),
+    })),
+  }));
+  const relatedProducts = relatedRows.map((related) => ({
     name: related.name,
     slug: related.slug,
     businessName: business?.name ?? "Tienda por confirmar",

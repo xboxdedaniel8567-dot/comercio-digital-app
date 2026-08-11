@@ -6,6 +6,7 @@ import { BusinessCard } from "@/components/BusinessCard";
 import { ProductCard } from "@/components/ProductCard";
 import { formatPrice } from "@/lib/format-price";
 import { supabase } from "@/lib/supabase";
+import { firstRelation } from "@/lib/supabase-relations";
 
 export const metadata: Metadata = {
   title: "Comercio Digital - Busca productos en comercios fisicos",
@@ -85,7 +86,11 @@ export default async function Home() {
   ]);
 
   const categories = (categoriesResult.data ?? []) as CategoryRow[];
-  const products = ((productsResult.data ?? []) as ProductRow[]).map((product) => ({
+  const products = (productsResult.data ?? []).map((row) => ({
+    ...row,
+    businesses: firstRelation(row.businesses),
+    categories: firstRelation(row.categories),
+  })).map((product: ProductRow) => ({
     name: product.name,
     slug: product.slug,
     businessName: product.businesses?.name ?? "Tienda por confirmar",
@@ -96,7 +101,10 @@ export default async function Home() {
     attributes: [],
     imageUrl: product.product_images?.[0]?.url ?? null,
   }));
-  const businessRows = (businessesResult.data ?? []) as BusinessRow[];
+  const businessRows: BusinessRow[] = (businessesResult.data ?? []).map((business) => ({
+    ...business,
+    categories: firstRelation(business.categories),
+  }));
   const businesses = businessRows.map((business) => ({
     name: business.name,
     slug: business.slug,

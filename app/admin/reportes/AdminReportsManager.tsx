@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { StatusBadge } from "@/components/StatusBadge";
 import { supabase } from "@/lib/supabase";
+import { firstRelation } from "@/lib/supabase-relations";
 
 type ReportRow = {
   id: string;
@@ -48,7 +49,13 @@ export function AdminReportsManager() {
       return;
     }
 
-    setReports((data ?? []) as ReportRow[]);
+    setReports(
+      (data ?? []).map((report) => ({
+        ...report,
+        businesses: firstRelation(report.businesses),
+        products: firstRelation(report.products),
+      })),
+    );
     setMessage("");
   }
 

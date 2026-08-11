@@ -2,6 +2,7 @@ import Link from "next/link";
 import { DashboardShell } from "@/components/DashboardShell";
 import { adminLinks } from "@/lib/admin-links";
 import { supabase } from "@/lib/supabase";
+import { firstRelation } from "@/lib/supabase-relations";
 
 type ProductRow = {
   id: string;
@@ -154,7 +155,10 @@ export default async function AdminQualityPage() {
       .limit(200),
   ]);
 
-  const products = (productsResult.data ?? []) as ProductRow[];
+  const products: ProductRow[] = (productsResult.data ?? []).map((product) => ({
+    ...product,
+    businesses: firstRelation(product.businesses),
+  }));
   const businesses = (businessesResult.data ?? []) as BusinessRow[];
   const issues = [
     ...products.flatMap(productIssues),

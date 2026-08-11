@@ -7,6 +7,7 @@ import { InventoryBadge } from "@/components/InventoryBadge";
 import { readComparison, writeComparison } from "@/lib/comparison";
 import { formatPrice } from "@/lib/format-price";
 import { supabase } from "@/lib/supabase";
+import { firstRelation } from "@/lib/supabase-relations";
 
 type ComparisonProduct = {
   id: string;
@@ -57,7 +58,16 @@ export function CompareProducts() {
         return;
       }
 
-      const rows = (data ?? []) as ComparisonProduct[];
+      const rows: ComparisonProduct[] = (data ?? []).map((product) => ({
+        ...product,
+        businesses: firstRelation(product.businesses),
+        categories: firstRelation(product.categories),
+        subcategories: firstRelation(product.subcategories),
+        product_attribute_values: product.product_attribute_values.map((attribute) => ({
+          ...attribute,
+          category_attributes: firstRelation(attribute.category_attributes),
+        })),
+      }));
       setProducts(
         selected
           .map((item) => rows.find((product) => product.slug === item.slug))

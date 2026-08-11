@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { BusinessModerationActions } from "@/components/BusinessModerationActions";
 import { StatusBadge } from "@/components/StatusBadge";
 import { supabase } from "@/lib/supabase";
+import { firstRelation } from "@/lib/supabase-relations";
 
 type BusinessRow = {
   id: string;
@@ -57,7 +58,12 @@ export function AdminBusinessesManager() {
         return;
       }
 
-      setBusinesses((data ?? []) as BusinessRow[]);
+      setBusinesses(
+        (data ?? []).map((business) => ({
+          ...business,
+          categories: firstRelation(business.categories),
+        })),
+      );
       setMessage("");
     }
 

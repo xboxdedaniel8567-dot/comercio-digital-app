@@ -1,6 +1,7 @@
 import { AppHeader } from "@/components/AppHeader";
 import { MerchantDirectory, type DirectoryBusiness } from "@/components/MerchantDirectory";
 import { supabase } from "@/lib/supabase";
+import { firstRelation } from "@/lib/supabase-relations";
 
 export default async function MerchantsPage() {
   const { data, error } = await supabase
@@ -9,7 +10,10 @@ export default async function MerchantsPage() {
     .eq("status", "active")
     .order("name");
 
-  const businesses = (data ?? []) as DirectoryBusiness[];
+  const businesses: DirectoryBusiness[] = (data ?? []).map((business) => ({
+    ...business,
+    categories: firstRelation(business.categories),
+  }));
 
   return (
     <main className="shell">

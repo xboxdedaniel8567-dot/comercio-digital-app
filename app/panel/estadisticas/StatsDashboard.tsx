@@ -5,6 +5,7 @@ import { getCurrentBusiness } from "@/lib/current-business";
 import { formatPrice } from "@/lib/format-price";
 import { getInventoryState } from "@/lib/inventory";
 import { supabase } from "@/lib/supabase";
+import { firstRelation } from "@/lib/supabase-relations";
 
 type ProductRow = {
   name: string;
@@ -84,7 +85,12 @@ export function StatsDashboard() {
         return;
       }
 
-      setProducts((data ?? []) as ProductRow[]);
+      setProducts(
+        (data ?? []).map((product) => ({
+          ...product,
+          businesses: firstRelation(product.businesses),
+        })),
+      );
       setContactClicks(count ?? 0);
       setSearchCount(searchesTotal ?? 0);
       setRecentSearches((searchRows ?? []) as SearchLog[]);

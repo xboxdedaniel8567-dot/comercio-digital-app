@@ -6,6 +6,7 @@ import { ProductModerationActions } from "@/components/ProductModerationActions"
 import { StatusBadge } from "@/components/StatusBadge";
 import { formatPrice } from "@/lib/format-price";
 import { supabase } from "@/lib/supabase";
+import { firstRelation } from "@/lib/supabase-relations";
 
 type ProductRow = {
   id: string;
@@ -65,7 +66,13 @@ export function AdminProductsManager() {
         return;
       }
 
-      setProducts((data ?? []) as ProductRow[]);
+      setProducts(
+        (data ?? []).map((product) => ({
+          ...product,
+          businesses: firstRelation(product.businesses),
+          categories: firstRelation(product.categories),
+        })),
+      );
       setMessage("");
     }
 

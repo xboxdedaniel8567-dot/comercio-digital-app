@@ -4,6 +4,7 @@ import { BusinessCard } from "@/components/BusinessCard";
 import { ProductCard } from "@/components/ProductCard";
 import { formatPrice } from "@/lib/format-price";
 import { supabase } from "@/lib/supabase";
+import { firstRelation } from "@/lib/supabase-relations";
 
 type CityPageProps = {
   params: Promise<{ city: string }>;
@@ -84,7 +85,10 @@ export default async function CityPage({ params }: CityPageProps) {
       .limit(24),
   ]);
 
-  const businesses = ((businessesResult.data ?? []) as BusinessRow[]).map((business) => ({
+  const businesses = (businessesResult.data ?? []).map((row) => ({
+    ...row,
+    categories: firstRelation(row.categories),
+  })).map((business: BusinessRow) => ({
     name: business.name,
     slug: business.slug,
     category: business.categories?.name ?? "Sin categoria",
@@ -93,7 +97,11 @@ export default async function CityPage({ params }: CityPageProps) {
     status: "Activo",
   }));
 
-  const products = ((productsResult.data ?? []) as ProductRow[]).map((product) => ({
+  const products = (productsResult.data ?? []).map((row) => ({
+    ...row,
+    businesses: firstRelation(row.businesses),
+    categories: firstRelation(row.categories),
+  })).map((product: ProductRow) => ({
     name: product.name,
     slug: product.slug,
     businessName: product.businesses?.name ?? "Tienda por confirmar",

@@ -3,6 +3,7 @@ import { AppHeader } from "@/components/AppHeader";
 import { ProductCard } from "@/components/ProductCard";
 import { formatPrice } from "@/lib/format-price";
 import { supabase } from "@/lib/supabase";
+import { firstRelation } from "@/lib/supabase-relations";
 
 type CategoryPageProps = {
   params: Promise<{ city: string; slug: string }>;
@@ -86,7 +87,11 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
   ]);
 
   const category = categoryResult.data as CategoryRow | null;
-  const products = ((productsResult.data ?? []) as ProductRow[]).map((product) => ({
+  const products = (productsResult.data ?? []).map((row) => ({
+    ...row,
+    businesses: firstRelation(row.businesses),
+    categories: firstRelation(row.categories),
+  })).map((product: ProductRow) => ({
     name: product.name,
     slug: product.slug,
     businessName: product.businesses?.name ?? "Tienda por confirmar",

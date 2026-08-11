@@ -9,6 +9,7 @@ import { ReportButton } from "@/components/ReportButton";
 import { StoreProfileTabs } from "./StoreProfileTabs";
 import { formatPrice } from "@/lib/format-price";
 import { supabase } from "@/lib/supabase";
+import { firstRelation } from "@/lib/supabase-relations";
 
 type StorePageProps = {
   params: Promise<{ slug: string }>;
@@ -153,7 +154,10 @@ export default async function StorePage({ params }: StorePageProps) {
     console.error("[store-page] Error loading products:", productsError.message, productsError.code);
   }
 
-  const allProducts = ((productsData ?? []) as ProductRow[]).map((product) => ({
+  const allProducts = (productsData ?? []).map((row) => ({
+    ...row,
+    categories: firstRelation(row.categories),
+  })).map((product: ProductRow) => ({
     id: product.id,
     name: product.name,
     slug: product.slug,

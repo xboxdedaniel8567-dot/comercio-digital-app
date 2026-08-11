@@ -7,6 +7,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { StatusBadge } from "@/components/StatusBadge";
 import { formatPrice } from "@/lib/format-price";
 import { supabase } from "@/lib/supabase";
+import { firstRelation } from "@/lib/supabase-relations";
 import { PrivacyRequestCenter } from "./PrivacyRequestCenter";
 
 type FavoriteRow = {
@@ -167,10 +168,37 @@ export function BuyerAccount() {
       setPhone(loadedPhone);
       setDraftFullName(loadedName);
       setDraftPhone(loadedPhone);
-      setFavorites((favoriteData ?? []) as FavoriteRow[]);
+      setFavorites(
+        (favoriteData ?? []).map((favorite) => {
+          const product = firstRelation(favorite.products);
+          return {
+            ...favorite,
+            products: product
+              ? {
+                  ...product,
+                  businesses: firstRelation(product.businesses),
+                  categories: firstRelation(product.categories),
+                }
+              : null,
+          };
+        }),
+      );
       setSearchHistory((searchData ?? []) as SearchHistoryRow[]);
-      setReports((reportData ?? []) as MarketplaceReportRow[]);
-      setReservations((reservationData ?? []) as ReservationRow[]);
+      setReports(
+        (reportData ?? []).map((report) => ({
+          ...report,
+          products: firstRelation(report.products),
+          businesses: firstRelation(report.businesses),
+        })),
+      );
+      setReservations(
+        (reservationData ?? []).map((reservation) => ({
+          ...reservation,
+          products: firstRelation(reservation.products),
+          businesses: firstRelation(reservation.businesses),
+          product_variants: firstRelation(reservation.product_variants),
+        })),
+      );
       setMessage(
         error
           ? `No se pudieron cargar tus favoritos: ${error.message}`
