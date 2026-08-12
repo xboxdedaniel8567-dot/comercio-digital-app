@@ -22,8 +22,7 @@ export function GoogleAuthButton({
     setIsRedirecting(true);
     onError("");
 
-    const callbackUrl = new URL("/panel/login", window.location.origin);
-    callbackUrl.searchParams.set("oauth", "1");
+    const callbackUrl = new URL("/auth/callback", window.location.origin);
     if (nextPath) callbackUrl.searchParams.set("next", nextPath);
 
     const { error } = await supabase.auth.signInWithOAuth({

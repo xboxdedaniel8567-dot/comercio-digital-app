@@ -54,3 +54,78 @@ test("SQL onboarding never defaults a missing account type to merchant", async (
   assert.match(sql, /account_type_value is null or account_type_value not in \('buyer', 'merchant'\)/);
   assert.match(sql, /return new;/);
 });
+
+test("public panel auth routes stay available before authentication", async () => {
+  const { isProtectedPrivatePath } = await import("../lib/auth-redirects.ts");
+
+  for (const pathname of [
+    "/panel/login",
+    "/panel/registro",
+    "/panel/recuperar",
+    "/panel/restablecer",
+  ]) {
+    assert.equal(isProtectedPrivatePath(pathname), false);
+  }
+});
+
+test("anonymous and expired sessions are redirected before private routes", async () => {
+  const { resolvePrivateRouteAccess } = await import("../lib/auth-redirects.ts");
+
+  assert.deepEqual(resolvePrivateRouteAccess("/panel", null, false, false), {
+    allowed: false,
+    redirectTo: "/panel/login?next=%2Fpanel",
+  });
+  assert.deepEqual(resolvePrivateRouteAccess("/admin", null, false, false), {
+    allowed: false,
+    redirectTo: "/panel/login?next=%2Fadmin",
+  });
+  assert.equal(resolvePrivateRouteAccess("/panel/productos", null, false, false).allowed, false);
+});
+
+test("buyer cannot render merchant or admin routes", async () => {
+  const { resolvePrivateRouteAccess } = await import("../lib/auth-redirects.ts");
+
+  for (const pathname of ["/panel", "/admin"]) {
+    assert.deepEqual(resolvePrivateRouteAccess(pathname, "buyer", true, true), {
+      allowed: false,
+      redirectTo: "/cuenta",
+    });
+  }
+});
+
+test("merchant roles can render panel but not admin", async () => {
+  const { resolvePrivateRouteAccess } = await import("../lib/auth-redirects.ts");
+
+  for (const role of ["merchant", "merchant_staff"]) {
+    assert.deepEqual(resolvePrivateRouteAccess("/panel/productos", role, true, true), {
+      allowed: true,
+    });
+    assert.deepEqual(resolvePrivateRouteAccess("/admin/productos", role, true, true), {
+      allowed: false,
+      redirectTo: "/panel",
+    });
+  }
+});
+
+test("admin roles can render admin and keep the current panel redirect policy", async () => {
+  const { resolvePrivateRouteAccess } = await import("../lib/auth-redirects.ts");
+
+  for (const role of ["admin", "super_admin"]) {
+    assert.deepEqual(resolvePrivateRouteAccess("/admin", role, true, true), {
+      allowed: true,
+    });
+    assert.deepEqual(resolvePrivateRouteAccess("/panel", role, true, true), {
+      allowed: false,
+      redirectTo: "/admin",
+    });
+  }
+});
+
+test("authenticated users without profiles continue OAuth onboarding", async () => {
+  const { resolvePrivateRouteAccess } = await import("../lib/auth-redirects.ts");
+
+  assert.deepEqual(resolvePrivateRouteAccess("/panel", null, true, false), {
+    allowed: false,
+    redirectTo: "/cuenta/tipo",
+  });
+});

@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js";
+import { createBrowserClient } from "@supabase/ssr";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
@@ -12,8 +12,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
   // This keeps the production route from failing completely when
   // configuration is missing and allows graceful handling/logging.
   // Note: the test suite sets defaults for these variables.
-  // eslint-disable-next-line no-console
   console.warn("Supabase environment variables are missing. Continuing with a client created from empty values.");
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey);

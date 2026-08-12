@@ -168,7 +168,7 @@ export function MerchantRegisterForm() {
           data_policy_version: LEGAL_VERSION,
           consent_source: "merchant_registration",
         },
-        emailRedirectTo: `${window.location.origin}/panel/login?confirmed=1`,
+        emailRedirectTo: `${window.location.origin}/auth/callback?next=/panel`,
       },
     });
 
