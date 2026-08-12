@@ -49,6 +49,7 @@ export function MerchantRegisterForm() {
   const [message, setMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [acceptedLegal, setAcceptedLegal] = useState(false);
+  const [isOAuthOnboarding, setIsOAuthOnboarding] = useState(false);
 
   useEffect(() => {
     async function loadCategories() {
@@ -67,12 +68,85 @@ export function MerchantRegisterForm() {
     }
 
     void loadCategories();
+
+    async function loadOAuthAccount() {
+      if (new URLSearchParams(window.location.search).get("oauth") !== "1") return;
+
+      const { data } = await supabase.auth.getUser();
+      if (!data.user) {
+        window.location.href = "/panel/login";
+        return;
+      }
+
+      setIsOAuthOnboarding(true);
+      setEmail(data.user.email ?? "");
+      setFullName(
+        data.user.user_metadata.full_name ?? data.user.user_metadata.name ?? "",
+      );
+    }
+
+    void loadOAuthAccount();
   }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsSubmitting(true);
     setMessage("Creando cuenta de comerciante...");
+
+    if (isOAuthOnboarding) {
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError || !userData.user) {
+        setIsSubmitting(false);
+        setMessage("Tu sesion no esta disponible. Inicia sesion nuevamente.");
+        return;
+      }
+
+      const { error: metadataError } = await supabase.auth.updateUser({
+        data: {
+          ...userData.user.user_metadata,
+          account_type: "merchant",
+          address: address.trim(),
+          business_name: businessName.trim(),
+          category_id: categoryId,
+          city: city.trim(),
+          description: description.trim(),
+          full_name: fullName.trim(),
+          phone: whatsapp.trim(),
+          whatsapp: whatsapp.trim(),
+          legal_consent: "accepted",
+          terms_version: LEGAL_VERSION,
+          privacy_version: LEGAL_VERSION,
+          data_policy_version: LEGAL_VERSION,
+          consent_source: "google_merchant_onboarding",
+        },
+      });
+
+      if (metadataError) {
+        setIsSubmitting(false);
+        setMessage(`No se pudo guardar el registro: ${metadataError.message}`);
+        return;
+      }
+
+      const { error } = await supabase.rpc("complete_oauth_onboarding", {
+        p_account_type: "merchant",
+        p_address: address.trim(),
+        p_business_name: businessName.trim(),
+        p_category_id: categoryId,
+        p_city: city.trim(),
+        p_description: description.trim(),
+        p_whatsapp: whatsapp.trim(),
+      });
+
+      setIsSubmitting(false);
+      if (error) {
+        setMessage(`No se pudo crear la tienda: ${error.message}`);
+        return;
+      }
+
+      setMessage("Cuenta y tienda creadas. Entrando al panel...");
+      window.location.href = "/panel";
+      return;
+    }
 
     const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
       email,
@@ -212,23 +286,26 @@ export function MerchantRegisterForm() {
             id="reg-email"
             onChange={(event) => setEmail(event.target.value)}
             placeholder="tu@correo.com"
+            readOnly={isOAuthOnboarding}
             required
             type="email"
             value={email}
           />
         </Field>
-        <Field id="reg-password" label="Contrasena" hint="Minimo 8 caracteres">
-          <input
-            className="input"
-            id="reg-password"
-            minLength={8}
-            onChange={(event) => setPassword(event.target.value)}
-            placeholder="Crea una contrasena segura"
-            required
-            type="password"
-            value={password}
-          />
-        </Field>
+        {!isOAuthOnboarding ? (
+          <Field id="reg-password" label="Contrasena" hint="Minimo 8 caracteres">
+            <input
+              className="input"
+              id="reg-password"
+              minLength={8}
+              onChange={(event) => setPassword(event.target.value)}
+              placeholder="Crea una contrasena segura"
+              required
+              type="password"
+              value={password}
+            />
+          </Field>
+        ) : null}
       </div>
 
       <label style={{ alignItems: "flex-start", display: "flex", gap: 10, lineHeight: 1.5, fontSize: "0.88rem" }}>
@@ -246,7 +323,11 @@ export function MerchantRegisterForm() {
         </span>
       </label>
       <button className="btn" disabled={isSubmitting} type="submit" style={{ minHeight: 50, fontSize: "0.96rem" }}>
-        {isSubmitting ? "Creando..." : "Crear cuenta y tienda"}
+        {isSubmitting
+          ? "Creando..."
+          : isOAuthOnboarding
+            ? "Registrar tienda"
+            : "Crear cuenta y tienda"}
       </button>
       {message ? <p className="muted" style={{ fontSize: "0.88rem", margin: 0 }}>{message}</p> : null}
     </form>

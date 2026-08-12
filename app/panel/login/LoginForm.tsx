@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { FormEvent, useEffect, useRef, useState } from "react";
 import { GoogleAuthButton } from "@/components/GoogleAuthButton";
+import { resolveAuthenticatedEntryPath } from "@/lib/auth-redirects";
 import { supabase } from "@/lib/supabase";
 
 export function LoginForm() {
@@ -52,22 +53,11 @@ export function LoginForm() {
 
       isRedirecting.current = true;
       const requestedPath = params.get("next");
-      const safePath = requestedPath?.startsWith("/") && !requestedPath.startsWith("//")
-        ? requestedPath
-        : "/panel";
-
-      if (!profile) {
-        window.location.href = "/cuenta/registro";
-        return;
-      }
-
-      const isAdmin = ["admin", "super_admin"].includes(profile.role);
-      const isBuyer = profile.role === "buyer";
-      window.location.href = isAdmin
-        ? (safePath.startsWith("/admin") ? safePath : "/admin")
-        : isBuyer
-          ? (safePath.startsWith("/panel") ? "/cuenta" : safePath)
-          : (safePath.startsWith("/cuenta") ? "/panel" : safePath);
+      window.location.href = resolveAuthenticatedEntryPath(
+        profile?.role,
+        Boolean(profile),
+        requestedPath,
+      );
     }
 
     void finishOAuthSignIn();
@@ -111,16 +101,11 @@ export function LoginForm() {
 
     setMessage("Sesion iniciada. Entrando...");
     const requestedPath = new URLSearchParams(window.location.search).get("next");
-    const safePath = requestedPath?.startsWith("/") && !requestedPath.startsWith("//")
-      ? requestedPath
-      : "/panel";
-    const isAdmin = profile && ["admin", "super_admin"].includes(profile.role);
-    const isBuyer = profile?.role === "buyer";
-    window.location.href = isAdmin
-      ? (safePath.startsWith("/admin") ? safePath : "/admin")
-      : isBuyer
-        ? (safePath.startsWith("/panel") ? "/cuenta" : safePath)
-        : (safePath.startsWith("/cuenta") ? "/panel" : safePath);
+    window.location.href = resolveAuthenticatedEntryPath(
+      profile?.role,
+      Boolean(profile),
+      requestedPath,
+    );
   }
 
   return (
