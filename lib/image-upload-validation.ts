@@ -1,4 +1,6 @@
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+import { IMAGE_UPLOAD_LIMITS } from "./images/image-config.ts";
+
+const MAX_IMAGE_SIZE = IMAGE_UPLOAD_LIMITS.maxSourceBytes;
 
 const ALLOWED_MIME_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
 const ALLOWED_EXTENSIONS = new Set(["jpg", "jpeg", "png", "webp", "gif"]);

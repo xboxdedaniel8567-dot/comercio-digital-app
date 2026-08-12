@@ -1,18 +1,9 @@
 import { validateImageFile } from "@/lib/image-upload-validation";
+import { BusinessImageUploadService } from "@/lib/images/upload-services";
+import { SupabaseStorageProvider } from "@/lib/images/supabase-storage-provider";
 import { supabase } from "@/lib/supabase";
 
-function safeFileName(fileName: string) {
-  const extension = fileName.split(".").pop()?.toLowerCase() || "jpg";
-  const baseName = fileName
-    .replace(/\.[^.]+$/, "")
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "") || "tienda";
-
-  return `${baseName}.${extension}`;
-}
+const uploadService = new BusinessImageUploadService(new SupabaseStorageProvider(supabase));
 
 export function validateBusinessImage(file: File) {
   return validateImageFile(file);
@@ -24,24 +15,25 @@ export async function uploadBusinessImage(
   kind: "logo" | "cover",
 ) {
   const validationError = validateBusinessImage(file);
-  if (validationError) return { error: validationError, publicUrl: "" };
+  if (validationError) return { error: validationError, objectPath: "", publicUrl: "" };
 
   const { data: userData, error: userError } = await supabase.auth.getUser();
   if (userError || !userData.user) {
-    return { error: "Debes iniciar sesion para subir imagenes.", publicUrl: "" };
+    return { error: "Debes iniciar sesion para subir imagenes.", objectPath: "", publicUrl: "" };
   }
 
-  const objectPath = `${userData.user.id}/${businessId}/${kind}-${Date.now()}-${safeFileName(file.name)}`;
-  const { error: uploadError } = await supabase.storage
-    .from("business-images")
-    .upload(objectPath, file, {
-      cacheControl: "3600",
-      contentType: file.type,
-      upsert: false,
-    });
+  try {
+    const upload = await uploadService.upload(file, userData.user.id, businessId, kind);
+    return { error: "", objectPath: upload.objectPath, publicUrl: upload.publicUrl };
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "No se pudo subir la imagen.",
+      objectPath: "",
+      publicUrl: "",
+    };
+  }
+}
 
-  if (uploadError) return { error: uploadError.message, publicUrl: "" };
-
-  const { data } = supabase.storage.from("business-images").getPublicUrl(objectPath);
-  return { error: "", publicUrl: data.publicUrl };
+export async function rollbackBusinessImageUploads(objectPaths: string[]) {
+  await uploadService.rollback(objectPaths);
 }

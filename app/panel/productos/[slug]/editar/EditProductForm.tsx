@@ -5,7 +5,10 @@ import { AdaptiveAttributeFields } from "@/components/AdaptiveAttributeFields";
 import { PriceInput } from "@/components/PriceInput";
 import { ProductImageInput } from "@/components/ProductImageInput";
 import { getPriceError, parsePriceInput } from "@/lib/format-price";
-import { uploadProductImage } from "@/lib/product-image-upload";
+import {
+  rollbackProductImageUpload,
+  uploadProductImage,
+} from "@/lib/product-image-upload";
 import { getUniqueProductSlug } from "@/lib/product-slug";
 import { supabase } from "@/lib/supabase";
 
@@ -235,6 +238,7 @@ export function EditProductForm({ slug }: EditProductFormProps) {
 
     let cleanImageUrl = imageUrl.trim();
     const currentImage = product.product_images?.[0];
+    let uploadedImage = null;
 
     if (imageFile) {
       setMessage("Subiendo imagen...");
@@ -247,6 +251,7 @@ export function EditProductForm({ slug }: EditProductFormProps) {
       }
 
       cleanImageUrl = uploadResult.publicUrl;
+      uploadedImage = uploadResult.upload;
     }
 
     if (cleanImageUrl && currentImage) {
@@ -259,6 +264,13 @@ export function EditProductForm({ slug }: EditProductFormProps) {
         .eq("id", currentImage.id);
 
       if (imageError) {
+        if (uploadedImage) {
+          try {
+            await rollbackProductImageUpload(uploadedImage);
+          } catch {
+            // The database error remains primary; cleanup can be retried separately.
+          }
+        }
         setIsSaving(false);
         setMessage(`El producto se actualizo, pero fallo la imagen: ${imageError.message}`);
         return;
@@ -274,6 +286,13 @@ export function EditProductForm({ slug }: EditProductFormProps) {
       });
 
       if (imageError) {
+        if (uploadedImage) {
+          try {
+            await rollbackProductImageUpload(uploadedImage);
+          } catch {
+            // The database error remains primary; cleanup can be retried separately.
+          }
+        }
         setIsSaving(false);
         setMessage(`El producto se actualizo, pero fallo la imagen: ${imageError.message}`);
         return;

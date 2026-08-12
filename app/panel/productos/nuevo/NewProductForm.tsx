@@ -6,7 +6,10 @@ import { PriceInput } from "@/components/PriceInput";
 import { ProductImageInput } from "@/components/ProductImageInput";
 import { getCurrentBusiness } from "@/lib/current-business";
 import { getPriceError, parsePriceInput } from "@/lib/format-price";
-import { uploadProductImage } from "@/lib/product-image-upload";
+import {
+  rollbackProductImageUpload,
+  uploadProductImage,
+} from "@/lib/product-image-upload";
 import { getUniqueProductSlug } from "@/lib/product-slug";
 import { supabase } from "@/lib/supabase";
 
@@ -151,7 +154,8 @@ export function NewProductForm() {
       return;
     }
 
-   let finalImageUrl = imageUrl.trim();
+    let finalImageUrl = imageUrl.trim();
+    let uploadedImage = null;
 
     if (imageFile && product) {
       setMessage("Subiendo imagen...");
@@ -166,6 +170,7 @@ export function NewProductForm() {
       }
 
       finalImageUrl = uploadResult.publicUrl;
+      uploadedImage = uploadResult.upload;
     }
 
     if (finalImageUrl && product) {
@@ -177,6 +182,13 @@ export function NewProductForm() {
       });
 
       if (imageError) {
+        if (uploadedImage) {
+          try {
+            await rollbackProductImageUpload(uploadedImage);
+          } catch {
+            // The database error remains primary; cleanup can be retried separately.
+          }
+        }
         setIsSubmitting(false);
         setMessage(
           `El producto fue creado, pero no se pudo guardar la imagen: ${imageError.message}`,

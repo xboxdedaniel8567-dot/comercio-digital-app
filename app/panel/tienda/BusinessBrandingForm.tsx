@@ -2,6 +2,7 @@
 
 import { ChangeEvent, useEffect, useState } from "react";
 import {
+  rollbackBusinessImageUploads,
   uploadBusinessImage,
   validateBusinessImage,
 } from "@/lib/business-image-upload";
@@ -85,6 +86,7 @@ export function BusinessBrandingForm() {
     setMessage("Subiendo imagenes...");
     let nextLogoUrl = logoUrl;
     let nextCoverUrl = coverUrl;
+    const uploadedPaths: string[] = [];
 
     if (logoFile) {
       const result = await uploadBusinessImage(logoFile, businessId, "logo");
@@ -94,16 +96,25 @@ export function BusinessBrandingForm() {
         return;
       }
       nextLogoUrl = result.publicUrl;
+      uploadedPaths.push(result.objectPath);
     }
 
     if (coverFile) {
       const result = await uploadBusinessImage(coverFile, businessId, "cover");
       if (result.error) {
+        if (uploadedPaths.length > 0) {
+          try {
+            await rollbackBusinessImageUploads(uploadedPaths);
+          } catch {
+            // Keep the cover upload error visible; cleanup can be retried separately.
+          }
+        }
         setIsSaving(false);
         setMessage(`No se pudo subir la portada: ${result.error}`);
         return;
       }
       nextCoverUrl = result.publicUrl;
+      uploadedPaths.push(result.objectPath);
     }
 
     const { error } = await supabase
@@ -113,6 +124,13 @@ export function BusinessBrandingForm() {
 
     setIsSaving(false);
     if (error) {
+      if (uploadedPaths.length > 0) {
+        try {
+          await rollbackBusinessImageUploads(uploadedPaths);
+        } catch {
+          // The database error remains primary; cleanup can be retried separately.
+        }
+      }
       setMessage(`No se pudieron guardar las imagenes: ${error.message}`);
       return;
     }

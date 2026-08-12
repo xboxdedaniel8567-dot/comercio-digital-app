@@ -1,18 +1,9 @@
 import { validateImageFile } from "@/lib/image-upload-validation";
+import { ProductImageUploadService, type ProductUploadResult } from "@/lib/images/upload-services";
+import { SupabaseStorageProvider } from "@/lib/images/supabase-storage-provider";
 import { supabase } from "@/lib/supabase";
 
-function safeFileName(fileName: string) {
-  const extension = fileName.split(".").pop()?.toLowerCase() || "jpg";
-  const baseName = fileName
-    .replace(/\.[^.]+$/, "")
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "") || "producto";
-
-  return `${baseName}.${extension}`;
-}
+const uploadService = new ProductImageUploadService(new SupabaseStorageProvider(supabase));
 
 export function validateProductImage(file: File) {
   return validateImageFile(file);
@@ -22,29 +13,28 @@ export async function uploadProductImage(file: File, productId: string) {
   const validationError = validateProductImage(file);
 
   if (validationError) {
-    return { error: validationError, publicUrl: "" };
+    return { error: validationError, publicUrl: "", upload: null };
   }
 
   const { data: userData, error: userError } = await supabase.auth.getUser();
   const user = userData.user;
 
   if (userError || !user) {
-    return { error: "Debes iniciar sesion para subir imagenes.", publicUrl: "" };
+    return { error: "Debes iniciar sesion para subir imagenes.", publicUrl: "", upload: null };
   }
 
-  const objectPath = `${user.id}/${productId}/${Date.now()}-${safeFileName(file.name)}`;
-  const { error: uploadError } = await supabase.storage
-    .from("product-images")
-    .upload(objectPath, file, {
-      cacheControl: "3600",
-      contentType: file.type,
-      upsert: false,
-    });
-
-  if (uploadError) {
-    return { error: uploadError.message, publicUrl: "" };
+  try {
+    const upload = await uploadService.upload(file, user.id, productId);
+    return { error: "", publicUrl: upload.main.publicUrl, upload };
+  } catch (error) {
+    return {
+      error: error instanceof Error ? error.message : "No se pudo subir la imagen.",
+      publicUrl: "",
+      upload: null,
+    };
   }
+}
 
-  const { data } = supabase.storage.from("product-images").getPublicUrl(objectPath);
-  return { error: "", publicUrl: data.publicUrl };
+export async function rollbackProductImageUpload(upload: ProductUploadResult) {
+  await uploadService.rollback(upload);
 }
