@@ -34,11 +34,93 @@ test("server-renders the Comercio Digital marketplace shell", async () => {
 
   const html = await response.text();
   assert.match(html, /<title>Comercio Digital - Busca productos en comercios fisicos<\/title>/i);
-  assert.match(html, /Encuentra lo que buscas/i);
+  assert.match(html, /Buscar productos en comercios fisicos/i);
   assert.match(html, /action="\/buscar"/i);
-  assert.match(html, /Registrar mi tienda/i);
+  assert.match(html, /Cerca de ti/i);
   assert.match(html, /href="\/legal\/terminos"/i);
   assert.match(html, /Superintendencia de Industria y Comercio/i);
+  assert.equal((html.match(/<footer\b/gi) ?? []).length, 1);
+  assert.match(html, /aria-label="Navegacion movil"/i);
+});
+
+test("Home renders real discovery data without unsupported marketing claims", async () => {
+  const originalFetch = globalThis.fetch;
+
+  globalThis.fetch = async (input) => {
+    const url = typeof input === "string" ? input : input instanceof URL ? input.href : input?.url ?? "";
+
+    if (url.includes("/rest/v1/categories")) {
+      return Response.json([{ name: "Tecnologia", slug: "tecnologia", description: null }]);
+    }
+
+    if (url.includes("/rest/v1/products")) {
+      return Response.json([
+        {
+          name: "Telefono piloto",
+          slug: "telefono-piloto",
+          price: 1800000,
+          currency: "COP",
+          stock: 2,
+          businesses: { name: "Tienda Cali", city: "Cali" },
+          categories: { name: "Tecnologia" },
+          product_images: [{ url: "https://example.com/telefono.webp" }],
+        },
+      ]);
+    }
+
+    if (url.includes("/rest/v1/businesses")) {
+      return Response.json([
+        {
+          name: "Tienda Cali",
+          slug: "tienda-cali",
+          city: "Cali",
+          city_slug: "cali",
+          address: "Centro de Cali",
+          status: "active",
+          logo_url: null,
+          cover_url: "https://example.com/tienda.webp",
+          categories: { name: "Tecnologia" },
+        },
+      ]);
+    }
+
+    return Response.json([]);
+  };
+
+  try {
+    const response = await render();
+    assert.equal(response.status, 200);
+
+    const html = await response.text();
+    assert.match(html, /role="search"/i);
+    assert.match(html, /Explora por categoria/i);
+    assert.match(html, /Tecnologia/i);
+    assert.match(html, /Telefono piloto/i);
+    assert.match(html, /Tienda Cali/i);
+    assert.match(html, /href="\/comerciantes"/i);
+    assert.doesNotMatch(html, /Productos destacados|Comercios piloto|Como funciona/i);
+    assert.equal((html.match(/<footer\b/gi) ?? []).length, 1);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test("Home presents useful empty states when the catalog has no content", async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => Response.json([]);
+
+  try {
+    const response = await render();
+    assert.equal(response.status, 200);
+
+    const html = await response.text();
+    assert.match(html, /Todavia no hay productos para mostrar/i);
+    assert.match(html, /Todavia no hay comercios para mostrar/i);
+    assert.match(html, /Explorar busqueda/i);
+    assert.match(html, /Registrar un comercio/i);
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 });
 
 test("keeps launch-critical application files in place", async () => {
@@ -145,4 +227,26 @@ test("server-renders /tiendas/[slug] without crashing (no function props)", asyn
   } finally {
     globalThis.fetch = originalFetch;
   }
+});
+
+test("server-renders the design system primitives with accessible contracts", async () => {
+  const response = await render("/design-system");
+  assert.equal(response.status, 200);
+
+  const html = await response.text();
+  assert.match(html, /Comercio Digital Design System/i);
+  assert.match(html, /cd-button-primary/i);
+  assert.match(html, /cd-button-secondary/i);
+  assert.match(html, /cd-button-destructive/i);
+  assert.match(html, /aria-busy="true"/i);
+  assert.match(html, /disabled=""/i);
+  assert.match(html, /<label[^>]+for=/i);
+  assert.match(html, /aria-describedby=/i);
+  assert.match(html, /aria-label="Cerrar ejemplo"/i);
+  assert.match(html, /Fixtures locales de demostracion/i);
+  assert.match(html, /cd-product-card-grid/i);
+  assert.match(html, /cd-product-card-horizontal/i);
+  assert.match(html, /cd-product-card-mapPreview/i);
+  assert.match(html, /cd-store-card-featured/i);
+  assert.match(html, /No encontramos productos/i);
 });

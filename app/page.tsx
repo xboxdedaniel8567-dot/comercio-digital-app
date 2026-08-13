@@ -1,17 +1,21 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
 import { AppHeader } from "@/components/AppHeader";
-import { AppFooter } from "@/components/AppFooter";
-import { BusinessCard } from "@/components/BusinessCard";
+import { EmptyState } from "@/components/EmptyState";
 import { ProductCard } from "@/components/ProductCard";
-import { formatPrice } from "@/lib/format-price";
+import { ProductCardSkeleton } from "@/components/ProductCardSkeleton";
+import { ShellIcon } from "@/components/ShellIcon";
+import { StoreCard } from "@/components/StoreCard";
+import { StoreCardSkeleton } from "@/components/StoreCardSkeleton";
+import { Alert } from "@/components/ui";
 import { supabase } from "@/lib/supabase";
 import { firstRelation } from "@/lib/supabase-relations";
 
 export const metadata: Metadata = {
   title: "Comercio Digital - Busca productos en comercios fisicos",
   description:
-    "Encuentra productos, compara tiendas y habla por WhatsApp con comercios fisicos de tu ciudad.",
+    "Encuentra productos disponibles y comercios fisicos de tu ciudad en Comercio Digital.",
 };
 
 type CategoryRow = {
@@ -26,16 +30,9 @@ type ProductRow = {
   price: number | null;
   currency: string;
   stock: number | null;
-  businesses: {
-    name: string;
-    city: string | null;
-  } | null;
-  categories: {
-    name: string;
-  } | null;
-  product_images: {
-    url: string;
-  }[];
+  businesses: { name: string; city: string | null } | null;
+  categories: { name: string } | null;
+  product_images: { url: string }[];
 };
 
 type BusinessRow = {
@@ -45,27 +42,35 @@ type BusinessRow = {
   city_slug: string;
   address: string | null;
   status: string;
-  categories: {
-    name: string;
-  } | null;
+  logo_url: string | null;
+  cover_url: string | null;
+  categories: { name: string } | null;
 };
 
-const CATEGORY_ICONS: Record<string, string> = {
-  electronica: "📱",
-  moda: "👕",
-  hogar: "🏠",
-  deportes: "⚽",
-  belleza: "💄",
-  alimentos: "🍔",
-  ferreteria: "🔧",
-  juguetes: "🧸",
-};
-
-function categoryIcon(name: string, slug: string) {
-  return CATEGORY_ICONS[slug] ?? "📦";
+function HomeLoading() {
+  return (
+    <main className="shell">
+      <AppHeader />
+      <div aria-label="Cargando inicio" className="home-pilot container">
+        <section className="home-entry home-entry-loading">
+          <div className="cd-skeleton home-loading-search" />
+          <div className="cd-skeleton home-loading-categories" />
+        </section>
+        <section aria-label="Cargando productos" className="home-pilot-section">
+          <div className="home-product-grid">
+            {Array.from({ length: 4 }, (_, index) => <ProductCardSkeleton key={index} />)}
+          </div>
+        </section>
+        <section aria-label="Cargando comercios" className="home-pilot-section home-store-list">
+          <StoreCardSkeleton />
+          <StoreCardSkeleton />
+        </section>
+      </div>
+    </main>
+  );
 }
 
-export default async function Home() {
+async function HomeContent() {
   const [categoriesResult, productsResult, businessesResult] = await Promise.all([
     supabase.from("categories").select("name, slug, description").order("name").limit(8),
     supabase
@@ -79,28 +84,31 @@ export default async function Home() {
       .limit(8),
     supabase
       .from("businesses")
-      .select("name, slug, city, city_slug, address, status, categories(name)")
+      .select("name, slug, city, city_slug, address, status, logo_url, cover_url, categories(name)")
       .eq("status", "active")
       .order("created_at", { ascending: false })
       .limit(4),
   ]);
 
   const categories = (categoriesResult.data ?? []) as CategoryRow[];
-  const products = (productsResult.data ?? []).map((row) => ({
-    ...row,
-    businesses: firstRelation(row.businesses),
-    categories: firstRelation(row.categories),
-  })).map((product: ProductRow) => ({
-    name: product.name,
-    slug: product.slug,
-    businessName: product.businesses?.name ?? "Tienda por confirmar",
-    businessCity: product.businesses?.city ?? null,
-    category: product.categories?.name ?? "Sin categoria",
-    price: formatPrice(product.price, product.currency),
-    stock: product.stock,
-    attributes: [],
-    imageUrl: product.product_images?.[0]?.url ?? null,
-  }));
+  const products = (productsResult.data ?? [])
+    .map((row) => ({
+      ...row,
+      businesses: firstRelation(row.businesses),
+      categories: firstRelation(row.categories),
+    }))
+    .map((product: ProductRow) => ({
+      name: product.name,
+      slug: product.slug,
+      businessName: product.businesses?.name ?? "Tienda por confirmar",
+      businessCity: product.businesses?.city ?? null,
+      category: product.categories?.name ?? "Sin categoria",
+      price: product.price,
+      currency: product.currency,
+      stock: product.stock,
+      attributes: [],
+      imageUrl: product.product_images?.[0]?.url ?? null,
+    }));
   const businessRows: BusinessRow[] = (businessesResult.data ?? []).map((business) => ({
     ...business,
     categories: firstRelation(business.categories),
@@ -112,6 +120,7 @@ export default async function Home() {
     city: business.city,
     address: business.address ?? "Direccion por confirmar",
     status: business.status === "active" ? "Activo" : business.status,
+    imageUrl: business.cover_url ?? business.logo_url,
   }));
   const cities = [
     ...new Map(
@@ -120,210 +129,120 @@ export default async function Home() {
         .map((business) => [business.city_slug, { name: business.city, slug: business.city_slug }]),
     ).values(),
   ];
-  const defaultCitySlug = cities[0]?.slug ?? "cali-valle-del-cauca";
-  const loadErrors = [
-    categoriesResult.error ? `Categorias: ${categoriesResult.error.message}` : null,
-    productsResult.error ? `Productos: ${productsResult.error.message}` : null,
-    businessesResult.error ? `Comercios: ${businessesResult.error.message}` : null,
-  ].filter(Boolean) as string[];
+  const defaultCitySlug = cities[0]?.slug ?? null;
+  const hasLoadErrors = Boolean(categoriesResult.error || productsResult.error || businessesResult.error);
 
   return (
     <main className="shell">
       <AppHeader />
-
-      {loadErrors.length > 0 ? (
-        <section className="container" style={{ paddingTop: 24 }}>
-          <div className="card" style={{ borderColor: "#ef4444" }} role="alert">
-            <strong>Parte del contenido no se pudo cargar.</strong>
-            {loadErrors.map((line) => (
-              <p className="muted" key={line} style={{ marginBottom: 0 }}>
-                {line}
-              </p>
-            ))}
-          </div>
-        </section>
-      ) : null}
-
-      {/* ─── HERO ─── */}
-      <section className="home-hero">
-        <div className="container home-hero-inner">
-          <div className="home-hero-copy animate-in">
-            <span className="hero-badge">
-              <span aria-hidden="true" className="hero-badge-dot" />
-              by Gregor Magnus
-            </span>
-            <h1 className="home-hero-title">
-              Encuentra lo que buscas{" "}
-              <span className="home-hero-accent">sin recorrer</span> toda la ciudad
-            </h1>
-            <p className="home-hero-subtitle">
-              Comercio Digital conecta compradores con tiendas fisicas: productos, precios,
-              ubicacion y contacto directo por WhatsApp en una sola busqueda.
-            </p>
-            <form action="/buscar" className="home-hero-search">
-              <input
-                aria-label="Buscar productos o tiendas"
-                className="home-hero-search-input"
-                name="q"
-                placeholder="Buscar: iPhone, zapatillas, perfume, taladro..."
-                type="search"
-              />
-              <button className="btn home-hero-search-btn" type="submit">Buscar</button>
-            </form>
-            <div className="home-hero-stats">
-              <div className="hero-stat">
-                <span className="hero-stat-value">{businesses.length}</span>
-                <span className="hero-stat-label">Tiendas activas</span>
+      <div className="home-pilot container">
+        <section aria-labelledby="home-title" className="home-entry">
+          <h1 className="sr-only" id="home-title">Buscar productos en comercios fisicos</h1>
+          <form action="/buscar" className="home-search" method="get" role="search">
+            <ShellIcon name="search" size={22} />
+            <label className="sr-only" htmlFor="home-search-input">Buscar productos, marcas o comercios</label>
+            <input
+              autoComplete="off"
+              id="home-search-input"
+              name="q"
+              placeholder="Buscar productos, marcas o comercios"
+              type="search"
+            />
+            <button type="submit">Buscar</button>
+          </form>
+          {categories.length > 0 ? (
+            <div className="home-category-block">
+              <div className="home-category-heading">
+                <h2>Explora por categoria</h2>
+                <Link href="/buscar">Ver todas</Link>
               </div>
-              <div className="hero-stat">
-                <span className="hero-stat-value">{products.length}</span>
-                <span className="hero-stat-label">Productos disponibles</span>
-              </div>
-              <div className="hero-stat">
-                <span className="hero-stat-value">WhatsApp</span>
-                <span className="hero-stat-label">Contacto directo</span>
-              </div>
+              <nav aria-label="Categorias para explorar" className="home-quick-categories">
+                {categories.map((category) => (
+                  <Link
+                    href={defaultCitySlug ? `/c/${defaultCitySlug}/categoria/${category.slug}` : `/buscar?category=${category.slug}`}
+                    key={category.slug}
+                  >
+                    {category.name}
+                  </Link>
+                ))}
+              </nav>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── CÓMO FUNCIONA ─── */}
-      <section className="container home-section">
-        <div className="how-it-works">
-          <div className="how-it-works-step">
-            <div className="how-it-works-icon" aria-hidden="true">🔍</div>
-            <h3>Busca productos</h3>
-            <p>Escribe lo que necesitas y encuentra tiendas cercanas que lo tienen disponible.</p>
-          </div>
-          <div className="how-it-works-step">
-            <div className="how-it-works-icon" aria-hidden="true">📍</div>
-            <h3>Compara y elige</h3>
-            <p>Revisa precios, distancia, horarios y disponibilidad antes de salir de casa.</p>
-          </div>
-          <div className="how-it-works-step">
-            <div className="how-it-works-icon" aria-hidden="true">💬</div>
-            <h3>Contacta por WhatsApp</h3>
-            <p>Habla directamente con el comercio, reserva tu producto y ve a recogerlo.</p>
-          </div>
-        </div>
-      </section>
-
-      {/* ─── CATEGORÍAS ─── */}
-      {categories.length > 0 ? (
-        <section className="container home-section">
-          <div className="section-header">
-            <div>
-              <p className="kicker">Categorias</p>
-              <h2>Explora por categoria</h2>
-            </div>
-            <Link className="section-header-link" href="/buscar">Ver todas</Link>
-          </div>
-          <div className="home-category-grid">
-            {categories.map((category) => (
-              <Link
-                className="home-category-card"
-                href={`/c/${defaultCitySlug}/categoria/${category.slug}`}
-                key={category.slug}
-              >
-                <span className="home-category-icon" aria-hidden="true">
-                  {categoryIcon(category.name, category.slug)}
-                </span>
-                <span className="home-category-name">{category.name}</span>
-              </Link>
-            ))}
-          </div>
-        </section>
-      ) : null}
-
-      {/* ─── CIUDADES ─── */}
-      {cities.length > 0 ? (
-        <section className="container home-section">
-          <div className="section-header">
-            <div>
-              <p className="kicker">Ciudades</p>
-              <h2>Explora por ciudad</h2>
-            </div>
-          </div>
-          <div className="grid-auto">
-            {cities.map((city) => (
-              <Link className="card" href={`/c/${city.slug}`} key={city.slug}>
-                <strong style={{ fontSize: "1.15rem" }}>{city.name}</strong>
-                <p className="muted" style={{ marginTop: 6 }}>
-                  Explorar comercios y productos disponibles.
-                </p>
-              </Link>
-            ))}
-          </div>
-        </section>
-      ) : null}
-
-      {/* ─── PRODUCTOS DESTACADOS ─── */}
-      {products.length > 0 ? (
-        <section className="container home-section">
-          <div className="section-header">
-            <div>
-              <p className="kicker">Destacados</p>
-              <h2>Productos disponibles ahora</h2>
-            </div>
-            <Link className="section-header-link" href="/buscar">Ver todos</Link>
-          </div>
-          <div className="home-product-grid">
-            {products.map((product) => (
-              <ProductCard key={product.slug} product={product} />
-            ))}
-          </div>
-          {productsResult.error ? (
-            <p className="muted" style={{ marginTop: 16 }}>
-              No se pudieron cargar los productos: {productsResult.error.message}
-            </p>
           ) : null}
         </section>
-      ) : null}
 
-      {/* ─── TIENDAS ─── */}
-      {businesses.length > 0 ? (
-        <section className="container home-section">
-          <div className="section-header">
+        {hasLoadErrors ? (
+          <Alert
+            action={<Link className="home-inline-action" href="/">Reintentar</Link>}
+            message="Puedes seguir buscando mientras recuperamos el contenido que falta."
+            title="Algunas secciones no estan disponibles"
+            tone="warning"
+          />
+        ) : null}
+
+        <section aria-labelledby="home-products-title" className="home-pilot-section">
+          <div className="home-section-heading">
             <div>
-              <p className="kicker">Tiendas</p>
-              <h2>Comercios piloto</h2>
+              <p className="kicker">Productos</p>
+              <h2 id="home-products-title">Productos disponibles</h2>
             </div>
-            <Link className="section-header-link" href="/comerciantes">Ver todas</Link>
+            <Link href="/buscar">Ver todos</Link>
           </div>
-          <div className="grid-auto">
-            {businesses.map((business) => (
-              <BusinessCard business={business} key={business.slug} />
-            ))}
-          </div>
-          {businessesResult.error ? (
-            <p className="muted" style={{ marginTop: 16 }}>
-              No se pudieron cargar los comercios: {businessesResult.error.message}
-            </p>
+          {products.length > 0 ? (
+            <div className="home-product-grid">
+              {products.map((product, index) => (
+                <ProductCard imagePriority={index < 2} key={product.slug} product={product} />
+              ))}
+            </div>
+          ) : !productsResult.error ? (
+            <EmptyState
+              action={<Link className="home-empty-action" href="/buscar">Explorar busqueda</Link>}
+              description="Cuando los comercios publiquen productos disponibles, apareceran en esta seccion."
+              icon={<ShellIcon name="package" />}
+              title="Todavia no hay productos para mostrar"
+            />
           ) : null}
         </section>
-      ) : null}
 
-      {/* ─── CTA COMERCIANTES ─── */}
-      <section className="container home-section">
-        <div className="cta-band">
-          <h2>Tu tienda tambien puede estar aqui</h2>
-          <p>
-            Une tu comercio a Comercio Digital y llega a mas clientes en tu ciudad. Registro
-            gratuito, configuracion en minutos.
-          </p>
-          <div className="cta-band-actions">
-            <Link className="btn" href="/panel/registro" style={{ minHeight: 50, padding: "0 32px" }}>
-              Registrar mi tienda
-            </Link>
-            <Link className="btn btn-dark" href="/buscar" style={{ minHeight: 50, padding: "0 32px" }}>
-              Explorar productos
-            </Link>
+        <section aria-labelledby="home-stores-title" className="home-pilot-section">
+          <div className="home-section-heading">
+            <div>
+              <p className="kicker">Comercios</p>
+              <h2 id="home-stores-title">Comercios para explorar</h2>
+            </div>
+            <Link href="/comerciantes">Ver directorio</Link>
           </div>
-        </div>
-      </section>
+          {businesses.length > 0 ? (
+            <div className="home-store-list">
+              {businesses.map((business) => <StoreCard business={business} key={business.slug} />)}
+            </div>
+          ) : !businessesResult.error ? (
+            <EmptyState
+              action={<Link className="home-empty-action" href="/panel/registro">Registrar un comercio</Link>}
+              description="Los comercios activos de la ciudad apareceran aqui."
+              icon={<ShellIcon name="store" />}
+              title="Todavia no hay comercios para mostrar"
+            />
+          ) : null}
+        </section>
 
-      <AppFooter />
+        <section aria-labelledby="home-nearby-title" className="home-nearby-entry">
+          <div className="home-nearby-icon" aria-hidden="true"><ShellIcon name="map-pin" size={24} /></div>
+          <div>
+            <p className="kicker">Comercio local</p>
+            <h2 id="home-nearby-title">Cerca de ti</h2>
+            <p>Explora comercios y consulta la ubicacion que cada establecimiento ha publicado.</p>
+          </div>
+          <Link href="/comerciantes">Explorar comercios</Link>
+        </section>
+      </div>
     </main>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<HomeLoading />}>
+      <HomeContent />
+    </Suspense>
   );
 }

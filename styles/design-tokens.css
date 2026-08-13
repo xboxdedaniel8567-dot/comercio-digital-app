@@ -1,0 +1,115 @@
+/* Comercio Digital Design System v1: primitive -> semantic -> component. */
+:root {
+  /* Primitive colors */
+  --cd-neutral-950: #090a0c;
+  --cd-neutral-900: #111318;
+  --cd-neutral-850: #181b21;
+  --cd-neutral-800: #20242c;
+  --cd-neutral-700: #292e37;
+  --cd-neutral-500: #515864;
+  --cd-neutral-400: #747c89;
+  --cd-neutral-300: #a9afba;
+  --cd-neutral-050: #f7f8fa;
+  --cd-blue-500: #3b82f6;
+  --cd-blue-400: #60a5fa;
+  --cd-blue-600: #2563eb;
+  --cd-green-500: #22c55e;
+  --cd-amber-500: #f59e0b;
+  --cd-red-500: #ef4444;
+
+  /* Semantic colors */
+  --cd-color-background-base: var(--cd-neutral-950);
+  --cd-color-surface-default: var(--cd-neutral-900);
+  --cd-color-surface-elevated: var(--cd-neutral-850);
+  --cd-color-surface-interactive: var(--cd-neutral-800);
+  --cd-color-text-primary: var(--cd-neutral-050);
+  --cd-color-text-secondary: var(--cd-neutral-300);
+  --cd-color-text-muted: var(--cd-neutral-400);
+  --cd-color-text-disabled: var(--cd-neutral-500);
+  --cd-color-border-subtle: var(--cd-neutral-800);
+  --cd-color-border-default: var(--cd-neutral-700);
+  --cd-color-brand-primary: var(--cd-blue-500);
+  --cd-color-brand-hover: var(--cd-blue-400);
+  --cd-color-brand-active: var(--cd-blue-600);
+  --cd-color-state-info: var(--cd-blue-500);
+  --cd-color-state-success: var(--cd-green-500);
+  --cd-color-state-warning: var(--cd-amber-500);
+  --cd-color-state-danger: var(--cd-red-500);
+  --cd-color-on-brand: #ffffff;
+
+  /* Typography */
+  --cd-font-sans: "Geist", "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --cd-font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
+  --cd-type-display: 600 32px/40px var(--cd-font-sans);
+  --cd-type-h1: 600 28px/32px var(--cd-font-sans);
+  --cd-type-h2: 600 24px/30px var(--cd-font-sans);
+  --cd-type-h3: 600 20px/26px var(--cd-font-sans);
+  --cd-type-title: 600 16px/22px var(--cd-font-sans);
+  --cd-type-body: 400 16px/24px var(--cd-font-sans);
+  --cd-type-body-sm: 400 14px/20px var(--cd-font-sans);
+  --cd-type-label: 600 13px/18px var(--cd-font-sans);
+  --cd-type-caption: 400 12px/16px var(--cd-font-sans);
+  --cd-type-price: 600 18px/24px var(--cd-font-sans);
+  --cd-type-price-lg: 600 24px/30px var(--cd-font-sans);
+
+  /* Spacing */
+  --cd-space-1: 4px;
+  --cd-space-2: 8px;
+  --cd-space-3: 12px;
+  --cd-space-4: 16px;
+  --cd-space-5: 20px;
+  --cd-space-6: 24px;
+  --cd-space-8: 32px;
+  --cd-space-10: 40px;
+  --cd-space-12: 48px;
+  --cd-space-16: 64px;
+  --cd-space-20: 80px;
+  --cd-space-24: 96px;
+
+  /* Radius */
+  --cd-radius-1: 4px;
+  --cd-radius-2: 6px;
+  --cd-radius-3: 10px;
+  --cd-radius-4: 14px;
+  --cd-radius-5: 18px;
+  --cd-radius-full: 999px;
+
+  /* Motion */
+  --cd-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --cd-motion-instant: 120ms var(--cd-ease-standard);
+  --cd-motion-fast: 160ms var(--cd-ease-standard);
+  --cd-motion-standard: 220ms var(--cd-ease-standard);
+  --cd-motion-emphasis: 300ms var(--cd-ease-standard);
+
+  /* Elevation */
+  --cd-shadow-raised: 0 4px 14px rgba(0, 0, 0, 0.28);
+  --cd-shadow-overlay: 0 18px 48px rgba(0, 0, 0, 0.52);
+
+  /* Layering */
+  --cd-z-base: 0;
+  --cd-z-sticky: 100;
+  --cd-z-dropdown: 200;
+  --cd-z-overlay: 300;
+  --cd-z-modal: 400;
+  --cd-z-toast: 500;
+
+  /* Component tokens */
+  --cd-control-height-sm: 36px;
+  --cd-control-height-md: 44px;
+  --cd-control-height-lg: 48px;
+  --cd-control-radius: var(--cd-radius-3);
+  --cd-focus-ring: 0 0 0 3px rgba(59, 130, 246, 0.38);
+}
+
+@theme inline {
+  --color-cd-background: var(--cd-color-background-base);
+  --color-cd-surface: var(--cd-color-surface-default);
+  --color-cd-elevated: var(--cd-color-surface-elevated);
+  --color-cd-interactive: var(--cd-color-surface-interactive);
+  --color-cd-brand: var(--cd-color-brand-primary);
+  --color-cd-success: var(--cd-color-state-success);
+  --color-cd-warning: var(--cd-color-state-warning);
+  --color-cd-danger: var(--cd-color-state-danger);
+  --font-sans: var(--cd-font-sans);
+  --font-mono: var(--cd-font-mono);
+}

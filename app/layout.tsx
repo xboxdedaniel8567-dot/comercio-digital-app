@@ -3,6 +3,9 @@ import { PwaRegistration } from "../components/PwaRegistration";
 import { AppFooter } from "@/components/AppFooter";
 import { getSiteUrl } from "@/lib/site-url";
 import "./globals.css";
+import "../styles/shell.css";
+import "../styles/commerce-components.css";
+import "../styles/home-pilot.css";
 
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),

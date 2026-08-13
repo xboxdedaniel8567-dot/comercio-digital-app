@@ -2,8 +2,8 @@ import Link from "next/link";
 
 export function AppFooter() {
   return (
-    <footer className="container" style={{ paddingBottom: 40, paddingTop: 48 }}>
-      <div className="app-footer-inner">
+    <footer className="app-footer">
+      <div className="container app-footer-inner">
         <div className="app-footer-brand">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
