@@ -1214,7 +1214,7 @@ h3 {
 .product-secondary-actions {
   display: grid;
   gap: 8px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   margin-top: 10px;
 }
 
@@ -5382,58 +5382,6 @@ h3 {
 
 .product-context-status-out span {
   background: var(--danger);
-}
-
-/* Sticky mobile action bar on product detail */
-.product-mobile-action-bar {
-  display: none;
-}
-
-@media (max-width: 820px) {
-  .product-mobile-action-bar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 100;
-    background: var(--surface);
-    border-top: 1px solid var(--line);
-    padding: 12px 16px;
-    padding-bottom: max(12px, env(safe-area-inset-bottom));
-  }
-
-  .product-mobile-action-bar .btn {
-    flex: 1;
-    min-height: 48px;
-  }
-
-  .product-mobile-action-bar-info {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    min-width: 80px;
-  }
-
-  .product-mobile-stock {
-    font-size: 0.75rem;
-    font-weight: 600;
-  }
-
-  .product-mobile-stock-in {
-    color: var(--success);
-  }
-
-  .product-mobile-stock-out {
-    color: var(--danger);
-  }
-
-  /* Add bottom padding so the bar doesn't cover content */
-  .product-detail-page {
-    padding-bottom: 80px;
-  }
 }
 
 /* Report form styles */

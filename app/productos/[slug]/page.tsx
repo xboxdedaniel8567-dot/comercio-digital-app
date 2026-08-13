@@ -276,7 +276,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
             <div className="product-secondary-actions">
               <FavoriteButton productId={product.id} returnPath={`/productos/${product.slug}`} />
-              <DirectionsLink address={business?.address ?? null} city={business?.city ?? null} />
             </div>
           </article>
 
@@ -293,6 +292,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 <br />
                 {business?.city ?? "Ciudad por confirmar"}
               </address>
+              <DirectionsLink address={business?.address ?? null} city={business?.city ?? null} />
             </section>
 
             <section className="product-context-block product-store-summary">
@@ -352,30 +352,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
         </section>
       </div>
 
-      <div className="product-mobile-action-bar">
-        <div className="product-mobile-action-bar-info">
-          <strong>{formatPrice(product.price, product.currency)}</strong>
-          <span className={`product-mobile-stock product-mobile-stock-${isOutOfStock ? "out" : "in"}`}>
-            {isOutOfStock ? "Agotado" : "Disponible"}
-          </span>
-        </div>
-        <ContactButton
-          businessId={business?.id ?? ""}
-          businessName={business?.name ?? ""}
-          className="btn"
-          label="WhatsApp"
-          message={`Hola, estoy interesado en ${product.name}. ¿Sigue disponible?`}
-          productId={product.id}
-          source="product_detail"
-          whatsapp={business?.whatsapp ?? null}
-        />
-        <DirectionsLink
-          address={business?.address ?? null}
-          city={business?.city ?? null}
-          className="btn btn-dark"
-          label="Como llegar"
-        />
-      </div>
     </main>
   );
 }
