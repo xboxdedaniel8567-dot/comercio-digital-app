@@ -35,7 +35,7 @@ export function BusinessModerationActions({
 
     if (error) {
       setIsSaving(false);
-      setMessage(`No se pudo cambiar el estado: ${error.message}`);
+      setMessage("No pudimos cambiar el estado. Intenta nuevamente.");
       return;
     }
 

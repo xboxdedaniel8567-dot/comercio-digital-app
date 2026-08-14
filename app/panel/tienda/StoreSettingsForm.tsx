@@ -116,7 +116,7 @@ export function StoreSettingsForm() {
 
     if (error) {
       setIsSaving(false);
-      setMessage(`No se pudieron guardar los cambios: ${error.message}`);
+      setMessage("No pudimos guardar los cambios. Revisa los datos e intenta nuevamente.");
       return;
     }
 

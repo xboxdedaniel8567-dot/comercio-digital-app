@@ -44,7 +44,7 @@ export function ProductVariantsManager({ slug }: ProductVariantsManagerProps) {
       .order("name");
 
     if (error) {
-      setMessage(`No se pudieron cargar las variantes: ${error.message}`);
+      setMessage("No pudimos cargar las variantes. Intenta nuevamente.");
       return;
     }
 
@@ -175,7 +175,7 @@ export function ProductVariantsManager({ slug }: ProductVariantsManagerProps) {
       .eq("id", variant.id);
 
     if (error) {
-      setMessage(`No se pudo actualizar la variante: ${error.message}`);
+      setMessage("No pudimos actualizar la variante. Intenta nuevamente.");
       return;
     }
 
@@ -193,7 +193,7 @@ export function ProductVariantsManager({ slug }: ProductVariantsManagerProps) {
     const { error } = await supabase.from("product_variants").delete().eq("id", variant.id);
 
     if (error) {
-      setMessage(`No se pudo eliminar la variante: ${error.message}`);
+      setMessage("No pudimos eliminar la variante. Intenta nuevamente.");
       return;
     }
 

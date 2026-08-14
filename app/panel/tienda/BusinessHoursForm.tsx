@@ -109,7 +109,7 @@ export function BusinessHoursForm() {
         .order("day_of_week");
 
       if (error) {
-        setMessage(`No se pudieron cargar los horarios: ${error.message}`);
+        setMessage("No pudimos cargar los horarios. Intenta nuevamente.");
         setIsLoading(false);
         return;
       }
@@ -164,7 +164,7 @@ export function BusinessHoursForm() {
       .upsert(rows, { onConflict: "business_id,day_of_week" });
 
     setIsSaving(false);
-    setMessage(error ? `No se guardaron los horarios: ${error.message}` : "Horarios actualizados correctamente.");
+    setMessage(error ? "No pudimos guardar los horarios. Revisa los datos e intenta nuevamente." : "Horarios actualizados correctamente.");
   }
 
   return (

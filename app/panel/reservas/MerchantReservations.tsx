@@ -56,7 +56,7 @@ export function MerchantReservations() {
       .limit(100);
 
     if (error) {
-      setMessage(`No se pudieron cargar las reservas: ${error.message}`);
+      setMessage("No pudimos cargar las reservas. Intenta nuevamente.");
       return;
     }
 
@@ -82,7 +82,7 @@ export function MerchantReservations() {
     });
 
     if (error) {
-      setMessage(`No se pudo actualizar la reserva: ${error.message}`);
+      setMessage("No pudimos actualizar la reserva. Intenta nuevamente.");
       return;
     }
 

@@ -49,7 +49,7 @@ export function PrivacyRequestCenter() {
       .order("created_at", { ascending: false });
 
     if (error) {
-      setMessage(`No se pudieron cargar tus solicitudes: ${error.message}`);
+      setMessage("No pudimos cargar tus solicitudes. Intenta nuevamente.");
       return;
     }
 
@@ -89,7 +89,7 @@ export function PrivacyRequestCenter() {
     if (error) {
       setMessage(error.code === "23505"
         ? "Ya tienes una solicitud de este tipo pendiente. Espera su respuesta antes de crear otra."
-        : `No se pudo enviar la solicitud: ${error.message}`);
+        : "No pudimos enviar la solicitud. Revisa los datos e intenta nuevamente.");
       setIsSubmitting(false);
       return;
     }

@@ -50,7 +50,7 @@ export function ReservationButton({
     });
 
     if (error) {
-      setMessage(`No se pudo solicitar la reserva: ${error.message}`);
+      setMessage("No pudimos solicitar la reserva. Intenta nuevamente.");
       setIsSaving(false);
       return;
     }
@@ -97,4 +97,3 @@ export function ReservationButton({
     </div>
   );
 }
-

@@ -131,7 +131,7 @@ export function BusinessBrandingForm() {
           // The database error remains primary; cleanup can be retried separately.
         }
       }
-      setMessage(`No se pudieron guardar las imagenes: ${error.message}`);
+      setMessage("No pudimos guardar las imagenes. Revisa los archivos e intenta nuevamente.");
       return;
     }
 
@@ -150,7 +150,7 @@ export function BusinessBrandingForm() {
     setIsSaving(false);
 
     if (error) {
-      setMessage(`No se pudo quitar la imagen: ${error.message}`);
+      setMessage("No pudimos quitar la imagen. Intenta nuevamente.");
       return;
     }
 

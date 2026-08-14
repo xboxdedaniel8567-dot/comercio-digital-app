@@ -45,7 +45,7 @@ export function AdminReportsManager() {
       .limit(100);
 
     if (error) {
-      setMessage(`No se pudieron cargar los reportes: ${error.message}`);
+      setMessage("No pudimos cargar los reportes. Intenta nuevamente.");
       return;
     }
 
@@ -75,7 +75,7 @@ export function AdminReportsManager() {
       .eq("id", reportId);
 
     if (error) {
-      setMessage(`No se pudo actualizar el reporte: ${error.message}`);
+      setMessage("No pudimos actualizar el reporte. Intenta nuevamente.");
       return;
     }
 

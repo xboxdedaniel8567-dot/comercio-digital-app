@@ -145,7 +145,7 @@ export function EditProductForm({ slug }: EditProductFormProps) {
       if (error) {
         setSubcategories([]);
         setSubcategoryId("");
-        setMessage(`No se pudieron cargar las subcategorias: ${error.message}`);
+        setMessage("No pudimos cargar las subcategorias. Intenta nuevamente.");
         setIsLoadingSubcategories(false);
         return;
       }
@@ -348,17 +348,6 @@ export function EditProductForm({ slug }: EditProductFormProps) {
         </div>
       </section>
       <section className="merchant-form-section panel">
-        <div className="merchant-form-heading"><div><span className="eyebrow">Caracteristicas</span><h2>Detalles para comparar</h2></div><p>Manten actualizados los atributos que ayudan a filtrar este producto.</p></div>
-      <AdaptiveAttributeFields
-        categoryId={categoryId}
-        disabled={isLoading || isSaving}
-        onError={setMessage}
-        onValuesChange={setAttributeValues}
-        subcategoryId={subcategoryId}
-        values={attributeValues}
-      />
-      </section>
-      <section className="merchant-form-section panel">
         <div className="merchant-form-heading"><div><span className="eyebrow">Venta e inventario</span><h2>Disponibilidad</h2></div><p>Controla el precio, el stock y la visibilidad del producto.</p></div>
         <div className="merchant-form-grid">
       <PriceInput
@@ -394,6 +383,20 @@ export function EditProductForm({ slug }: EditProductFormProps) {
         onValidationError={setMessage}
       />
       </section>
+      <details className="merchant-form-advanced panel">
+        <summary>Agregar mas detalles</summary>
+        <div className="merchant-form-advanced-content">
+          <div className="merchant-form-heading"><div><span className="eyebrow">Caracteristicas</span><h2>Detalles para comparar</h2></div><p>Manten actualizados solo los atributos que ayudan a filtrar este producto.</p></div>
+          <AdaptiveAttributeFields
+            categoryId={categoryId}
+            disabled={isLoading || isSaving}
+            onError={setMessage}
+            onValuesChange={setAttributeValues}
+            subcategoryId={subcategoryId}
+            values={attributeValues}
+          />
+        </div>
+      </details>
       <div className="merchant-form-submit panel">
         <div><strong>Guardar actualizacion</strong><p className="muted">Los cambios se reflejaran en la ficha publica.</p></div>
       <button

@@ -43,7 +43,7 @@ export function ReportButton({ targetId, targetName, targetType, returnPath }: R
     });
 
     if (error) {
-      setMessage(`No se pudo enviar el reporte: ${error.message}`);
+      setMessage("No pudimos enviar el reporte. Intenta nuevamente.");
       setIsSaving(false);
       return;
     }

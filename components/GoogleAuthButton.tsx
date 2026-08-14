@@ -34,7 +34,7 @@ export function GoogleAuthButton({
 
     if (error) {
       setIsRedirecting(false);
-      onError(`No se pudo continuar con Google: ${error.message}`);
+      onError("No pudimos continuar con Google. Intenta nuevamente.");
     }
   }
 

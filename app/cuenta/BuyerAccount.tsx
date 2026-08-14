@@ -201,7 +201,7 @@ export function BuyerAccount() {
       );
       setMessage(
         error
-          ? `No se pudieron cargar tus favoritos: ${error.message}`
+          ? "No pudimos cargar tus favoritos. Intenta nuevamente."
           : searchError
             ? `No se pudo cargar tu historial: ${searchError.message}`
             : reportError
@@ -230,7 +230,7 @@ export function BuyerAccount() {
       .eq("user_id", userData.user.id);
 
     if (error) {
-      setMessage(`No se pudo borrar el historial: ${error.message}`);
+      setMessage("No pudimos borrar el historial. Intenta nuevamente.");
       return;
     }
 
@@ -244,7 +244,7 @@ export function BuyerAccount() {
     });
 
     if (error) {
-      setMessage(`No se pudo cancelar la reserva: ${error.message}`);
+      setMessage("No pudimos cancelar la reserva. Intenta nuevamente.");
       return;
     }
 
@@ -271,7 +271,7 @@ export function BuyerAccount() {
     });
 
     if (error) {
-      setProfileMessage(`No se pudo guardar: ${error.message}`);
+      setProfileMessage("No pudimos guardar los cambios. Intenta nuevamente.");
       setIsSaving(false);
       return;
     }

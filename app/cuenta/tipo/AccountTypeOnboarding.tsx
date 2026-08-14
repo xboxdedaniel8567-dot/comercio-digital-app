@@ -27,7 +27,7 @@ export function AccountTypeOnboarding() {
         .maybeSingle();
 
       if (error) {
-        setMessage(`No se pudo verificar tu cuenta: ${error.message}`);
+        setMessage("No pudimos verificar tu cuenta. Intenta iniciar sesion nuevamente.");
         return;
       }
 
@@ -73,7 +73,7 @@ export function AccountTypeOnboarding() {
 
     if (error) {
       setIsSubmitting(false);
-      setMessage(`No se pudo completar tu cuenta: ${error.message}`);
+      setMessage("No pudimos completar tu cuenta. Revisa los datos e intenta nuevamente.");
       return;
     }
 

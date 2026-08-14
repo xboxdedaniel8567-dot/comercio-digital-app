@@ -49,7 +49,7 @@ export function NewProductForm() {
         .order("name");
 
       if (error) {
-        setMessage(`No se pudieron cargar las categorias: ${error.message}`);
+        setMessage("No pudimos cargar las categorias. Intenta nuevamente.");
         setIsLoadingCategories(false);
         return;
       }
@@ -84,7 +84,7 @@ export function NewProductForm() {
       if (error) {
         setSubcategories([]);
         setSubcategoryId("");
-        setMessage(`No se pudieron cargar las subcategorias: ${error.message}`);
+        setMessage("No pudimos cargar las subcategorias. Intenta nuevamente.");
         setIsLoadingSubcategories(false);
         return;
       }
@@ -265,17 +265,6 @@ export function NewProductForm() {
         </div>
       </section>
       <section className="merchant-form-section panel">
-        <div className="merchant-form-heading"><div><span className="eyebrow">Caracteristicas</span><h2>Detalles para comparar</h2></div><p>Estos datos cambian segun la categoria seleccionada.</p></div>
-      <AdaptiveAttributeFields
-        categoryId={categoryId}
-        disabled={isSubmitting}
-        onError={setMessage}
-        onValuesChange={setAttributeValues}
-        subcategoryId={subcategoryId}
-        values={attributeValues}
-      />
-      </section>
-      <section className="merchant-form-section panel">
         <div className="merchant-form-heading"><div><span className="eyebrow">Venta e inventario</span><h2>Precio y disponibilidad</h2></div><p>El stock debe coincidir con las unidades disponibles en tu local.</p></div>
         <div className="merchant-form-grid">
           <PriceInput
@@ -299,6 +288,20 @@ export function NewProductForm() {
         onValidationError={setMessage}
       />
       </section>
+      <details className="merchant-form-advanced panel">
+        <summary>Agregar mas detalles</summary>
+        <div className="merchant-form-advanced-content">
+          <div className="merchant-form-heading"><div><span className="eyebrow">Caracteristicas</span><h2>Detalles para comparar</h2></div><p>Completa solo los datos que apliquen a este producto.</p></div>
+          <AdaptiveAttributeFields
+            categoryId={categoryId}
+            disabled={isSubmitting}
+            onError={setMessage}
+            onValuesChange={setAttributeValues}
+            subcategoryId={subcategoryId}
+            values={attributeValues}
+          />
+        </div>
+      </details>
       <div className="merchant-form-submit panel">
         <div><strong>Todo listo para publicar</strong><p className="muted">Podras editar la informacion y agregar variantes despues.</p></div>
       <button

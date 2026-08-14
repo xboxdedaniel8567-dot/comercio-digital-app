@@ -57,7 +57,7 @@ export function AdaptiveAttributeFields({
 
       if (error) {
         setDefinitions([]);
-        onError(`No se pudieron cargar los campos de la categoria: ${error.message}`);
+        onError("No pudimos cargar los detalles de esta categoria. Intenta nuevamente.");
         setIsLoading(false);
         return;
       }

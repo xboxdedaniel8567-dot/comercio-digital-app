@@ -32,7 +32,7 @@ export default async function MerchantsPage() {
         {error ? (
           <div className="card" style={{ borderColor: "#ef4444", marginTop: 24 }}>
             <strong>No se pudieron cargar los comercios.</strong>
-            <p className="muted">{error.message}</p>
+            <p className="muted">Intenta nuevamente en unos momentos.</p>
           </div>
         ) : null}
 

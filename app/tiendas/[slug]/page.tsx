@@ -205,7 +205,9 @@ export default async function StorePage({ params }: StorePageProps) {
                 src={business.cover_url}
               />
             ) : (
-              <div className="store-profile-cover store-profile-cover-placeholder" />
+              <div className="store-profile-cover store-profile-cover-placeholder">
+                <span>Comercio local</span>
+              </div>
             )}
           </div>
 

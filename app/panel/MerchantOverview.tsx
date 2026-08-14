@@ -67,7 +67,7 @@ export function MerchantOverview() {
         .eq("status", "pending");
 
       if (reservationResult.error) {
-        setError(reservationResult.error.message);
+        setError("No pudimos cargar el resumen de reservas. Intenta nuevamente.");
         setMessage("");
         return;
       }

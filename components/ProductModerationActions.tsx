@@ -38,7 +38,7 @@ export function ProductModerationActions({
 
     if (error) {
       setIsSaving(false);
-      setMessage(`No se pudo moderar: ${error.message}`);
+      setMessage("No pudimos guardar la moderacion. Intenta nuevamente.");
       return;
     }
 

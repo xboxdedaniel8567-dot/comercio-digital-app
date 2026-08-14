@@ -2,6 +2,7 @@ import Link from "next/link";
 import { AppHeader } from "@/components/AppHeader";
 import { CompareButton } from "@/components/CompareButton";
 import { CompareTray } from "@/components/CompareTray";
+import { StoreCard, type StoreCardData } from "@/components/StoreCard";
 import { PriceFilterInputs } from "@/components/PriceFilterInputs";
 import { ProductCard } from "@/components/ProductCard";
 import { SearchLogger } from "@/components/SearchLogger";
@@ -32,6 +33,7 @@ type ProductRow = {
   currency: string;
   stock: number | null;
   businesses: {
+    id: string;
     city: string | null;
     name: string;
   } | null;
@@ -78,6 +80,20 @@ type SubcategoryOption = {
   } | null;
 };
 
+type BusinessRow = {
+  id: string;
+  name: string;
+  slug: string;
+  city: string | null;
+  address: string | null;
+  logo_url: string | null;
+  cover_url: string | null;
+  categories: {
+    name: string;
+    slug: string;
+  } | null;
+};
+
 
 
 type SortOption =
@@ -110,7 +126,18 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const sort: SortOption = sortParam in sortLabels ? sortParam : "relevance";
   const pageSize = 24;
 
-  const [searchResult, categoriesResult, subcategoriesResult] = await Promise.all([
+  let businessesQuery = supabase
+    .from("businesses")
+    .select("id, name, slug, city, address, logo_url, cover_url, categories!inner(name, slug)")
+    .eq("status", "active")
+    .order("name")
+    .limit(6);
+
+  if (query) businessesQuery = businessesQuery.ilike("name", `%${query}%`);
+  if (cityFilter) businessesQuery = businessesQuery.ilike("city", `%${cityFilter}%`);
+  if (categoryFilter) businessesQuery = businessesQuery.eq("categories.slug", categoryFilter);
+
+  const [searchResult, categoriesResult, subcategoriesResult, businessesResult] = await Promise.all([
     supabase.rpc("search_marketplace_products", {
       category_slug: categoryFilter,
       city_query: cityFilter,
@@ -126,6 +153,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
       .select("id, name, categories(name)")
       .eq("is_active", true)
       .order("name"),
+    businessesQuery,
   ]);
 
   const rankedResults = (searchResult.data ?? []) as SearchResult[];
@@ -140,7 +168,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     ? await supabase
         .from("products")
         .select(
-          "id, name, slug, description, price, currency, stock, businesses!inner(name, city), categories(name, slug), subcategories(id, name), product_images(url), product_attribute_values(value, category_attributes(name)), product_variants(name, option_values, stock)",
+          "id, name, slug, description, price, currency, stock, businesses!inner(id, name, city), categories(name, slug), subcategories(id, name), product_images(url), product_attribute_values(value, category_attributes(name)), product_variants(name, option_values, stock)",
         )
         .in("id", productIds)
         .eq("status", "active")
@@ -219,6 +247,44 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     if (maxPrice !== null) nextParams.set("max_price", String(maxPrice));
     if (sort !== "relevance") nextParams.set("sort", sort);
     if (targetPage > 1) nextParams.set("page", String(targetPage));
+    const queryString = nextParams.toString();
+    return queryString ? `/buscar?${queryString}` : "/buscar";
+  }
+
+  const productBusinessIds = [...new Set(productRows.map((product) => product.businesses?.id).filter(Boolean))] as string[];
+  const productBusinessesResult = query && productBusinessIds.length > 0
+    ? await supabase
+        .from("businesses")
+        .select("id, name, slug, city, address, logo_url, cover_url, categories!inner(name, slug)")
+        .in("id", productBusinessIds)
+        .eq("status", "active")
+        .limit(6)
+    : { data: [], error: null };
+  const businessRows = [...(businessesResult.data ?? []), ...(productBusinessesResult.data ?? [])]
+    .filter((business, index, rows) => rows.findIndex((candidate) => candidate.id === business.id) === index)
+    .slice(0, 6);
+  const businesses: StoreCardData[] = businessRows.map((business) => {
+    const row = {
+      ...business,
+      categories: firstRelation(business.categories),
+    } as BusinessRow;
+
+    return {
+      address: row.address ?? "Ubicacion por confirmar",
+      category: row.categories?.name ?? "Comercio local",
+      city: row.city ?? "Ciudad por confirmar",
+      imageUrl: row.cover_url ?? row.logo_url,
+      name: row.name,
+      slug: row.slug,
+      status: "Tienda activa",
+    };
+  });
+
+  function categoryHref(slug: string) {
+    const nextParams = new URLSearchParams();
+    if (query) nextParams.set("q", query);
+    if (cityFilter) nextParams.set("city", cityFilter);
+    if (slug) nextParams.set("category", slug);
     const queryString = nextParams.toString();
     return queryString ? `/buscar?${queryString}` : "/buscar";
   }
@@ -323,6 +389,27 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           </div>
         </form>
 
+        <nav aria-label="Categorias del marketplace" className="search-category-strip">
+          <Link
+            aria-current={!categoryFilter ? "page" : undefined}
+            className="search-category-chip"
+            href={categoryHref("")}
+          >
+            Todas
+          </Link>
+          {categories.slice(0, 8).map((category) => (
+            <Link
+              aria-current={categoryFilter === category.slug ? "page" : undefined}
+              className="search-category-chip"
+              href={categoryHref(category.slug)}
+              key={category.id}
+            >
+              {category.name}
+            </Link>
+          ))}
+          <Link className="search-category-more" href="/buscar">Ver todas</Link>
+        </nav>
+
         <details className="search-mobile-filters">
           <summary>Filtros de busqueda</summary>
           <form action="/buscar" className="search-filter-form">
@@ -357,7 +444,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             {error ? (
               <div className="search-error" role="alert">
                 <strong>No pudimos cargar los productos.</strong>
-                <p>{error.message}</p>
+                <p>Intenta nuevamente en unos momentos o ajusta tu busqueda.</p>
               </div>
             ) : null}
             {!error && products.length > 0 ? (
@@ -370,7 +457,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 ))}
               </div>
             ) : null}
-            {!error && products.length === 0 ? (
+            {!error && products.length === 0 && businesses.length === 0 ? (
               <section className="search-empty-state">
                 <span>Sin coincidencias</span>
                 <h2>No encontramos resultados{query ? ` para “${query}”` : ""}</h2>
@@ -396,6 +483,23 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                 ))}
                 {currentPage < totalPages ? <Link className="btn btn-dark" href={paginationHref(currentPage + 1)}>Siguiente</Link> : null}
               </nav>
+            ) : null}
+
+            {!businessesResult.error && !productBusinessesResult.error && businesses.length > 0 ? (
+              <section className="search-store-results">
+                <div className="search-section-heading">
+                  <div>
+                    <span>Comercios</span>
+                    <h2>{query ? "Tiendas relacionadas" : "Comercios para explorar"}</h2>
+                  </div>
+                  <Link href="/comerciantes">Ver directorio</Link>
+                </div>
+                <div className="search-store-grid">
+                  {businesses.map((business) => (
+                    <StoreCard business={business} key={business.slug} />
+                  ))}
+                </div>
+              </section>
             ) : null}
           </div>
         </div>

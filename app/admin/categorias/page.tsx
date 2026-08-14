@@ -63,7 +63,7 @@ export default async function AdminCategoriesPage() {
         {error ? (
           <div className="card" style={{ borderColor: "#ef4444" }}>
             <strong>No se pudieron cargar las categorias.</strong>
-            <p className="muted">{error.message}</p>
+            <p className="muted">Intenta nuevamente en unos momentos.</p>
           </div>
         ) : null}
         {categories.map((category) => (

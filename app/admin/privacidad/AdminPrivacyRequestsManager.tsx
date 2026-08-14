@@ -40,7 +40,7 @@ export function AdminPrivacyRequestsManager() {
       .limit(100);
 
     if (error) {
-      setMessage(`No se pudieron cargar las solicitudes: ${error.message}`);
+      setMessage("No pudimos cargar las solicitudes. Intenta nuevamente.");
       return;
     }
 
@@ -64,7 +64,7 @@ export function AdminPrivacyRequestsManager() {
       .eq("id", id);
 
     if (error) {
-      setMessage(`No se pudo actualizar la solicitud: ${error.message}`);
+      setMessage("No pudimos actualizar la solicitud. Intenta nuevamente.");
       return;
     }
 
